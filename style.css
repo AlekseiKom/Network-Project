@@ -766,6 +766,7 @@ code:not([class*="language-"]) {
   font-size: 0.86em;
   font-family: 'JetBrains Mono', Consolas, Monaco, monospace;
   border: 1px solid rgba(255, 255, 255, 0.06);
+} 
 /* Math & Formula Box */
 .math-box {
   margin: 14px 0;
