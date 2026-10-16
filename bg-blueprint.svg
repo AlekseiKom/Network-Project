@@ -1,0 +1,432 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="900" viewBox="0 0 1400 900">
+  <defs>
+    <!-- Background Gradient -->
+    <linearGradient id="blueprintBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#07122b" />
+      <stop offset="30%" stop-color="#0b1b3f" />
+      <stop offset="70%" stop-color="#091838" />
+      <stop offset="100%" stop-color="#050d22" />
+    </linearGradient>
+
+    <!-- Subtle Radial Glows inside background -->
+    <radialGradient id="glowSpot1" cx="25%" cy="30%" r="45%">
+      <stop offset="0%" stop-color="#1e3a8a" stop-opacity="0.3" />
+      <stop offset="100%" stop-color="#1e3a8a" stop-opacity="0" />
+    </radialGradient>
+    <radialGradient id="glowSpot2" cx="75%" cy="70%" r="50%">
+      <stop offset="0%" stop-color="#2563eb" stop-opacity="0.25" />
+      <stop offset="60%" stop-color="#4f46e5" stop-opacity="0.1" />
+      <stop offset="100%" stop-color="#091838" stop-opacity="0" />
+    </radialGradient>
+
+    <!-- Wire Glow Filter -->
+    <filter id="softGlow" x="-10%" y="-10%" width="120%" height="120%">
+      <feGaussianBlur stdDeviation="1" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- Solid Sapphire Blue Backdrop -->
+  <rect width="1400" height="900" fill="url(#blueprintBg)" />
+  <rect width="1400" height="900" fill="url(#glowSpot1)" />
+  <rect width="1400" height="900" fill="url(#glowSpot2)" />
+
+  <!-- Subtle Blueprint Tech Grid Gridlines -->
+  <g stroke="rgba(56, 189, 248, 0.05)" stroke-width="1">
+    <line x1="0" y1="100" x2="1400" y2="100" />
+    <line x1="0" y1="200" x2="1400" y2="200" />
+    <line x1="0" y1="300" x2="1400" y2="300" />
+    <line x1="0" y1="400" x2="1400" y2="400" />
+    <line x1="0" y1="500" x2="1400" y2="500" />
+    <line x1="0" y1="600" x2="1400" y2="600" />
+    <line x1="0" y1="700" x2="1400" y2="700" />
+    <line x1="0" y1="800" x2="1400" y2="800" />
+
+    <line x1="100" y1="0" x2="100" y2="900" />
+    <line x1="200" y1="0" x2="200" y2="900" />
+    <line x1="300" y1="0" x2="300" y2="900" />
+    <line x1="400" y1="0" x2="400" y2="900" />
+    <line x1="500" y1="0" x2="500" y2="900" />
+    <line x1="600" y1="0" x2="600" y2="900" />
+    <line x1="700" y1="0" x2="700" y2="900" />
+    <line x1="800" y1="0" x2="800" y2="900" />
+    <line x1="900" y1="0" x2="900" y2="900" />
+    <line x1="1000" y1="0" x2="1000" y2="900" />
+    <line x1="1100" y1="0" x2="1100" y2="900" />
+    <line x1="1200" y1="0" x2="1200" y2="900" />
+    <line x1="1300" y1="0" x2="1300" y2="900" />
+  </g>
+
+  <!-- =========================================================================
+       CIRCUIT BOARD (PCB) TRACES & VIAS
+       ========================================================================= -->
+  <g stroke="rgba(56, 189, 248, 0.18)" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Trace cluster 1 (Top Left) -->
+    <path d="M 50,80 L 120,80 L 160,120 L 250,120 L 280,90 L 350,90" />
+    <path d="M 50,100 L 110,100 L 150,140 L 240,140 L 270,110 L 320,110" />
+    <path d="M 160,120 L 160,220 L 200,260 L 280,260" />
+    <path d="M 280,90 L 320,50 L 420,50" />
+
+    <!-- Trace cluster 2 (Bottom Left) -->
+    <path d="M 80,680 L 150,680 L 190,720 L 260,720 L 290,690 L 380,690" />
+    <path d="M 120,760 L 180,760 L 220,720 L 220,620 L 260,580 L 320,580" />
+
+    <!-- Trace cluster 3 (Center Top) -->
+    <path d="M 580,60 L 640,60 L 680,100 L 760,100 L 790,70 L 880,70" />
+    <path d="M 680,100 L 680,180 L 720,220 L 800,220" />
+
+    <!-- Trace cluster 4 (Right Center) -->
+    <path d="M 1050,320 L 1120,320 L 1160,360 L 1260,360 L 1290,330 L 1360,330" />
+    <path d="M 1080,380 L 1140,380 L 1180,420 L 1240,420 L 1280,380 L 1320,380" />
+    <path d="M 1160,360 L 1160,460 L 1200,500 L 1280,500" />
+
+    <!-- Trace cluster 5 (Bottom Right) -->
+    <path d="M 980,740 L 1050,740 L 1090,780 L 1200,780 L 1230,750 L 1320,750" />
+    <path d="M 1090,780 L 1090,840 L 1130,880 L 1250,880" />
+  </g>
+
+  <!-- PCB Vias / Solder Pads (Glow dots) -->
+  <g fill="rgba(56, 189, 248, 0.4)" stroke="rgba(147, 197, 253, 0.3)" stroke-width="1">
+    <circle cx="50" cy="80" r="3" />
+    <circle cx="350" cy="90" r="3" />
+    <circle cx="50" cy="100" r="3" />
+    <circle cx="320" cy="110" r="3" />
+    <circle cx="280" cy="260" r="3" />
+    <circle cx="420" cy="50" r="3" />
+    <circle cx="80" cy="680" r="3" />
+    <circle cx="380" cy="690" r="3" />
+    <circle cx="320" cy="580" r="3" />
+    <circle cx="580" cy="60" r="3" />
+    <circle cx="880" cy="70" r="3" />
+    <circle cx="800" cy="220" r="3" />
+    <circle cx="1050" cy="320" r="3" />
+    <circle cx="1360" cy="330" r="3" />
+    <circle cx="1320" cy="380" r="3" />
+    <circle cx="1280" cy="500" r="3" />
+    <circle cx="980" cy="740" r="3" />
+    <circle cx="1320" cy="750" r="3" />
+  </g>
+
+  <!-- =========================================================================
+       INTEGRATED CIRCUITS (IC CHIPS / CPU / ASIC)
+       ========================================================================= -->
+  <!-- Chip 1: Network ASIC (Top Left 180, 160) -->
+  <g transform="translate(180, 160)">
+    <rect x="0" y="0" width="56" height="56" rx="4" fill="rgba(15, 23, 42, 0.7)" stroke="rgba(96, 165, 250, 0.35)" stroke-width="1.5" />
+    <!-- Chip pins -->
+    <path d="M 8,-6 L 8,0 M 20,-6 L 20,0 M 32,-6 L 32,0 M 44,-6 L 44,0" stroke="rgba(96, 165, 250, 0.3)" stroke-width="1.5" />
+    <path d="M 8,56 L 8,62 M 20,56 L 20,62 M 32,56 L 32,62 M 44,56 L 44,62" stroke="rgba(96, 165, 250, 0.3)" stroke-width="1.5" />
+    <path d="M -6,8 L 0,8 M -6,20 L 0,20 M -6,32 L 0,32 M -6,44 L 0,44" stroke="rgba(96, 165, 250, 0.3)" stroke-width="1.5" />
+    <path d="M 56,8 L 62,8 M 56,20 L 62,20 M 56,32 L 62,32 M 56,44 L 62,44" stroke="rgba(96, 165, 250, 0.3)" stroke-width="1.5" />
+    <!-- Silicon die engraving -->
+    <rect x="12" y="12" width="32" height="32" rx="2" fill="rgba(30, 58, 138, 0.4)" stroke="rgba(56, 189, 248, 0.25)" stroke-width="1" />
+    <circle cx="28" cy="28" r="4" fill="rgba(56, 189, 248, 0.3)" />
+    <text x="28" y="49" font-family="monospace" font-size="6" fill="rgba(147, 197, 253, 0.5)" text-anchor="middle">ASIC L3</text>
+  </g>
+
+  <!-- Chip 2: Crypto Co-Processor (Right 1180, 560) -->
+  <g transform="translate(1180, 560)">
+    <rect x="0" y="0" width="48" height="48" rx="4" fill="rgba(15, 23, 42, 0.7)" stroke="rgba(168, 85, 247, 0.35)" stroke-width="1.5" />
+    <path d="M 10,-5 L 10,0 M 24,-5 L 24,0 M 38,-5 L 38,0" stroke="rgba(168, 85, 247, 0.3)" stroke-width="1.5" />
+    <path d="M 10,48 L 10,53 M 24,48 L 24,53 M 38,48 L 38,53" stroke="rgba(168, 85, 247, 0.3)" stroke-width="1.5" />
+    <path d="M -5,10 L 0,10 M -5,24 L 0,24 M -5,38 L 0,38" stroke="rgba(168, 85, 247, 0.3)" stroke-width="1.5" />
+    <path d="M 48,10 L 53,10 M 48,24 L 53,24 M 48,38 L 53,38" stroke="rgba(168, 85, 247, 0.3)" stroke-width="1.5" />
+    <rect x="10" y="10" width="28" height="28" rx="2" fill="rgba(88, 28, 135, 0.3)" stroke="rgba(168, 85, 247, 0.2)" stroke-width="1" />
+    <text x="24" y="27" font-family="monospace" font-size="6" fill="rgba(216, 180, 254, 0.5)" text-anchor="middle">TLS-1.3</text>
+  </g>
+
+  <!-- =========================================================================
+       NETWORK HARDWARE: RACK SERVERS (4U / 2U Data Center Blade)
+       ========================================================================= -->
+  <!-- Server Rack Enclosure (Left Top: 380, 140) -->
+  <g transform="translate(380, 140)">
+    <!-- Rack frame -->
+    <rect x="0" y="0" width="130" height="150" rx="6" fill="rgba(10, 20, 45, 0.6)" stroke="rgba(59, 130, 246, 0.35)" stroke-width="1.5" />
+    <text x="10" y="14" font-family="monospace" font-size="7" fill="rgba(147, 197, 253, 0.6)">DC-RACK-01 [42U]</text>
+    
+    <!-- Unit 1: Top Server -->
+    <g transform="translate(8, 22)">
+      <rect x="0" y="0" width="114" height="24" rx="2" fill="rgba(15, 28, 60, 0.7)" stroke="rgba(59, 130, 246, 0.25)" stroke-width="1" />
+      <!-- Drive bays -->
+      <rect x="6" y="5" width="12" height="14" rx="1" fill="rgba(30, 58, 138, 0.3)" stroke="rgba(96, 165, 250, 0.2)" stroke-width="0.7" />
+      <rect x="22" y="5" width="12" height="14" rx="1" fill="rgba(30, 58, 138, 0.3)" stroke="rgba(96, 165, 250, 0.2)" stroke-width="0.7" />
+      <rect x="38" y="5" width="12" height="14" rx="1" fill="rgba(30, 58, 138, 0.3)" stroke="rgba(96, 165, 250, 0.2)" stroke-width="0.7" />
+      <rect x="54" y="5" width="12" height="14" rx="1" fill="rgba(30, 58, 138, 0.3)" stroke="rgba(96, 165, 250, 0.2)" stroke-width="0.7" />
+      <!-- Fan grill / vents -->
+      <line x1="74" y1="7" x2="96" y2="7" stroke="rgba(255,255,255,0.15)" stroke-width="1" />
+      <line x1="74" y1="12" x2="96" y2="12" stroke="rgba(255,255,255,0.15)" stroke-width="1" />
+      <line x1="74" y1="17" x2="96" y2="17" stroke="rgba(255,255,255,0.15)" stroke-width="1" />
+      <!-- Status LEDs -->
+      <circle cx="104" cy="9" r="1.5" fill="#34d399" />
+      <circle cx="104" cy="15" r="1.5" fill="#38bdf8" />
+    </g>
+
+    <!-- Unit 2: Middle Server -->
+    <g transform="translate(8, 52)">
+      <rect x="0" y="0" width="114" height="24" rx="2" fill="rgba(15, 28, 60, 0.7)" stroke="rgba(59, 130, 246, 0.25)" stroke-width="1" />
+      <rect x="6" y="5" width="12" height="14" rx="1" fill="rgba(30, 58, 138, 0.3)" stroke="rgba(96, 165, 250, 0.2)" stroke-width="0.7" />
+      <rect x="22" y="5" width="12" height="14" rx="1" fill="rgba(30, 58, 138, 0.3)" stroke="rgba(96, 165, 250, 0.2)" stroke-width="0.7" />
+      <rect x="38" y="5" width="12" height="14" rx="1" fill="rgba(30, 58, 138, 0.3)" stroke="rgba(96, 165, 250, 0.2)" stroke-width="0.7" />
+      <rect x="54" y="5" width="12" height="14" rx="1" fill="rgba(30, 58, 138, 0.3)" stroke="rgba(96, 165, 250, 0.2)" stroke-width="0.7" />
+      <line x1="74" y1="7" x2="96" y2="7" stroke="rgba(255,255,255,0.15)" stroke-width="1" />
+      <line x1="74" y1="12" x2="96" y2="12" stroke="rgba(255,255,255,0.15)" stroke-width="1" />
+      <line x1="74" y1="17" x2="96" y2="17" stroke="rgba(255,255,255,0.15)" stroke-width="1" />
+      <circle cx="104" cy="9" r="1.5" fill="#34d399" />
+      <circle cx="104" cy="15" r="1.5" fill="#60a5fa" />
+    </g>
+
+    <!-- Unit 3: 24-Port Switch in Rack -->
+    <g transform="translate(8, 82)">
+      <rect x="0" y="0" width="114" height="22" rx="2" fill="rgba(8, 16, 36, 0.85)" stroke="rgba(14, 165, 233, 0.3)" stroke-width="1" />
+      <!-- RJ45 Ports row 1 -->
+      <g fill="rgba(30, 58, 138, 0.4)" stroke="rgba(56, 189, 248, 0.3)" stroke-width="0.7">
+        <rect x="8" y="4" width="6" height="5" rx="0.5" />
+        <rect x="16" y="4" width="6" height="5" rx="0.5" />
+        <rect x="24" y="4" width="6" height="5" rx="0.5" />
+        <rect x="32" y="4" width="6" height="5" rx="0.5" />
+        <rect x="44" y="4" width="6" height="5" rx="0.5" />
+        <rect x="52" y="4" width="6" height="5" rx="0.5" />
+        <rect x="60" y="4" width="6" height="5" rx="0.5" />
+        <rect x="68" y="4" width="6" height="5" rx="0.5" />
+        <!-- SFP+ Uplinks -->
+        <rect x="82" y="4" width="9" height="6" rx="0.5" stroke="rgba(168, 85, 247, 0.4)" />
+        <rect x="94" y="4" width="9" height="6" rx="0.5" stroke="rgba(168, 85, 247, 0.4)" />
+      </g>
+      <!-- RJ45 Ports row 2 -->
+      <g fill="rgba(30, 58, 138, 0.4)" stroke="rgba(56, 189, 248, 0.3)" stroke-width="0.7">
+        <rect x="8" y="11" width="6" height="5" rx="0.5" />
+        <rect x="16" y="11" width="6" height="5" rx="0.5" />
+        <rect x="24" y="11" width="6" height="5" rx="0.5" />
+        <rect x="32" y="11" width="6" height="5" rx="0.5" />
+        <rect x="44" y="11" width="6" height="5" rx="0.5" />
+        <rect x="52" y="11" width="6" height="5" rx="0.5" />
+        <rect x="60" y="11" width="6" height="5" rx="0.5" />
+        <rect x="68" y="11" width="6" height="5" rx="0.5" />
+        <rect x="82" y="11" width="9" height="6" rx="0.5" stroke="rgba(168, 85, 247, 0.4)" />
+        <rect x="94" y="11" width="9" height="6" rx="0.5" stroke="rgba(168, 85, 247, 0.4)" />
+      </g>
+      <!-- Port activity LEDs -->
+      <circle cx="11" cy="2" r="0.8" fill="#34d399" />
+      <circle cx="19" cy="2" r="0.8" fill="#38bdf8" />
+      <circle cx="27" cy="2" r="0.8" fill="#34d399" />
+      <circle cx="35" cy="2" r="0.8" fill="#34d399" />
+      <circle cx="86" cy="2" r="0.8" fill="#a855f7" />
+      <circle cx="98" cy="2" r="0.8" fill="#a855f7" />
+    </g>
+
+    <!-- Unit 4: UPS / Power Distribution Unit -->
+    <g transform="translate(8, 112)">
+      <rect x="0" y="0" width="114" height="28" rx="2" fill="rgba(12, 22, 48, 0.7)" stroke="rgba(59, 130, 246, 0.2)" stroke-width="1" />
+      <rect x="10" y="8" width="24" height="12" rx="1" fill="rgba(20, 35, 75, 0.5)" stroke="rgba(56, 189, 248, 0.2)" stroke-width="0.5" />
+      <text x="22" y="16" font-family="monospace" font-size="5" fill="#38bdf8" text-anchor="middle">230V AC</text>
+      <circle cx="48" cy="14" r="2.5" fill="none" stroke="#34d399" stroke-width="1" />
+      <circle cx="48" cy="14" r="1" fill="#34d399" />
+      <line x1="62" y1="10" x2="104" y2="10" stroke="rgba(255,255,255,0.1)" stroke-width="1" />
+      <line x1="62" y1="15" x2="104" y2="15" stroke="rgba(255,255,255,0.1)" stroke-width="1" />
+    </g>
+  </g>
+
+  <!-- =========================================================================
+       NETWORK HARDWARE: ENTERPRISE & WI-FI ROUTERS
+       ========================================================================= -->
+  <!-- Wi-Fi 6 / 7 Router with Triple Antennas (Center: 680, 480) -->
+  <g transform="translate(680, 480)">
+    <!-- Antennas with beam radiation waves -->
+    <!-- Left Antenna -->
+    <line x1="20" y1="40" x2="10" y2="5" stroke="rgba(56, 189, 248, 0.5)" stroke-width="2.5" stroke-linecap="round" />
+    <circle cx="10" cy="5" r="2" fill="#38bdf8" />
+    <!-- Center Antenna -->
+    <line x1="55" y1="40" x2="55" y2="0" stroke="rgba(56, 189, 248, 0.5)" stroke-width="2.5" stroke-linecap="round" />
+    <circle cx="55" cy="0" r="2" fill="#38bdf8" />
+    <!-- Right Antenna -->
+    <line x1="90" y1="40" x2="100" y2="5" stroke="rgba(56, 189, 248, 0.5)" stroke-width="2.5" stroke-linecap="round" />
+    <circle cx="100" cy="5" r="2" fill="#38bdf8" />
+
+    <!-- Radio Waves (Concentric Arcs) -->
+    <g stroke="rgba(56, 189, 248, 0.2)" stroke-width="1.2" fill="none">
+      <path d="M 40,-10 A 18 18 0 0 1 70,-10" />
+      <path d="M 32,-18 A 28 28 0 0 1 78,-18" />
+      <path d="M 24,-26 A 38 38 0 0 1 86,-26" />
+    </g>
+
+    <!-- Router Body -->
+    <rect x="0" y="40" width="110" height="42" rx="8" fill="rgba(12, 25, 55, 0.85)" stroke="rgba(56, 189, 248, 0.4)" stroke-width="1.5" />
+    
+    <!-- Top Chamfer Accents -->
+    <path d="M 10,48 L 100,48" stroke="rgba(255,255,255,0.12)" stroke-width="1" />
+    <text x="55" y="60" font-family="monospace" font-size="7" fill="rgba(147, 197, 253, 0.7)" text-anchor="middle">ROUTER-GATEWAY-L3</text>
+    
+    <!-- Status LEDs Array -->
+    <circle cx="25" cy="70" r="2" fill="#34d399" />
+    <circle cx="35" cy="70" r="2" fill="#38bdf8" />
+    <circle cx="45" cy="70" r="2" fill="#38bdf8" />
+    <circle cx="55" cy="70" r="2" fill="#38bdf8" />
+    <circle cx="65" cy="70" r="2" fill="#34d399" />
+    <circle cx="75" cy="70" r="2" fill="#a855f7" />
+    <circle cx="85" cy="70" r="2" fill="#60a5fa" />
+  </g>
+
+  <!-- Core Router / ISP Edge BGP Gateway (Top Right: 960, 110) -->
+  <g transform="translate(960, 110)">
+    <rect x="0" y="0" width="140" height="48" rx="6" fill="rgba(14, 28, 64, 0.8)" stroke="rgba(168, 85, 247, 0.35)" stroke-width="1.5" />
+    <text x="12" y="16" font-family="monospace" font-size="7" fill="rgba(216, 180, 254, 0.8)">BGP-EDGE [AS 64512]</text>
+    
+    <!-- Optical SFP28 25G / QSFP 100G Ports -->
+    <g transform="translate(12, 24)">
+      <rect x="0" y="0" width="14" height="12" rx="1" fill="rgba(88, 28, 135, 0.4)" stroke="rgba(168, 85, 247, 0.4)" stroke-width="1" />
+      <rect x="18" y="0" width="14" height="12" rx="1" fill="rgba(88, 28, 135, 0.4)" stroke="rgba(168, 85, 247, 0.4)" stroke-width="1" />
+      <rect x="36" y="0" width="14" height="12" rx="1" fill="rgba(88, 28, 135, 0.4)" stroke="rgba(168, 85, 247, 0.4)" stroke-width="1" />
+      <rect x="54" y="0" width="14" height="12" rx="1" fill="rgba(88, 28, 135, 0.4)" stroke="rgba(168, 85, 247, 0.4)" stroke-width="1" />
+      <circle cx="7" cy="-3" r="1" fill="#34d399" />
+      <circle cx="25" cy="-3" r="1" fill="#38bdf8" />
+      <circle cx="43" cy="-3" r="1" fill="#34d399" />
+      <circle cx="61" cy="-3" r="1" fill="#a855f7" />
+    </g>
+    <!-- Management Console & Aux Ports -->
+    <rect x="94" y="24" width="12" height="12" rx="1" fill="rgba(30, 58, 138, 0.4)" stroke="rgba(56, 189, 248, 0.3)" stroke-width="1" />
+    <text x="100" y="32" font-family="monospace" font-size="4" fill="#38bdf8" text-anchor="middle">CON</text>
+    <rect x="112" y="24" width="12" height="12" rx="1" fill="rgba(30, 58, 138, 0.4)" stroke="rgba(56, 189, 248, 0.3)" stroke-width="1" />
+    <text x="118" y="32" font-family="monospace" font-size="4" fill="#38bdf8" text-anchor="middle">MGMT</text>
+  </g>
+
+  <!-- =========================================================================
+       END-USER COMPUTERS: WORKSTATION & LAPTOP
+       ========================================================================= -->
+  <!-- Desktop Workstation PC with Monitor (Bottom Left: 140, 420) -->
+  <g transform="translate(140, 420)">
+    <!-- Monitor Stand -->
+    <path d="M 40,68 L 40,78 L 25,78 L 25,82 L 55,82 L 55,78 L 40,78" fill="rgba(56, 189, 248, 0.3)" />
+    <!-- Monitor Display Screen -->
+    <rect x="0" y="10" width="80" height="56" rx="4" fill="rgba(15, 23, 42, 0.85)" stroke="rgba(56, 189, 248, 0.35)" stroke-width="1.5" />
+    <!-- Inner Screen Display (Terminal / Topology Graph) -->
+    <rect x="5" y="15" width="70" height="44" rx="2" fill="rgba(6, 13, 29, 0.9)" />
+    <!-- Terminal Lines -->
+    <path d="M 10,24 L 35,24 M 10,30 L 55,30 M 10,36 L 45,36" stroke="rgba(52, 211, 153, 0.5)" stroke-width="1.2" stroke-linecap="round" />
+    <circle cx="62" cy="42" r="3" fill="none" stroke="#38bdf8" stroke-width="0.8" />
+    <circle cx="50" cy="48" r="2.5" fill="none" stroke="#60a5fa" stroke-width="0.8" />
+    <line x1="52" y1="47" x2="60" y2="43" stroke="#38bdf8" stroke-width="0.6" />
+
+    <!-- Keyboard -->
+    <polygon points="10,88 70,88 75,98 5,98" fill="rgba(15, 23, 42, 0.7)" stroke="rgba(56, 189, 248, 0.25)" stroke-width="1" />
+    <line x1="15" y1="92" x2="65" y2="92" stroke="rgba(255,255,255,0.2)" stroke-width="1" stroke-dasharray="2,2" />
+    <line x1="12" y1="95" x2="68" y2="95" stroke="rgba(255,255,255,0.2)" stroke-width="1" stroke-dasharray="2,2" />
+
+    <!-- PC Tower Unit -->
+    <g transform="translate(95, 12)">
+      <rect x="0" y="0" width="34" height="84" rx="4" fill="rgba(10, 18, 40, 0.85)" stroke="rgba(59, 130, 246, 0.35)" stroke-width="1.2" />
+      <!-- Power button -->
+      <circle cx="17" cy="10" r="3" fill="none" stroke="#38bdf8" stroke-width="1" />
+      <circle cx="17" cy="10" r="1" fill="#38bdf8" />
+      <!-- USB / Audio Ports -->
+      <rect x="10" y="18" width="6" height="2" fill="rgba(255,255,255,0.3)" />
+      <rect x="18" y="18" width="6" height="2" fill="rgba(255,255,255,0.3)" />
+      <!-- Front Mesh / Radiator Grill -->
+      <g stroke="rgba(56, 189, 248, 0.15)" stroke-width="1">
+        <line x1="6" y1="30" x2="28" y2="30" />
+        <line x1="6" y1="36" x2="28" y2="36" />
+        <line x1="6" y1="42" x2="28" y2="42" />
+        <line x1="6" y1="48" x2="28" y2="48" />
+        <line x1="6" y1="54" x2="28" y2="54" />
+        <line x1="6" y1="60" x2="28" y2="60" />
+        <line x1="6" y1="66" x2="28" y2="66" />
+      </g>
+    </g>
+  </g>
+
+  <!-- Laptop / Portable Terminal (Bottom Center: 480, 720) -->
+  <g transform="translate(480, 720)">
+    <!-- Screen -->
+    <polygon points="15,0 75,0 80,45 10,45" fill="rgba(15, 25, 55, 0.85)" stroke="rgba(56, 189, 248, 0.35)" stroke-width="1.2" />
+    <!-- Inner Screen Display -->
+    <polygon points="18,4 72,4 76,41 14,41" fill="rgba(8, 15, 34, 0.95)" />
+    <path d="M 22,14 L 45,14 M 22,20 L 60,20 M 22,26 L 50,26" stroke="rgba(56, 189, 248, 0.45)" stroke-width="1" stroke-linecap="round" />
+    <circle cx="64" cy="32" r="4" fill="none" stroke="#a855f7" stroke-width="1" />
+    <!-- Base / Keyboard Deck -->
+    <polygon points="0,48 90,48 100,58 -10,58" fill="rgba(12, 22, 48, 0.9)" stroke="rgba(59, 130, 246, 0.3)" stroke-width="1" />
+    <!-- Trackpad -->
+    <rect x="36" y="51" width="18" height="6" rx="1" fill="rgba(30, 58, 138, 0.3)" />
+  </g>
+
+  <!-- =========================================================================
+       INTERCONNECTING CABLES & FIBER OPTIC BUS LINES
+       ========================================================================= -->
+  <!-- Cable 1: Blue Cat6 Twisted Pair (Workstation PC to Server Rack) -->
+  <path d="M 270,450 C 320,450 330,220 380,220" 
+        fill="none" stroke="#2563eb" stroke-width="3" stroke-linecap="round" opacity="0.65" />
+  <path d="M 270,450 C 320,450 330,220 380,220" 
+        fill="none" stroke="#60a5fa" stroke-width="1.2" stroke-linecap="round" opacity="0.9" />
+
+  <!-- Cable 2: Purple Fiber Optic Trunk (Server Rack to Core BGP Edge) -->
+  <path d="M 510,180 C 680,180 780,130 960,130" 
+        fill="none" stroke="#7c3aed" stroke-width="3" stroke-linecap="round" opacity="0.6" />
+  <path d="M 510,180 C 680,180 780,130 960,130" 
+        fill="none" stroke="#c084fc" stroke-width="1.2" stroke-linecap="round" stroke-dasharray="8,6" opacity="0.85" />
+
+  <!-- Cable 3: Cyan High-Speed Patch Cord (Server Switch to Wi-Fi Gateway) -->
+  <path d="M 510,230 C 600,230 620,520 680,520" 
+        fill="none" stroke="#0284c7" stroke-width="3" stroke-linecap="round" opacity="0.65" />
+  <path d="M 510,230 C 600,230 620,520 680,520" 
+        fill="none" stroke="#38bdf8" stroke-width="1.2" stroke-linecap="round" opacity="0.9" />
+
+  <!-- Cable 4: Looping Fiber Cable (Wi-Fi Gateway to Laptop) -->
+  <path d="M 735,530 C 735,660 550,650 540,720" 
+        fill="none" stroke="#3b82f6" stroke-width="2.5" stroke-linecap="round" opacity="0.55" />
+  <path d="M 735,530 C 735,660 550,650 540,720" 
+        fill="none" stroke="#93c5fd" stroke-width="1" stroke-linecap="round" stroke-dasharray="6,4" opacity="0.85" />
+
+  <!-- Cable 5: Backbone Trunk Line crossing bottom right -->
+  <path d="M 790,520 C 950,520 1020,480 1150,480 C 1250,480 1280,680 1380,680" 
+        fill="none" stroke="#1d4ed8" stroke-width="3" stroke-linecap="round" opacity="0.6" />
+  <path d="M 790,520 C 950,520 1020,480 1150,480 C 1250,480 1280,680 1380,680" 
+        fill="none" stroke="#60a5fa" stroke-width="1.2" stroke-linecap="round" opacity="0.85" />
+
+  <!-- =========================================================================
+       DATA PACKETS, PACKET HEADERS & PROTOCOL SCHEMATICS
+       ========================================================================= -->
+  <!-- Flying Packet Envelope 1 (Over Cable 2) -->
+  <g transform="translate(710, 140)">
+    <rect x="0" y="0" width="34" height="20" rx="3" fill="rgba(15, 23, 42, 0.9)" stroke="#c084fc" stroke-width="1.2" />
+    <path d="M 0,0 L 17,11 L 34,0" stroke="#c084fc" stroke-width="1" fill="none" />
+    <circle cx="17" cy="14" r="1.5" fill="#38bdf8" />
+  </g>
+
+  <!-- Flying Packet Envelope 2 (Over Cable 1) -->
+  <g transform="translate(320, 310)">
+    <rect x="0" y="0" width="34" height="20" rx="3" fill="rgba(15, 23, 42, 0.9)" stroke="#38bdf8" stroke-width="1.2" />
+    <path d="M 0,0 L 17,11 L 34,0" stroke="#38bdf8" stroke-width="1" fill="none" />
+    <circle cx="17" cy="14" r="1.5" fill="#34d399" />
+  </g>
+
+  <!-- Binary Data Stream Snippets -->
+  <g font-family="monospace" font-size="9" fill="rgba(56, 189, 248, 0.28)" letter-spacing="2">
+    <text x="60" y="320">01001100 01100001 01111001 01100101 01110010</text>
+    <text x="60" y="336">11000000 10101000 00000001 00000001 [192.168.1.1]</text>
+    <text x="880" y="380">TCP SYN: SEQ=1000 ACK=0 WIN=65535</text>
+    <text x="880" y="396">TLS_AES_256_GCM_SHA384 [0x1302]</text>
+    <text x="600" y="850">01100101 01110000 01101111 01101100 01101100</text>
+    <text x="880" y="660">BGP4: NEXT_HOP 198.51.100.1 AS_PATH 64512 13335</text>
+  </g>
+
+  <!-- RJ-45 Connector Plug (Detail Blueprint Illustration: Bottom Right: 820, 680) -->
+  <g transform="translate(820, 680)">
+    <!-- Plug housing -->
+    <rect x="0" y="8" width="40" height="26" rx="2" fill="rgba(15, 27, 56, 0.7)" stroke="rgba(56, 189, 248, 0.4)" stroke-width="1.2" />
+    <!-- Latch clip -->
+    <path d="M 10,8 L 16,0 L 32,0 L 26,8" fill="rgba(30, 58, 138, 0.5)" stroke="rgba(56, 189, 248, 0.4)" stroke-width="1" />
+    <!-- 8 Gold contact pins -->
+    <g fill="#f59e0b" opacity="0.6">
+      <rect x="2" y="10" width="3" height="3" rx="0.5" />
+      <rect x="7" y="10" width="3" height="3" rx="0.5" />
+      <rect x="12" y="10" width="3" height="3" rx="0.5" />
+      <rect x="17" y="10" width="3" height="3" rx="0.5" />
+      <rect x="22" y="10" width="3" height="3" rx="0.5" />
+      <rect x="27" y="10" width="3" height="3" rx="0.5" />
+      <rect x="32" y="10" width="3" height="3" rx="0.5" />
+      <rect x="37" y="10" width="3" height="3" rx="0.5" />
+    </g>
+    <!-- Boot -->
+    <rect x="-14" y="11" width="14" height="20" rx="3" fill="rgba(37, 99, 235, 0.5)" stroke="rgba(96, 165, 250, 0.3)" stroke-width="1" />
+    <text x="20" y="27" font-family="monospace" font-size="5" fill="#38bdf8" text-anchor="middle">CAT-6A 10Gbps</text>
+  </g>
+
+</svg>
