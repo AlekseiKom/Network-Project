@@ -13,6 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initKeyboardShortcuts();
   initCidrCalculator();
   initPortLookup();
+  initSvgViewer();
 });
 
 /* ==========================================================================
@@ -420,6 +421,167 @@ function initPortLookup() {
       currentCategory = btn.getAttribute('data-filter') || 'all';
       filterTable();
     });
+  });
+}
+
+/* ==========================================================================
+   9. SVG FULLSCREEN VIEWER (тап по диаграмме → полноэкранный zoom/pan)
+   Мобильные: pinch-zoom + перетаскивание; десктоп: колесо мыши + drag.
+   Двойной тап / dblclick — сброс к исходному размеру или зум ×2.
+   ========================================================================== */
+function initSvgViewer() {
+  const containers = document.querySelectorAll('.svg-container');
+  if (!containers.length) return;
+
+  let overlay, stage, closeBtn;
+  let scale = 1, tx = 0, ty = 0;
+  let fitScale = 1;
+  const pointers = new Map();
+  let pinchDist = 0, pinchScale = 1;
+  let lastTapAt = 0, tapX = 0, tapY = 0;
+
+  function buildOverlay() {
+    overlay = document.createElement('div');
+    overlay.className = 'svg-viewer';
+    overlay.innerHTML =
+      '<button class="svg-viewer-close" type="button" aria-label="Закрыть просмотр">✕</button>' +
+      '<div class="svg-viewer-stage"></div>' +
+      '<span class="svg-viewer-hint">щипок / колесо — масштаб · перетаскивание — сдвиг · двойной тап — сброс</span>';
+    stage = overlay.querySelector('.svg-viewer-stage');
+    closeBtn = overlay.querySelector('.svg-viewer-close');
+    document.body.appendChild(overlay);
+
+    closeBtn.addEventListener('click', closeViewer);
+    overlay.addEventListener('pointerdown', onPointerDown);
+    window.addEventListener('pointermove', onPointerMove, { passive: false });
+    window.addEventListener('pointerup', onPointerUp);
+    window.addEventListener('pointercancel', onPointerUp);
+    overlay.addEventListener('wheel', onWheel, { passive: false });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeViewer();
+    });
+  }
+
+  function applyTransform() {
+    stage.style.transform = `translate(${tx}px, ${ty}px) scale(${scale})`;
+  }
+
+  // Вписать SVG во вьюпорт с отступами по краям
+  function resetView() {
+    const svg = stage.querySelector('svg');
+    if (!svg || !svg.viewBox) return;
+    const w = svg.viewBox.baseVal.width, h = svg.viewBox.baseVal.height;
+    const pad = Math.min(24, window.innerWidth * 0.06);
+    fitScale = Math.min((window.innerWidth - pad * 2) / w, (window.innerHeight - pad * 2) / h);
+    scale = fitScale;
+    tx = (window.innerWidth - w * scale) / 2;
+    ty = (window.innerHeight - h * scale) / 2;
+    applyTransform();
+  }
+
+  function openViewer(sourceSvg) {
+    if (!overlay) buildOverlay();
+    stage.innerHTML = '';
+    const clone = sourceSvg.cloneNode(true);
+    clone.removeAttribute('width');
+    clone.style.width = `${sourceSvg.viewBox.baseVal.width}px`;
+    clone.style.height = 'auto';
+    stage.appendChild(clone);
+    overlay.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    resetView();
+  }
+
+  function closeViewer() {
+    if (!overlay || !overlay.classList.contains('open')) return;
+    overlay.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  function clampScale(s) {
+    return Math.min(Math.max(s, fitScale * 0.5), fitScale * 8);
+  }
+
+  // Зум с фиксацией точки (cx, cy) на экране
+  function zoomAt(cx, cy, factor) {
+    const ns = clampScale(scale * factor);
+    const k = ns / scale;
+    tx = cx - (cx - tx) * k;
+    ty = cy - (cy - ty) * k;
+    scale = ns;
+    applyTransform();
+  }
+
+  function onPointerDown(e) {
+    if (!overlay.classList.contains('open')) return;
+    pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+
+    if (pointers.size === 2) {
+      const [a, b] = [...pointers.values()];
+      pinchDist = Math.hypot(b.x - a.x, b.y - a.y);
+      pinchScale = scale;
+    } else if (pointers.size === 1) {
+      // Двойной тап: сброс к fit или зум ×2 в точке тапа
+      const now = Date.now();
+      if (now - lastTapAt < 300 && Math.hypot(e.clientX - tapX, e.clientY - tapY) < 24) {
+        if (scale > fitScale * 1.25) resetView();
+        else zoomAt(e.clientX, e.clientY, 2);
+        lastTapAt = 0;
+      } else {
+        lastTapAt = now;
+        tapX = e.clientX;
+        tapY = e.clientY;
+      }
+    }
+  }
+
+  function onPointerMove(e) {
+    if (!overlay.classList.contains('open') || !pointers.has(e.pointerId)) return;
+    const prev = pointers.get(e.pointerId);
+    pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+
+    if (pointers.size === 1) {
+      // Перетаскивание одним пальцем / мышью
+      tx += e.clientX - prev.x;
+      ty += e.clientY - prev.y;
+      applyTransform();
+    } else if (pointers.size === 2 && pinchDist > 0) {
+      // Pinch-zoom двумя пальцами с фиксацией середины жеста
+      const [a, b] = [...pointers.values()];
+      const dist = Math.hypot(b.x - a.x, b.y - a.y);
+      if (dist > 0) {
+        zoomAt((a.x + b.x) / 2, (a.y + b.y) / 2, (pinchScale * (dist / pinchDist)) / scale);
+      }
+    }
+  }
+
+  function onPointerUp(e) {
+    pointers.delete(e.pointerId);
+    if (pointers.size < 2) pinchDist = 0;
+  }
+
+  function onWheel(e) {
+    if (!overlay.classList.contains('open')) return;
+    e.preventDefault();
+    zoomAt(e.clientX, e.clientY, e.deltaY < 0 ? 1.12 : 1 / 1.12);
+  }
+
+  // Тап по диаграмме на странице (без скролла) → открыть полноэкранный просмотр
+  containers.forEach((c) => {
+    const svg = c.querySelector('svg');
+    if (!svg) return;
+    let downX = 0, downY = 0;
+    c.addEventListener('pointerdown', (e) => {
+      downX = e.clientX;
+      downY = e.clientY;
+    });
+    c.addEventListener('pointerup', (e) => {
+      if (Math.hypot(e.clientX - downX, e.clientY - downY) < 8) openViewer(svg);
+    });
+  });
+
+  window.addEventListener('resize', () => {
+    if (overlay && overlay.classList.contains('open')) resetView();
   });
 }
 

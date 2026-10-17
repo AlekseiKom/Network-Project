@@ -861,6 +861,8 @@ code:not([class*="language-"]) {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 6px;
   padding: 8px 16px;
   background: rgba(255, 255, 255, 0.03);
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
@@ -873,6 +875,7 @@ code:not([class*="language-"]) {
   display: flex;
   align-items: center;
   gap: 6px;
+  min-width: 0;
   text-transform: uppercase;
   font-weight: 600;
   letter-spacing: 0.05em;
@@ -1103,6 +1106,88 @@ table.academic-table tr:hover td {
 }
 
 /* ==========================================================================
+   SVG FULLSCREEN VIEWER (тап по диаграмме → полноэкранный zoom/pan)
+   ========================================================================== */
+.svg-container {
+  position: relative;
+  cursor: zoom-in;
+}
+
+.svg-container::after {
+  content: '🔍';
+  position: absolute;
+  top: 4px;
+  right: 8px;
+  font-size: 0.85rem;
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.svg-viewer {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(3, 7, 16, 0.94);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  touch-action: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.25s ease, visibility 0.25s;
+}
+
+.svg-viewer.open {
+  opacity: 1;
+  visibility: visible;
+}
+
+.svg-viewer-stage {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform-origin: 0 0; /* формулы zoom/fit рассчитаны от левого верхнего угла */
+  will-change: transform;
+}
+
+.svg-viewer-stage svg {
+  display: block;
+  filter: drop-shadow(0 8px 24px rgba(0, 0, 0, 0.5));
+}
+
+.svg-viewer-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(15, 27, 56, 0.8);
+  color: #ffffff;
+  font-size: 1.2rem;
+  line-height: 1;
+  cursor: pointer;
+  z-index: 2;
+}
+
+.svg-viewer-hint {
+  position: absolute;
+  bottom: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.72rem;
+  color: rgba(148, 163, 184, 0.9);
+  background: rgba(15, 27, 56, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 6px 12px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+/* ==========================================================================
    FOOTER (Academic Citations & Reference Resources)
    ========================================================================== */
 .site-footer {
@@ -1311,12 +1396,111 @@ table.academic-table tr:hover td {
     font-size: 1.85rem;
   }
 
-  .hero-section {
-    padding: 28px 20px;
+  /* --- Мобильная плотность: контент занимает ~85–90% ширины экрана --- */
+  .main-content {
+    padding: 20px 12px 48px;
   }
 
-  .academic-card {
-    padding: 20px;
+  .hero-section {
+    padding: 24px 14px;
+    margin-bottom: 28px;
+  }
+
+  .hero-meta-row {
+    gap: 16px;
+    padding-top: 14px;
+  }
+
+  .academic-section {
+    margin-bottom: 36px;
+    scroll-margin-top: 72px;
+  }
+
+  .section-header {
+    margin-bottom: 14px;
+    padding-bottom: 10px;
+  }
+
+  .section-label {
+    font-size: 0.7rem;
+    margin-bottom: 6px;
+  }
+
+  /* Заголовки разделов −15% (1.9 → 1.6 rem) */
+  .section-title {
+    font-size: 1.6rem;
+    gap: 10px;
+  }
+
+  .section-desc {
+    font-size: 0.92rem;
+    margin-top: 4px;
+  }
+
+  .academic-card,
+  .tool-card {
+    padding: 14px;
+    margin-bottom: 16px;
+    border-radius: 14px;
+  }
+
+  /* Плашка сверху, заголовок ниже — на всю ширину блока (паттерн tool-карточек) */
+  .card-header,
+  .diagram-header {
+    flex-direction: column-reverse;
+    align-items: stretch;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+
+  .tool-card-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+
+  /* RFC-плашка не растягивается — остаётся пилюлей под заголовком */
+  .tool-card-header .badge-tag {
+    align-self: flex-start;
+  }
+
+  .card-category-badge,
+  .diagram-badge {
+    align-self: flex-start;
+  }
+
+  /* h3-заголовки карточек чуть меньше — симметрия с уменьшенными h2 */
+  .card-title {
+    font-size: 1.14rem;
+  }
+
+  .tool-card-title {
+    font-size: 1.18rem;
+  }
+
+  .diagram-title {
+    font-size: 0.95rem;
+  }
+
+  .diagram-card {
+    margin: 16px 0;
+    padding: 14px;
+  }
+
+  .svg-container {
+    padding: 8px 0;
+  }
+
+  .diagram-caption {
+    margin-top: 10px;
+    font-size: 0.78rem;
+  }
+
+  .calc-input-group {
+    margin: 14px 0;
+    padding: 12px;
+    gap: 10px;
   }
 
   .footer-grid {
@@ -1327,6 +1511,29 @@ table.academic-table tr:hover td {
     flex-direction: column;
     gap: 12px;
     text-align: center;
+  }
+
+  /* CIDR-калькулятор: одна колонка, чтобы все плашки помещались в карточку.
+     Префикс .tool-card — базовые правила .calc-* объявлены ниже по файлу,
+     поэтому без повышенной специфичности мобильная сетка их не переопределит */
+  .tool-card .calc-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .tool-card .calc-stat-wide {
+    grid-column: auto;
+  }
+
+  /* Двоичный разбор: подпись сверху, код снизу — без горизонтального переполнения */
+  .tool-card .calc-binary-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  .tool-card .calc-binary-code {
+    overflow-wrap: anywhere;
   }
 }
 
@@ -1473,6 +1680,11 @@ table.academic-table tr:hover td {
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 14px;
   margin-top: 20px;
+}
+
+/* Широкая плашка (диапазон хостов) — на десктопе занимает две колонки */
+.calc-stat-wide {
+  grid-column: span 2;
 }
 
 .calc-stat-box {
