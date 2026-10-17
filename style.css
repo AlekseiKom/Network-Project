@@ -295,7 +295,7 @@ body {
 
 .header-inner {
   width: 100%;
-  max-width: 1600px;
+  max-width: 1760px; /* синхронно с .app-layout */
   margin: 0 auto;
   padding: 0 24px;
   display: flex;
@@ -460,7 +460,7 @@ body {
    ========================================================================== */
 .app-layout {
   display: flex;
-  max-width: 1600px;
+  max-width: 1760px; /* +10% к исходным 1600px — шире контентная зона */
   margin: 0 auto;
   min-height: calc(100vh - 72px);
   position: relative;
@@ -476,9 +476,9 @@ body {
   flex-shrink: 0;
   position: sticky;
   top: 104px; /* шапка (72px) + отступ 32px — выравнивание с hero-карточкой */
-  height: calc(100vh - 128px); /* минус шапка и верхний/нижний зазоры */
+  height: calc(100vh - 136px); /* минус шапка и равные зазоры сверху/снизу по 32px */
   overflow-y: auto;
-  margin: 32px 28px 24px 24px;
+  margin: 32px 0 32px 24px; /* правый зазор = 0, расстояние до контента задаёт padding-left .main-content (24px) */
   padding: 24px 16px 32px 20px;
   border-radius: 18px;
   border: 1px solid var(--border-glass);
@@ -574,12 +574,12 @@ body {
 .main-content {
   flex: 1;
   min-width: 0;
-  padding: 32px 36px 80px 36px;
+  padding: 32px 36px 80px 24px; /* left = 24px — тот же ритм, что между карточками (.academic-card margin-bottom) */
   overflow-y: visible;
 }
 
 .content-container {
-  max-width: 1040px;
+  max-width: 1760px; /* синхронно с .app-layout — диаграммы на всю ширину */
   margin: 0 auto;
 }
 
@@ -1080,17 +1080,16 @@ table.academic-table tr:hover td {
 
 .svg-container {
   width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
   overflow-x: auto;
   padding: 12px 0;
 }
 
 .svg-container svg {
   max-width: 100%;
+  min-width: 640px; /* на узких экранах — горизонтальный скролл, а не нечитаемое сжатие */
   height: auto;
   display: block;
+  margin: 0 auto;
   border-radius: 8px;
   filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.4));
 }
@@ -1271,11 +1270,33 @@ table.academic-table tr:hover td {
 
 @media (max-width: 640px) {
   .header-inner {
-    padding: 0 16px;
+    padding: 0 12px;
+    gap: 12px;
+  }
+
+  .header-brand {
+    gap: 10px;
+  }
+
+  .brand-icon-wrapper {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+  }
+
+  .brand-title {
+    font-size: 1rem;
+  }
+
+  .brand-subtitle {
+    font-size: 0.64rem;
+    letter-spacing: 0.03em;
   }
 
   .header-search {
-    max-width: 200px;
+    max-width: 150px;
+    min-width: 84px;
+    flex: 1 1 auto;
   }
 
   .search-kbd {
