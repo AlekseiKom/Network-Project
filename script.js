@@ -264,16 +264,33 @@ function initCidrCalculator() {
   const elBinIp = document.getElementById('calcBinIp');
   const elBinMask = document.getElementById('calcBinMask');
 
+  // Валидация ввода: плашка с ошибкой + подсветка поля IP
+  const errorBox = document.getElementById('cidrError');
+  const errorMsg = errorBox ? errorBox.querySelector('.calc-error-msg') : null;
+
   function ipToInt(ipStr) {
     const parts = ipStr.trim().split('.');
     if (parts.length !== 4) return null;
     let res = 0;
     for (let i = 0; i < 4; i++) {
+      // Строгий формат октета: только цифры (без пробелов, знаков и «хвостов» вроде «5x»)
+      if (!/^\d{1,3}$/.test(parts[i])) return null;
       const n = parseInt(parts[i], 10);
-      if (isNaN(n) || n < 0 || n > 255) return null;
+      if (n > 255) return null;
       res = (res << 8) | n;
     }
     return (res >>> 0);
+  }
+
+  function ipErrorMessage(rawIp) {
+    if (!rawIp) return 'Введите IPv4-адрес';
+    const parts = rawIp.split('.');
+    if (parts.length !== 4) return 'Ожидается формат a.b.c.d — четыре октета, разделённые точками';
+    for (const p of parts) {
+      if (!/^\d{1,3}$/.test(p)) return `Некорректный октет «${p}» — допустимы только цифры`;
+      if (parseInt(p, 10) > 255) return `Октет ${p} вне диапазона 0–255`;
+    }
+    return null;
   }
 
   function intToIp(intVal) {
@@ -307,16 +324,20 @@ function initCidrCalculator() {
   function update() {
     let rawIp = ipInput.value.trim();
     let prefix = parseInt(prefixSelect.value, 10);
+    let prefixError = null;
 
     // If user pasted CIDR notation e.g. 192.168.1.50/26
     if (rawIp.includes('/')) {
       const tokens = rawIp.split('/');
       rawIp = tokens[0].trim();
-      const p = parseInt(tokens[1], 10);
-      if (!isNaN(p) && p >= 0 && p <= 32) {
-        prefix = p;
-        prefixSelect.value = p;
-        prefixSlider.value = p;
+      const pRaw = (tokens[1] || '').trim();
+      if (pRaw !== '') {
+        const p = parseInt(pRaw, 10);
+        if (/^\d{1,2}$/.test(pRaw) && p >= 0 && p <= 32) {
+          prefix = p;
+        } else {
+          prefixError = `Некорректный префикс «/${pRaw}» — допустимо /0…/32`;
+        }
       }
     }
 
@@ -325,11 +346,19 @@ function initCidrCalculator() {
     prefixSelect.value = prefix;
 
     const ipInt = ipToInt(rawIp);
+    const ipError = ipInt === null ? ipErrorMessage(rawIp) : null;
+
+    // Состояние валидации: плашка с ошибкой + подсветка поля ввода
+    if (errorMsg) {
+      errorMsg.textContent = ipError || prefixError || '';
+      errorBox.classList.toggle('visible', !!(ipError || prefixError));
+    }
+    ipInput.classList.toggle('calc-input-invalid', !!ipError);
+
     if (ipInt === null) {
-      if (elNet) elNet.textContent = 'Некорректный IPv4';
-      if (elBcast) elBcast.textContent = '—';
-      if (elRange) elRange.textContent = '—';
-      if (elHosts) elHosts.textContent = '—';
+      // Сбрасываем все результаты, чтобы не оставались «старые» значения
+      [elNet, elBcast, elMask, elWildcard, elRange, elHosts, elScope, elBinIp, elBinMask]
+        .forEach(el => { if (el) el.textContent = '—'; });
       return;
     }
 

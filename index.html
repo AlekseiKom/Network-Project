@@ -1434,7 +1434,7 @@ Paths: (2 available, best #1)
               <div class="calc-field" style="flex: 2; min-width: 220px;">
                 <label for="cidrIpInput">IP-адрес хоста или сети</label>
                 <input type="text" id="cidrIpInput" class="calc-text-input" value="192.168.1.100"
-                  placeholder="Например: 10.0.5.15">
+                  placeholder="Например: 10.0.5.15" spellcheck="false" autocapitalize="off">
               </div>
 
               <div class="calc-field" style="flex: 2; min-width: 240px;">
@@ -1464,6 +1464,11 @@ Paths: (2 available, best #1)
                 </label>
                 <input type="range" id="cidrPrefixSlider" class="calc-range-slider" min="0" max="32" value="24">
               </div>
+            </div>
+
+            <div class="calc-error" id="cidrError" role="alert">
+              <span class="calc-error-icon" aria-hidden="true">⚠</span>
+              <span class="calc-error-msg"></span>
             </div>
 
             <!-- Fast Presets Bar -->
