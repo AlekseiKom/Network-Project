@@ -1849,3 +1849,69 @@ table.academic-table tr:hover td {
   border-color: rgba(6, 182, 212, 0.4);
 }
 
+/* ===== Card actions: favorites & copy link (injected by script.js) ===== */
+.card-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.card-action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  font-size: 0.95rem;
+  line-height: 1;
+  color: var(--text-muted);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--trans-fast);
+}
+
+.card-action-btn:hover {
+  color: var(--text-white);
+  background: rgba(94, 92, 230, 0.25);
+  border-color: var(--violet-primary);
+}
+
+.card-action-btn.active {
+  color: #fbbf24;
+  border-color: rgba(251, 191, 36, 0.5);
+  background: rgba(251, 191, 36, 0.12);
+}
+
+.card-action-btn.copied {
+  color: var(--badge-success);
+  border-color: rgba(16, 185, 129, 0.5);
+}
+
+/* ===== CIDR calculator: plain-language explanation (beginner mode) ===== */
+.calc-plain-expl {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  margin-top: 16px;
+  padding: 14px 18px;
+  border-radius: var(--radius-md);
+  background: rgba(59, 130, 246, 0.08);
+  border: 1px solid rgba(59, 130, 246, 0.25);
+}
+
+.calc-plain-icon {
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+.calc-plain-expl p {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.92rem;
+  line-height: 1.6;
+}
+
+

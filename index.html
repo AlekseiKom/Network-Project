@@ -63,11 +63,8 @@
         </div>
       </div>
 
-      <!-- Action badges & mobile toggle -->
+      <!-- Mobile toggle -->
       <div class="header-actions">
-        <span class="badge-tag badge-tag-edition">
-          <span>📚</span> Tanenbaum & Kurose Ed.
-        </span>
         <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Открыть навигацию">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
             stroke-linecap="round" stroke-linejoin="round">
@@ -87,6 +84,17 @@
 
     <!-- Left Navigation Sidebar -->
     <aside class="sidebar" id="sidebar">
+      <!-- BEGINNER START: Navigation for newcomers -->
+      <div class="sidebar-category">
+        <div class="sidebar-heading">Начни здесь</div>
+        <ul class="sidebar-nav-list">
+          <li><a href="#sec-intro" class="sidebar-nav-link"><span class="sidebar-icon">🗺️</span><span>Карта
+                местности</span></a></li>
+          <li><a href="#sec-journey" class="sidebar-nav-link"><span class="sidebar-icon">📦</span><span>Путь
+                пакета</span></a></li>
+        </ul>
+      </div>
+
       <div class="sidebar-category">
         <div class="sidebar-heading">Фундамент & Архитектура</div>
         <ul class="sidebar-nav-list">
@@ -228,6 +236,407 @@
         </div>
 
         <!-- ==========================================================================
+             РАЗДЕЛ 0: КАРТА МЕСТНОСТИ — ВВОД ДЛЯ НОВИЧКОВ
+             ========================================================================== -->
+        <section class="academic-section" id="sec-intro">
+          <div class="section-header">
+            <span class="section-label">Старт • Orientation</span>
+            <h2 class="section-title">🗺️ Карта местности: с чего начать изучение сетей</h2>
+            <p class="section-desc">
+              Прежде чем погружаться в уровни и протоколы, разберем базовые понятия на бытовых аналогиях и соберем
+              мини-словарь терминов, которые будут встречаться во всех разделах.
+            </p>
+          </div>
+
+          <!-- Card 0.1: What is a network (plain analogy) -->
+          <article class="academic-card card-theory">
+            <header class="card-header">
+              <div class="card-title-group">
+                <h3 class="card-title">📮 Что такое сеть простыми словами</h3>
+              </div>
+              <span class="card-category-badge">На пальцах</span>
+            </header>
+            <div class="card-body">
+              <p>Сеть — это <strong>почтовая система для данных</strong>. Как почта доставляет письмо от отправителя к
+                получателю, так сеть пересылает пакеты от одного компьютера к другому. При этом у этой «почты» есть
+                четкая организация:</p>
+              <ul>
+                <li><strong>Адрес получателя (IP)</strong> — город, улица и дом: по нему письмо найдет адресата в любой
+                  точке мира.</li>
+                <li><strong>Конверт с маршрутом (заголовки уровней)</strong> — на каждом этапе доставки меняется
+                  «обертка», а само письмо внутри не трогается.</li>
+                <li><strong>Сортировочные центры (роутеры)</strong> — перенаправляют письма между городами, сверяясь со
+                  своими таблицами маршрутов.</li>
+                <li><strong>Почтальон «последней мили» (коммутатор, Wi-Fi-адаптер)</strong> — доставляет письмо
+                  конкретному дому на вашей улице по номеру дома (MAC-адресу).</li>
+              </ul>
+              <p>Весь этот учебник и есть описание работы этой почтовой системы: от написания адреса до вручения письма
+                в руки.</p>
+            </div>
+          </article>
+
+          <!-- Card 0.2: Anatomy of a packet (envelope analogy) -->
+          <article class="academic-card card-theory">
+            <header class="card-header">
+              <div class="card-title-group">
+                <h3 class="card-title">✉️ Анатомия пакета: письмо в конвертах</h3>
+              </div>
+              <span class="card-category-badge">На пальцах</span>
+            </header>
+            <div class="card-body">
+              <p>Данные, которые вы отправляете (страница сайта, сообщение), разбиваются на <strong>пакеты</strong>.
+                Каждый пакет — это письмо в нескольких конвертах: каждый уровень сети добавляет свой заголовок-«конверт»
+                с нужной служебной информацией.</p>
+              <ul>
+                <li><strong>Внешний конверт (L2, MAC)</strong> — адрес «последней мили»: кому передать пакет на этом
+                  отрезке. Меняется на каждом участке пути.</li>
+                <li><strong>Средний конверт (L3, IP)</strong> — полный адрес получателя и отправителя: не меняется по
+                  всему маршруту.</li>
+                <li><strong>Внутренний конверт (L4, порты TCP/UDP)</strong> — «кому внутри дома»: какому именно
+                  приложению отдать письмо (браузеру, почте, игре).</li>
+                <li><strong>Само письмо (данные приложения)</strong> — то, что вы отправили: текст, картинка, звук.</li>
+              </ul>
+              <p>По пути каждый «сортировочный центр» вскрывает и заклеивает только свой конверт. Поэтому уровни сети
+                можно изучать по отдельности — это и есть принцип <strong>инкапсуляции</strong>, который мы разберем в
+                разделе 1.</p>
+            </div>
+          </article>
+
+          <!-- Card 0.3: Mini glossary of key terms -->
+          <article class="academic-card card-theory">
+            <header class="card-header">
+              <div class="card-title-group">
+                <h3 class="card-title">📖 Мини-словарь: ключевые термины</h3>
+              </div>
+              <span class="card-category-badge">Справочно</span>
+            </header>
+            <div class="card-body">
+              <p>Эти слова будут встречаться во всех разделах. Если встретите термин — возвращайтесь к этой таблице.</p>
+              <table class="academic-table">
+                <thead>
+                  <tr>
+                    <th>Термин</th>
+                    <th>Что это простыми словами</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Пакет</strong></td>
+                    <td>«Письмо» — фрагмент данных с заголовками, единица передачи по сети.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Протокол</strong></td>
+                    <td>«Соглашение о правилах общения»: формат сообщений и порядок действий (HTTP, TCP, DNS...).</td>
+                  </tr>
+                  <tr>
+                    <td><strong>IP-адрес</strong></td>
+                    <td>Глобальный адрес устройства в интернете — как почтовый адрес дома.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>MAC-адрес</strong></td>
+                    <td>Адрес сетевого адаптера «на одной улице» (в пределах локальной сети).</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Порт</strong></td>
+                    <td>«Дверь внутри дома»: номер приложения, которому отдать данные (80 — веб, 443 — HTTPS...).</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Коммутатор (switch)</strong></td>
+                    <td>Устройство локальной сети: доставляет пакеты по MAC-адресам «в пределах дома».</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Роутер</strong></td>
+                    <td>«Сортировочный центр»: пересылает пакеты между сетями, выбирая маршрут по IP.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Шлюз (gateway)</strong></td>
+                    <td>Вход/выход из локальной сети в интернет — обычно ваш роутер.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Домашний адрес / домен</strong></td>
+                    <td>Человекочитаемое имя сайта; DNS переводит его в IP-адрес (раздел 6).</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Пропускная способность</strong></td>
+                    <td>Максимальная скорость канала — «ширина дороги» для данных.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Задержка (latency)</strong></td>
+                    <td>Время доставки пакета от отправителя к получателю.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Поток (stream) / соединение</strong></td>
+                    <td>Упорядоченная последовательность пакетов между двумя приложениями.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Шифрование</strong></td>
+                    <td>«Запечатывание письма»: данные становятся нечитаемыми без ключа (раздел 5, TLS).</td>
+                  </tr>
+                  <tr>
+                    <td><strong>API / сокеты</strong></td>
+                    <td>«Окно в сеть» для программ: функции ОС, через которые приложения отправляют и принимают пакеты
+                      (раздел 4).</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </article>
+        </section>
+
+        <!-- ==========================================================================
+             РАЗДЕЛ 0.5: СКВОЗНОЙ СЦЕНАРИЙ «ПУТЬ ПАКЕТА»
+             ========================================================================== -->
+        <section class="academic-section" id="sec-journey">
+          <div class="section-header">
+            <span class="section-label">Сквозной сценарий • End-to-End</span>
+            <h2 class="section-title">📦 Путь пакета: от «Enter» в браузере до картинки на экране</h2>
+            <p class="section-desc">
+              Один конкретный пример — вы вводите <code>https://example.com</code> и нажимаете Enter. Разберем, что
+              происходит шаг за шагом, связывая все уровни из следующих разделов в единую цепочку.
+            </p>
+          </div>
+
+          <!-- Card J1: Plain-language walkthrough -->
+          <article class="academic-card card-theory">
+            <header class="card-header">
+              <div class="card-title-group">
+                <h3 class="card-title">🚶 Сценарий на пальцах (8 шагов)</h3>
+              </div>
+              <span class="card-category-badge">На пальцах</span>
+            </header>
+            <div class="card-body">
+              <ol>
+                <li><strong>Имя → адрес.</strong> Браузер спрашивает у DNS: «Какой IP у example.com?» — как вы звоните в
+                  справочную, чтобы узнать номер телефона. (Раздел 06)</li>
+                <li><strong>Кому на улице передать?</strong> Компьютер узнает MAC-адрес своего шлюза (роутера) через ARP
+                  и отправляет первый пакет ему — как вы отдаёте письмо почтальону, а не несёте его в другой город сами.
+                  (Раздел 01)</li>
+                <li><strong>Маршрут по городам.</strong> Роутеры пересылают пакет через интернет до сервера example.com:
+                  каждый «город» меняет только L2-«конверт», IP остаётся прежним. (Раздел 02)</li>
+                <li><strong>Знакомство (TCP handshake).</strong> Клиент и сервер обмениваются SYN / SYN-ACK / ACK — как
+                  «алло, вы там?» → «да, слушаю» → «отлично, говорим». Без этого ни байта данных. (Раздел 03)</li>
+                <li><strong>Запечатывание (TLS handshake).</strong> Стороны проверяют сертификат сервера и
+                  договариваются о ключах шифрования — дальше всё летит в «запечатанном конверте». (Раздел 05)</li>
+                <li><strong>Запрос страницы (HTTP).</strong> Внутри зашифрованного канала клиент шлёт
+                  <code>GET / HTTP/1.1</code>, сервер отвечает HTML-кодом, картинками и стилями — тоже пакетами TCP.
+                  (Раздел 06)</li>
+                <li><strong>Обратный путь.</strong> Пакеты с данными идут обратно тем же маршрутом; браузер собирает их
+                  по номерам последовательности в правильном порядке. (Раздел 03)</li>
+                <li><strong>Экран.</strong> Браузер разбирает HTML, запрашивает картинки/шрифты отдельными запросами и
+                  рисует страницу. Всё заняло обычно меньше секунды.</li>
+              </ol>
+            </div>
+          </article>
+
+          <!-- Card J2: Step-by-step technical details -->
+          <article class="academic-card card-theory">
+            <header class="card-header">
+              <div class="card-title-group">
+                <h3 class="card-title">🔍 Пошагово под капотом</h3>
+              </div>
+              <span class="card-category-badge">Технические детали</span>
+            </header>
+            <div class="card-body">
+
+              <details class="academic-accordion" id="journey-step-dns">
+                <summary class="accordion-summary">
+                  <div class="accordion-title-box"><span>1️⃣</span><span>DNS: как имя превращается в IP</span></div>
+                  <svg class="accordion-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                  </svg>
+                </summary>
+                <div class="accordion-content">
+                  <p><strong>На пальцах:</strong> браузер сначала смотрит в локальный кэш, затем спрашивает DNS-сервер
+                    провайдера (его адрес вы получили от DHCP). Тот обходит цепочку: корневой сервер → сервер зоны .com
+                    → авторитетный сервер example.com. Ответ — IP-адрес сайта.</p>
+                  <p><strong>Технически:</strong> запрос UDP/53 с флагом рекурсии (RD); ответ кэшируется на время TTL.
+                    Если DNS не отвечает — сайт «не откроется», хотя сама сеть работает исправно.</p>
+                </div>
+              </details>
+
+              <details class="academic-accordion" id="journey-step-arp">
+                <summary class="accordion-summary">
+                  <div class="accordion-title-box"><span>2️⃣</span><span>ARP: кто на нашей улице (MAC шлюза)</span>
+                  </div>
+                  <svg class="accordion-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                  </svg>
+                </summary>
+                <div class="accordion-content">
+                  <p><strong>На пальцах:</strong> компьютер знает IP шлюза (например, 192.168.1.1), но Ethernet работает
+                    по MAC-адресам. Поэтому он «кричит» в локальной сети: «Кто имеет IP 192.168.1.1?» — и роутер
+                    отвечает своим MAC.</p>
+                  <p><strong>Технически:</strong> ARP-запрос — broadcast-кадр (FF:FF:FF:FF:FF:FF) с EtherType 0x0806;
+                    ответ хранится в ARP-кэше. Все пакеты к чужим сетям уходят на MAC шлюза, а не сервера.</p>
+                </div>
+              </details>
+
+              <details class="academic-accordion" id="journey-step-routing">
+                <summary class="accordion-summary">
+                  <div class="accordion-title-box"><span>3️⃣</span><span>Маршрутизация: путь через роутеры</span></div>
+                  <svg class="accordion-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                  </svg>
+                </summary>
+                <div class="accordion-content">
+                  <p><strong>На пальцах:</strong> каждый роутер смотрит только на IP получателя и свою таблицу
+                    маршрутов: «В эту сторону — через порт X». Как почта: каждое отделение перекладывает письмо в
+                    машину, едущую дальше по маршруту.</p>
+                  <p><strong>Технически:</strong> Longest Prefix Match в таблице FIB; на каждом хопе TTL уменьшается на
+                    1 (защита от вечных циклов), L2-кадр собирается заново с новыми MAC. Путь виден командой traceroute.
+                  </p>
+                </div>
+              </details>
+
+              <details class="academic-accordion" id="journey-step-tcp">
+                <summary class="accordion-summary">
+                  <div class="accordion-title-box"><span>4️⃣</span><span>TCP handshake: «алло, вы там?»</span></div>
+                  <svg class="accordion-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                  </svg>
+                </summary>
+                <div class="accordion-content">
+                  <p><strong>На пальцах:</strong> перед передачей данных стороны «проверяют связь»: клиент стучится
+                    (SYN), сервер отвечает (SYN-ACK), клиент подтверждает (ACK). Только теперь канал готов.</p>
+                  <p><strong>Технически:</strong> 3-Way Handshake на порту 443; договариваются начальные номера
+                    последовательности (ISN) и размер окна. Дальше каждый байт нумеруется, а сервер шлёт ACK — это даёт
+                    доставку «без потерь и в порядке».</p>
+                </div>
+              </details>
+
+              <details class="academic-accordion" id="journey-step-tls">
+                <summary class="accordion-summary">
+                  <div class="accordion-title-box"><span>5️⃣</span><span>TLS handshake: запечатывание канала</span>
+                  </div>
+                  <svg class="accordion-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                  </svg>
+                </summary>
+                <div class="accordion-content">
+                  <p><strong>На пальцах:</strong> клиент проверяет сертификат сервера («вы действительно example.com, а
+                    не подделка?») и стороны договариваются о ключах. Дальше всё шифруется — как письмо в запечатанном
+                    конверте.</p>
+                  <p><strong>Технически:</strong> TLS 1.3: ClientHello → ServerHello + сертификат + Finished, обмен
+                    ключами через ECDHE (PFS). С этого момента HTTP-запрос и ответы идут зашифрованными внутри
+                    TCP-потока.</p>
+                </div>
+              </details>
+
+              <details class="academic-accordion" id="journey-step-http">
+                <summary class="accordion-summary">
+                  <div class="accordion-title-box"><span>6️⃣</span><span>HTTP: сам запрос страницы</span></div>
+                  <svg class="accordion-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                  </svg>
+                </summary>
+                <div class="accordion-content">
+                  <p><strong>На пальцах:</strong> внутри «конверта» клиент пишет записку: «Дай мне главную страницу».
+                    Сервер отвечает кодом страницы и списком ресурсов (картинки, CSS, JS).</p>
+                  <p><strong>Технически:</strong> <code>GET / HTTP/1.1</code> + заголовки Host/User-Agent; ответ
+                    <code>200 OK</code> с телом HTML. Картинки и стили запрашиваются отдельными GET-запросами (часто
+                    параллельно, по тем же или новым соединениям).</p>
+                </div>
+              </details>
+
+              <details class="academic-accordion" id="journey-step-back">
+                <summary class="accordion-summary">
+                  <div class="accordion-title-box"><span>7️⃣</span><span>Обратный путь и сборка данных</span></div>
+                  <svg class="accordion-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                  </svg>
+                </summary>
+                <div class="accordion-content">
+                  <p><strong>На пальцах:</strong> пакеты с данными едут обратно через те же «города». Часть может
+                    задержаться или прийти не по порядку — но у каждого пакета есть номер, и браузер собирает их в
+                    правильную последовательность.</p>
+                  <p><strong>Технически:</strong> TCP гарантирует порядок и целостность: дубликаты отбрасываются по
+                    номеру последовательности, потерянные сегменты запрашиваются повторно (RTO/ретрансмиссия). Скорость
+                    ограничивается окном и контролем перегрузки.</p>
+                </div>
+              </details>
+
+              <details class="academic-accordion" id="journey-step-render">
+                <summary class="accordion-summary">
+                  <div class="accordion-title-box"><span>8️⃣</span><span>Браузер рисует страницу</span></div>
+                  <svg class="accordion-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                  </svg>
+                </summary>
+                <div class="accordion-content">
+                  <p><strong>На пальцах:</strong> браузер строит из HTML дерево, применяет CSS и загружает недостающие
+                    ресурсы. Когда всё готово — вы видите страницу.</p>
+                  <p><strong>Технически:</strong> DOM → CSSOM → Render Tree → layout → paint. Время до первой отрисовки
+                    (FCP) складывается из DNS + TCP + TLS + времени ответа сервера (TTFB) + загрузки ресурсов — все
+                    этапы видны в DevTools → Network.</p>
+                </div>
+              </details>
+
+            </div>
+          </article>
+
+          <!-- Card J3: Verify yourself in terminal -->
+          <article class="academic-card card-theory">
+            <header class="card-header">
+              <div class="card-title-group">
+                <h3 class="card-title">🛠️ Проверьте сами в терминале</h3>
+              </div>
+              <span class="card-category-badge">Практика</span>
+            </header>
+            <div class="card-body">
+              <p>Команды Linux/macOS (в Windows — WSL или PowerShell). Комментарий после <code>#</code> объясняет, что
+                вы увидите.</p>
+
+              <div class="code-block-wrapper">
+                <div class="code-block-header">
+                  <span class="code-lang-tag"><span>🌐</span> Шаг 1: DNS-разрешение (dig)</span>
+                  <button type="button" class="code-copy-btn"><span>📋</span> Копировать</button>
+                </div>
+                <pre><code class="language-bash">dig example.com +short
+# Увидите один или несколько IP-адресов, например: 93.184.215.14</code></pre>
+              </div>
+
+              <div class="code-block-wrapper">
+                <div class="code-block-header">
+                  <span class="code-lang-tag"><span>📡</span> Шаг 2: достижимость по IP (ping)</span>
+                  <button type="button" class="code-copy-btn"><span>📋</span> Копировать</button>
+                </div>
+                <pre><code class="language-bash">ping -c 4 93.184.215.14
+# Увидите 4 ответа с временем (time=XX ms) — L3-связь работает</code></pre>
+              </div>
+
+              <div class="code-block-wrapper">
+                <div class="code-block-header">
+                  <span class="code-lang-tag"><span>🗺️</span> Шаг 3: маршрут через роутеры (traceroute)</span>
+                  <button type="button" class="code-copy-btn"><span>📋</span> Копировать</button>
+                </div>
+                <pre><code class="language-bash">traceroute 93.184.215.14
+# Увидите список «городов» (хопов): ваш роутер, провайдер, ... сервер</code></pre>
+              </div>
+
+              <div class="code-block-wrapper">
+                <div class="code-block-header">
+                  <span class="code-lang-tag"><span>🔍</span> Шаг 4: весь путь под капотом (curl -v)</span>
+                  <button type="button" class="code-copy-btn"><span>📋</span> Копировать</button>
+                </div>
+                <pre><code class="language-bash">curl -v https://example.com
+# Увидите: DNS-запрос, TCP connect, TLS handshake (SSL connection using...),
+# затем HTTP-запрос GET / и ответ 200 OK с заголовками</code></pre>
+              </div>
+
+              <div class="code-block-wrapper">
+                <div class="code-block-header">
+                  <span class="code-lang-tag"><span>📊</span> Шаг 5: ваши активные соединения (ss)</span>
+                  <button type="button" class="code-copy-btn"><span>📋</span> Копировать</button>
+                </div>
+                <pre><code class="language-bash">ss -tnp | grep ESTAB
+# Увидите пары адресов: локальный IP:порт — удалённый IP:порт (например :443)</code></pre>
+              </div>
+
+            </div>
+          </article>
+        </section>
+
+        <!-- ==========================================================================
              РАЗДЕЛ 1: АРХИТЕКТУРА СЕТЕЙ И КАНАЛЬНЫЙ УРОВЕНЬ (L1-L2)
              ========================================================================== -->
         <section class="academic-section" id="sec-l2">
@@ -239,6 +648,45 @@
               инкапсуляция, архитектура коммутации Ethernet II и механизмы разрешения адресов ARP.
             </p>
           </div>
+
+          <!-- Card L0: Beginner guide to the Data Link Layer -->
+          <article class="academic-card card-theory">
+            <header class="card-header">
+              <div class="card-title-group">
+                <h3 class="card-title">🧭 Канальный уровень простыми словами</h3>
+              </div>
+              <span class="card-category-badge">На пальцах</span>
+            </header>
+            <div class="card-body">
+              <p><strong>Зачем это нужно:</strong> L2 доставляет пакет по одному отрезку — от вашего компьютера до
+                ближайшего роутера или коммутатора. Это «последняя миля» доставки.</p>
+              <p><strong>Аналогия из жизни:</strong> курьер, который знает номера домов на своей улице: ему не нужен
+                город получателя, только адрес в его районе. MAC-адрес — это и есть «номер дома», а коммутатор —
+                диспетчер, который помнит, к какому порту подключён какой дом.</p>
+              <p><strong>Что будет, если сломается:</strong> пакет не дойдёт даже до вашего локального роутера: нет
+                Wi-Fi-подключения, «нет IP-адреса», обрыв кабеля — интернет падает на самом первом шаге.</p>
+              <ul>
+                <li><strong>MAC-адрес</strong> — 6-байтовый номер устройства в пределах одного отрезка (например,
+                  <code>AA:BB:CC:DD:EE:FF</code>).</li>
+                <li><strong>Коммутатор (switch)</strong> — строит таблицу «порт ↔ MAC» и отправляет кадр только в нужный
+                  порт.</li>
+                <li><strong>ARP</strong> — вопрос соседям: «Кто из вас имеет IP 192.168.1.1? Ответь своим MAC!»</li>
+              </ul>
+
+              <div class="code-block-wrapper">
+                <div class="code-block-header">
+                  <span class="code-lang-tag"><span>🖥️</span> Проверьте ARP-таблицу сами</span>
+                  <button type="button" class="code-copy-btn"><span>📋</span> Копировать</button>
+                </div>
+                <pre><code class="language-bash"># Windows: какие пары IP-MAC знает ваш компьютер
+arp -a
+
+# Linux/macOS: ARP-кэш
+ip neigh show
+# Увидите строки вида "192.168.1.1 dev en0 lladdr aa:bb:... REACHABLE"</code></pre>
+              </div>
+            </div>
+          </article>
 
           <!-- DIAGRAM PLACEHOLDER: SVG-OSI -->
           <div class="diagram-card">
@@ -834,6 +1282,34 @@ Internet Protocol Version 4, Src: 10.100.1.25, Dst: 10.100.1.1</code></pre>
             </p>
           </div>
 
+          <!-- Card L0: Beginner guide to the Network Layer -->
+          <article class="academic-card card-theory">
+            <header class="card-header">
+              <div class="card-title-group">
+                <h3 class="card-title">🧭 Сетевой уровень простыми словами</h3>
+              </div>
+              <span class="card-category-badge">На пальцах</span>
+            </header>
+            <div class="card-body">
+              <p><strong>Зачем это нужно:</strong> L3 отвечает за «межгородскую» доставку: даёт каждому устройству
+                глобальный IP-адрес и ведёт пакеты между сетями через роутеры.</p>
+              <p><strong>Аналогия из жизни:</strong> почтовые сортировочные центры с таблицами маршрутов. Каждый роутер
+                знает только следующий город на пути, а не весь маршрут — как эстафета, где каждый бегун пробегает свой
+                отрезок.</p>
+              <p><strong>Что будет, если сломается:</strong> пакет потеряется или не выйдет из вашей сети: ping не
+                отвечает, traceroute обрывается на каком-то хопе, «нет интернета» при подключённом Wi-Fi.</p>
+              <ul>
+                <li><strong>IP-адрес</strong> — глобальный «город + улица + дом»: уникален во всём интернете.</li>
+                <li><strong>CIDR / подсеть (например, /24)</strong> — сколько адресов в вашей «улице» и сколько из них
+                  останется для устройств. Посчитайте сами в калькуляторе ниже.</li>
+                <li><strong>Таблица маршрутизации</strong> — список правил: «на такой диапазон адресов отправляй такому
+                  следующему узлу».</li>
+                <li><strong>ICMP (ping / traceroute)</strong> — «диагностика» сети: проверка достижимости и пути.</li>
+                <li><strong>DHCP</strong> — автоматически выдаёт IP-адрес, чтобы вы не настраивали его вручную.</li>
+              </ul>
+            </div>
+          </article>
+
           <!-- DIAGRAM PLACEHOLDER: SVG-ROUTING -->
           <div class="diagram-card">
             <div class="diagram-header">
@@ -971,8 +1447,10 @@ Internet Protocol Version 4, Src: 10.100.1.25, Dst: 10.100.1.1</code></pre>
                     1</text>
                   <text x="50" y="52" fill="#d8b4fe" font-size="9" text-anchor="middle">LPM & FIB</text>
                   <!-- Interface Badges -->
-                  <text x="50" y="106" fill="#93c5fd" font-size="8" font-family="'JetBrains Mono', monospace" text-anchor="middle">eth0: .1.1</text>
-                  <text x="50" y="120" fill="#c084fc" font-size="8" font-family="'JetBrains Mono', monospace" text-anchor="middle">eth1: 10.0.0.1</text>
+                  <text x="50" y="106" fill="#93c5fd" font-size="8" font-family="'JetBrains Mono', monospace"
+                    text-anchor="middle">eth0: .1.1</text>
+                  <text x="50" y="120" fill="#c084fc" font-size="8" font-family="'JetBrains Mono', monospace"
+                    text-anchor="middle">eth1: 10.0.0.1</text>
                 </g>
 
                 <!-- Node 4: Router 2 -->
@@ -982,8 +1460,10 @@ Internet Protocol Version 4, Src: 10.100.1.25, Dst: 10.100.1.1</code></pre>
                     2</text>
                   <text x="50" y="52" fill="#d8b4fe" font-size="9" text-anchor="middle">LPM & FIB</text>
                   <!-- Interface Badges -->
-                  <text x="50" y="106" fill="#c084fc" font-size="8" font-family="'JetBrains Mono', monospace" text-anchor="middle">eth0: 10.0.0.2</text>
-                  <text x="50" y="120" fill="#93c5fd" font-size="8" font-family="'JetBrains Mono', monospace" text-anchor="middle">eth1: .2.1</text>
+                  <text x="50" y="106" fill="#c084fc" font-size="8" font-family="'JetBrains Mono', monospace"
+                    text-anchor="middle">eth0: 10.0.0.2</text>
+                  <text x="50" y="120" fill="#93c5fd" font-size="8" font-family="'JetBrains Mono', monospace"
+                    text-anchor="middle">eth1: .2.1</text>
                 </g>
 
                 <!-- Node 5: Switch 2 -->
@@ -1011,9 +1491,13 @@ Internet Protocol Version 4, Src: 10.100.1.25, Dst: 10.100.1.1</code></pre>
                 <g transform="translate(180, 390)">
                   <rect width="580" height="56" rx="8" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.08)" />
                   <circle cx="20" cy="17" r="6" fill="#10b981" />
-                  <text x="35" y="21" fill="#cbd5e1" font-size="11"><tspan font-weight="700">L3 IP адресация:</tspan> End-to-End сквозная (не изменяется хопами)</text>
+                  <text x="35" y="21" fill="#cbd5e1" font-size="11">
+                    <tspan font-weight="700">L3 IP адресация:</tspan> End-to-End сквозная (не изменяется хопами)
+                  </text>
                   <circle cx="20" cy="40" r="6" fill="#a855f7" />
-                  <text x="35" y="44" fill="#cbd5e1" font-size="11"><tspan font-weight="700">L2 MAC адресация:</tspan> Hop-by-Hop (переписывается)</text>
+                  <text x="35" y="44" fill="#cbd5e1" font-size="11">
+                    <tspan font-weight="700">L2 MAC адресация:</tspan> Hop-by-Hop (переписывается)
+                  </text>
                 </g>
 
               </svg>
@@ -1526,6 +2010,12 @@ Paths: (2 available, best #1)
               </div>
             </div>
 
+            <!-- Plain-language explanation for beginners -->
+            <div class="calc-plain-expl" id="calcResPlain">
+              <span class="calc-plain-icon">💡</span>
+              <p id="calcResPlainText"></p>
+            </div>
+
             <!-- Binary Breakdown -->
             <div class="calc-binary-details">
               <div class="calc-binary-row">
@@ -1553,6 +2043,34 @@ Paths: (2 available, best #1)
               Reno, Cubic, BBR).
             </p>
           </div>
+
+          <!-- Card L0: Beginner guide to the Transport Layer -->
+          <article class="academic-card card-theory">
+            <header class="card-header">
+              <div class="card-title-group">
+                <h3 class="card-title">🧭 Транспортный уровень простыми словами</h3>
+              </div>
+              <span class="card-category-badge">На пальцах</span>
+            </header>
+            <div class="card-body">
+              <p><strong>Зачем это нужно:</strong> L3 доставляет пакет на компьютер, а L4 — в конкретное приложение на
+                нём (по порту). Плюс надёжность: порядок, повтор потерянных сегментов, контроль перегрузки.</p>
+              <p><strong>Аналогия из жизни:</strong> TCP — заказное письмо с уведомлением: если что-то потерялось, его
+                перешлют, и всё придёт по порядку. UDP — открытка: быстро, но без подтверждения и гарантий.</p>
+              <p><strong>Что будет, если сломается:</strong> видеозвонок «заикнётся» (UDP), загрузка зависнет или
+                начнётся заново (TCP); ошибка «адрес уже занят» означает, что два приложения претендуют на один порт.
+              </p>
+              <ul>
+                <li><strong>Порт</strong> — «номер квартиры» в доме: 80/443 — веб, 53 — DNS, 22 — SSH.</li>
+                <li><strong>Трёхэтапное рукопожатие (SYN → SYN-ACK → ACK)</strong> — «приветствие» перед началом
+                  передачи данных.</li>
+                <li><strong>Скользящее окно</strong> — сколько данных получатель готов принять без подтверждения:
+                  контроль потока.</li>
+                <li><strong>Контроль перегрузки (AIMD / Cubic / BBR)</strong> — автоматически замедляется, когда сеть
+                  загружена, и ускоряется, когда свободна.</li>
+              </ul>
+            </div>
+          </article>
 
           <!-- DIAGRAM PLACEHOLDER: SVG-HANDSHAKE -->
           <div class="diagram-card">
@@ -2211,6 +2729,36 @@ $ nft add rule inet filter forward tcp flags syn tcp option maxseg size set rt m
             </p>
           </div>
 
+          <!-- Card L0: Beginner guide to POSIX Sockets -->
+          <article class="academic-card card-theory">
+            <header class="card-header">
+              <div class="card-title-group">
+                <h3 class="card-title">🧭 Сокеты простыми словами</h3>
+              </div>
+              <span class="card-category-badge">На пальцах</span>
+            </header>
+            <div class="card-body">
+              <p><strong>Зачем это нужно:</strong> именно так программы общаются с сетью — через системные вызовы. Всё,
+                что описано выше (TCP, порты), реализовано в ядре ОС, а сокеты — его «дверь» для прикладного кода.</p>
+              <p><strong>Аналогия из жизни:</strong> сокет — телефонная линия с номером (IP + порт).
+                <code>connect()</code> — набрать номер; <code>accept()</code> — снять трубку; <code>send/recv</code> —
+                говорить в трубку.</p>
+              <p><strong>Что будет, если сломается:</strong> сервер не стартует («Address already in use»), клиент не
+                может подключиться, а при высокой нагрузке соединения отбрасываются из-за переполнения очередей ожидания
+                (backlog).</p>
+              <ul>
+                <li><strong>Сервер:</strong> <code>socket()</code> → <code>bind()</code> (занять номер) →
+                  <code>listen()</code> (начать отвечать) → <code>accept()</code> (каждый звонок).</li>
+                <li><strong>Клиент:</strong> <code>socket()</code> → <code>connect()</code> (набрать) →
+                  <code>send()/recv()</code>.</li>
+                <li><strong>SYN / accept backlog</strong> — две «очереди ожидания»: на рукопожатие и на готовые
+                  соединения.</li>
+                <li><strong>select / poll / epoll</strong> — ядро сообщает, какие сокеты готовы к чтению/записи: так
+                  один поток обслуживает тысячи клиентов.</li>
+              </ul>
+            </div>
+          </article>
+
           <!-- DIAGRAM PLACEHOLDER: SVG-SOCKETS -->
           <div class="diagram-card">
             <div class="diagram-header">
@@ -2522,6 +3070,49 @@ ssize_t bytes_read = <span class="tok-fn">read</span>(client_fd, buffer, <span c
             </p>
           </div>
 
+          <!-- Card L0: Beginner guide to TLS -->
+          <article class="academic-card card-theory">
+            <header class="card-header">
+              <div class="card-title-group">
+                <h3 class="card-title">🧭 TLS простыми словами</h3>
+              </div>
+              <span class="card-category-badge">На пальцах</span>
+            </header>
+            <div class="card-body">
+              <p><strong>Зачем это нужно:</strong> без шифрования любой на пути может прочитать или подменить ваши
+                данные. TLS даёт конфиденциальность, целостность и проверку личности собеседника — это «замок» рядом с
+                адресом сайта в браузере.</p>
+              <p><strong>Аналогия из жизни:</strong> запечатанный дипломатический мешок: обе стороны независимо выводят
+                один и тот же одноразовый ключ, не передавая его по проводам (Диффи-Хеллман), а дальше все данные
+                шифруются быстрым симметричным шифром.</p>
+              <p><strong>Что будет, если сломается:</strong> браузер покажет «Не защищено», злоумышленник в сети сможет
+                читать ваши пароли (man-in-the-middle), либо вы увидите ошибку сертификата («недоверенный / истёк срок
+                действия»).</p>
+              <ul>
+                <li><strong>Асимметричное шифрование (ECDHE)</strong> — для рукопожатия: обмен ключами без их передачи.
+                </li>
+                <li><strong>Симметричное шифрование (AES/GCM)</strong> — для самих данных: в разы быстрее.</li>
+                <li><strong>Сертификаты и PKI</strong> — доказательство, что «это действительно example.com, а не
+                  подделка».</li>
+                <li><strong>PFS (совершенная прямая секретность)</strong> — даже если ключ сервера утечёт в будущем,
+                  прошлые сессии останутся нечитаемыми.</li>
+              </ul>
+
+              <div class="code-block-wrapper">
+                <div class="code-block-header">
+                  <span class="code-lang-tag"><span>🔐</span> Проверьте TLS-соединение сами</span>
+                  <button type="button" class="code-copy-btn"><span>📋</span> Копировать</button>
+                </div>
+                <pre><code class="language-bash"># Посмотреть сертификат и параметры рукопожатия (Linux/macOS)
+openssl s_client -connect example.com:443
+
+# Быстрая проверка заголовков HTTPS из Windows/Linux
+curl -vI https://example.com
+# Увидите: "SSL connection using TLS_AES_256_GCM_SHA384" и ответ HTTP/2 200</code></pre>
+              </div>
+            </div>
+          </article>
+
           <!-- DIAGRAM PLACEHOLDER: SVG-TLS -->
           <div class="diagram-card">
             <div class="diagram-header">
@@ -2713,7 +3304,8 @@ ssize_t bytes_read = <span class="tok-fn">read</span>(client_fd, buffer, <span c
                 <g transform="translate(80, 515)">
                   <rect width="780" height="30" rx="6" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.08)" />
                   <text x="390" y="20" fill="#93c5fd" font-size="10" text-anchor="middle">🚀 В TLS 1.3 также доступен
-                    режим <tspan font-weight="700">0-RTT Resumption (Early Data)</tspan>: отправка зашифрованных данных в первом же
+                    режим <tspan font-weight="700">0-RTT Resumption (Early Data)</tspan>: отправка зашифрованных данных
+                    в первом же
                     пакете при повторных сессиях!</text>
                 </g>
 
@@ -2855,6 +3447,35 @@ ClientHello
               HTTP/3 QUIC.
             </p>
           </div>
+
+          <!-- Card L0: Beginner guide to the Application Layer -->
+          <article class="academic-card card-theory">
+            <header class="card-header">
+              <div class="card-title-group">
+                <h3 class="card-title">🧭 Прикладной уровень простыми словами</h3>
+              </div>
+              <span class="card-category-badge">На пальцах</span>
+            </header>
+            <div class="card-body">
+              <p><strong>Зачем это нужно:</strong> это «входная дверь» интернета: DNS переводит понятные имена в
+                IP-адреса, а HTTP/HTTPS доставляет сам контент.</p>
+              <p><strong>Аналогия из жизни:</strong> DNS — телефонный справочник или оператор: вместо того чтобы
+                запоминать номера, вы спрашиваете «какой адрес у example.com?» и за миллисекунды получаете ответ.</p>
+              <p><strong>Что будет, если сломается:</strong> сайты не откроются по имени (хотя по IP будут работать),
+                страницы станут грузиться медленнее, а при DNS-подмене пользователя могут направить на поддельный сайт.
+              </p>
+              <ul>
+                <li><strong>A / AAAA записи</strong> — соответствие «имя → IPv4/IPv6-адрес».</li>
+                <li><strong>Рекурсивное разрешение</strong> — ваш резолвер проходит иерархию DNS: корень → зона верхнего
+                  уровня → зона сайта.</li>
+                <li><strong>DoT / DoH</strong> — зашифрованные DNS-запросы, чтобы никто не видел, какие сайты вы ищете.
+                </li>
+                <li><strong>DNSSEC</strong> — цифровые подписи записей: доказательство, что ответ не подделан.</li>
+                <li><strong>HTTP/3 (QUIC)</strong> — веб поверх UDP: быстрее старт и нет «блокировки головой очереди».
+                </li>
+              </ul>
+            </div>
+          </article>
 
           <!-- Card 6.1: Theory - DNS Architecture & Resolution -->
           <article class="academic-card card-theory">

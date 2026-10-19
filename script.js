@@ -14,6 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initCidrCalculator();
   initPortLookup();
   initSvgViewer();
+  initCardTools();
 });
 
 /* ==========================================================================
@@ -263,6 +264,7 @@ function initCidrCalculator() {
   const elScope = document.getElementById('calcResScope');
   const elBinIp = document.getElementById('calcBinIp');
   const elBinMask = document.getElementById('calcBinMask');
+  const resPlain = document.getElementById('calcResPlainText');
 
   // Валидация ввода: плашка с ошибкой + подсветка поля IP
   const errorBox = document.getElementById('cidrError');
@@ -357,7 +359,7 @@ function initCidrCalculator() {
 
     if (ipInt === null) {
       // Сбрасываем все результаты, чтобы не оставались «старые» значения
-      [elNet, elBcast, elMask, elWildcard, elRange, elHosts, elScope, elBinIp, elBinMask]
+      [elNet, elBcast, elMask, elWildcard, elRange, elHosts, elScope, elBinIp, elBinMask, resPlain]
         .forEach(el => { if (el) el.textContent = '—'; });
       return;
     }
@@ -394,6 +396,11 @@ function initCidrCalculator() {
     if (elHosts) elHosts.textContent = `${usableHosts.toLocaleString()} полезных (из ${totalIps.toLocaleString()})`;
     if (elScope) elScope.textContent = getScope(ipInt);
     if (elBinIp) elBinIp.textContent = intToBinary(ipInt);
+
+    // Plain-language explanation for beginners
+    if (resPlain) {
+      resPlain.textContent = describeCidrInPlainWords(prefix, intToIp(netInt), intToIp(bcastInt), totalIps);
+    }
     if (elBinMask) elBinMask.textContent = intToBinary(maskInt);
   }
 
@@ -614,3 +621,134 @@ function initSvgViewer() {
   });
 }
 
+
+
+/* ==========================================================================
+   11. CARD TOOLS: favorites & copy link (injected into card headers)
+   ========================================================================== */
+const FAVORITES_KEY = 'network-project-favorites';
+
+function initCardTools() {
+  const cards = document.querySelectorAll('.academic-card, .diagram-card');
+  if (!cards.length) return;
+
+  let favs = new Set();
+  try {
+    const raw = JSON.parse(localStorage.getItem(FAVORITES_KEY) || '[]');
+    if (Array.isArray(raw)) favs = new Set(raw);
+  } catch (e) { /* ignore */ }
+
+  cards.forEach((card) => {
+    // Stable ID: own id, or generated from the parent section + position
+    let cardId = card.id;
+    if (!cardId) {
+      const sec = card.closest('.academic-section');
+      const secId = (sec && sec.id) ? sec.id : 'section';
+      const siblings = Array.from((sec || document).querySelectorAll('.academic-card, .diagram-card'));
+      cardId = `${secId}-card-${siblings.indexOf(card) + 1}`;
+    }
+
+    const header = card.querySelector('.card-header');
+    if (!header) return;
+
+    const actions = document.createElement('div');
+    actions.className = 'card-actions';
+
+    // Favorite toggle (persisted in localStorage)
+    const favBtn = document.createElement('button');
+    favBtn.type = 'button';
+    favBtn.className = 'card-action-btn' + (favs.has(cardId) ? ' active' : '');
+    favBtn.title = 'В избранное / убрать из избранного';
+    favBtn.textContent = favs.has(cardId) ? '★' : '☆';
+    favBtn.addEventListener('click', () => {
+      if (favs.has(cardId)) {
+        favs.delete(cardId);
+        favBtn.classList.remove('active');
+        favBtn.textContent = '☆';
+      } else {
+        favs.add(cardId);
+        favBtn.classList.add('active');
+        favBtn.textContent = '★';
+      }
+      try {
+        localStorage.setItem(FAVORITES_KEY, JSON.stringify([...favs]));
+      } catch (e) { /* ignore */ }
+    });
+
+    // Copy link to this card (works with file:// too — keeps current URL, swaps hash)
+    const linkBtn = document.createElement('button');
+    linkBtn.type = 'button';
+    linkBtn.className = 'card-action-btn';
+    linkBtn.title = 'Скопировать ссылку на этот блок';
+    linkBtn.textContent = '🔗';
+    linkBtn.addEventListener('click', () => {
+      const url = location.href.split('#')[0] + '#' + cardId;
+      copyTextToClipboard(url).then((ok) => {
+        if (ok) {
+          linkBtn.classList.add('copied');
+          linkBtn.textContent = '✓';
+          setTimeout(() => {
+            linkBtn.classList.remove('copied');
+            linkBtn.textContent = '🔗';
+          }, 1500);
+        }
+      });
+    });
+
+    actions.appendChild(favBtn);
+    actions.appendChild(linkBtn);
+    header.appendChild(actions);
+  });
+}
+
+function copyTextToClipboard(text) {
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    return navigator.clipboard.writeText(text).then(() => true, () => fallbackCopy(text));
+  }
+  return Promise.resolve(fallbackCopy(text));
+}
+
+function fallbackCopy(text) {
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed';
+  ta.style.opacity = '0';
+  document.body.appendChild(ta);
+  ta.select();
+  let ok = false;
+  try { ok = document.execCommand('copy'); } catch (e) { /* ignore */ }
+  document.body.removeChild(ta);
+  return ok;
+}
+
+
+/* ==========================================================================
+   12. CIDR PLAIN-LANGUAGE EXPLANATION (beginner mode)
+   ========================================================================== */
+function describeCidrInPlainWords(prefix, networkIp, broadcastIp, totalHosts) {
+  const netBits = prefix;
+  const hostBits = 32 - prefix;
+
+  if (prefix === 0) {
+    return `Маска /0 означает: всё IPv4-пространство — все ~4,3 млрд адресов принадлежат одной «улице». Отдельных сетей здесь нет.`;
+  }
+  if (prefix <= 8) {
+    return `Маска /${prefix} — огромная сеть на миллионы адресов (масштаб класса A). Первые ${netBits} бит задают «улицу» (сеть), остальные ${hostBits} — «номер дома».`;
+  }
+  if (prefix === 32) {
+    return `Маска /32 означает: ровно один адрес (${networkIp}) для одного устройства. Соседей и широковещания здесь нет.`;
+  }
+  if (prefix >= 31) {
+    return `Маска /${prefix} — точечная связь между двумя устройствами: всего два адреса — ${networkIp} и ${broadcastIp}.`;
+  }
+
+  let what;
+  if (prefix <= 12) what = 'очень большая сеть для крупной корпорации или провайдера';
+  else if (prefix <= 16) what = 'крупная организация, кампус или дата-центр — десятки тысяч устройств';
+  else if (prefix === 24) what = 'типичная домашняя или офисная сеть';
+  else if (prefix <= 28) what = 'небольшая команда или лаборатория: десяток-другой устройств';
+  else what = 'очень маленькая группа устройств — хватает на несколько машин';
+
+  const usable = totalHosts - 2;
+  return `Маска /${prefix} означает: первые ${netBits} бит адреса — это «улица» (сеть), остальные ${hostBits} — «номер дома». Это ${what}: всего ${totalHosts.toLocaleString('ru-RU')} адресов, из них ${usable.toLocaleString('ru-RU')} можно выдать устройствам. Адрес ${networkIp} называет саму улицу, а ${broadcastIp} — это «крик всем на улице» (широковещательный).`;
+}
