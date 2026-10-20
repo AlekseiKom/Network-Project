@@ -739,7 +739,7 @@ function describeCidrInPlainWords(prefix, networkIp, broadcastIp, totalHosts) {
     return `Маска /32 означает: ровно один адрес (${networkIp}) для одного устройства. Соседей и широковещания здесь нет.`;
   }
   if (prefix >= 31) {
-    return `Маска /${prefix} — точечная связь между двумя устройствами: всего два адреса — ${networkIp} и ${broadcastIp}.`;
+    return `Маска /${prefix} — точечная связь между двумя устройствами: всего два адреса — ${networkIp} и ${broadcastIp}. Оба можно выдать устройствам: широковещательного адреса на такой «улице» нет (RFC 3021).`;
   }
 
   let what;
