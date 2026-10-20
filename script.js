@@ -87,12 +87,13 @@ function initLiveSearch() {
     }
   });
 
-  // Clear on Escape
+  // Clear on Escape (on mobile — also collapse the dropdown panel)
   searchInput.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
       searchInput.value = '';
       searchInput.dispatchEvent(new Event('input'));
       searchInput.blur();
+      closeMobileSearchPanel(false);
     }
   });
 }
@@ -193,6 +194,7 @@ function initMobileMenu() {
   document.body.appendChild(backdrop);
 
   function openSidebar() {
+    closeMobileSearchPanel(); // панели взаимоисключающие: drawer закрывает поиск
     sidebar.classList.add('open');
     backdrop.style.opacity = '1';
     backdrop.style.pointerEvents = 'auto';
@@ -223,6 +225,85 @@ function initMobileMenu() {
       }
     });
   });
+
+  // Кнопка поиска в шапке — toggle дропдаун-панели (только мобильный viewport, ≤768px)
+  const searchBtn = document.getElementById('mobileSearchBtn');
+  if (searchBtn) {
+    searchBtn.addEventListener('click', () => {
+      if (mobileSearchIsOpen()) closeMobileSearchPanel();
+      else openMobileSearchPanel();
+    });
+  }
+
+  // Клик вне панели и кнопки поиска закрывает панель
+  document.addEventListener('click', (e) => {
+    if (!mobileSearchIsOpen()) return;
+    const t = e.target;
+    if (t.closest && (t.closest('.header-search') || t.closest('#mobileSearchBtn'))) return;
+    closeMobileSearchPanel();
+  });
+
+  // При выходе из мобильного viewport закрываем панель, чтобы она не «висела» на десктопе
+  window.addEventListener('resize', () => {
+    if (!isMobileViewport()) closeMobileSearchPanel();
+  });
+}
+
+/* ==========================================================================
+   5A. MOBILE SEARCH PANEL (dropdown, ≤768px)
+   Кнопка #mobileSearchBtn открывает панель поиска под шапкой: JS добавляет/
+   убирает .search-open на #siteHeader (стили — в @media в style.css).
+   Функции top-level — их вызывают initLiveSearch и initKeyboardShortcuts.
+   ========================================================================== */
+const MOBILE_SEARCH_MAX_WIDTH = 768; // должен совпадать с @media в style.css
+
+function isMobileViewport() {
+  return window.innerWidth <= MOBILE_SEARCH_MAX_WIDTH;
+}
+
+function mobileSearchIsOpen() {
+  const header = document.getElementById('siteHeader');
+  return !!(header && header.classList.contains('search-open'));
+}
+
+// Закрытие мобильного drawer извне (логика дублирует closeSidebar в initMobileMenu)
+function closeMobileDrawer() {
+  const sidebar = document.getElementById('sidebar');
+  if (sidebar) sidebar.classList.remove('open');
+  const backdrop = document.querySelector('.sidebar-backdrop');
+  if (backdrop) {
+    backdrop.style.opacity = '0';
+    backdrop.style.pointerEvents = 'none';
+  }
+}
+
+function openMobileSearchPanel() {
+  if (!isMobileViewport()) {
+    // Десктоп: дропдаун-панели нет — просто фокус на инпут в шапке
+    const input = document.getElementById('globalSearchInput');
+    if (input) { input.focus(); input.select(); }
+    return;
+  }
+  const header = document.getElementById('siteHeader');
+  const btn = document.getElementById('mobileSearchBtn');
+  const input = document.getElementById('globalSearchInput');
+  if (!header || !btn || !input) return;
+  closeMobileDrawer(); // панели взаимоисключающие
+  header.classList.add('search-open');
+  btn.setAttribute('aria-expanded', 'true');
+  input.focus();
+}
+
+function closeMobileSearchPanel(keepFocus = false) {
+  if (!mobileSearchIsOpen()) return; // no-op (в т.ч. на десктопе, где панели нет)
+  const header = document.getElementById('siteHeader');
+  const btn = document.getElementById('mobileSearchBtn');
+  header.classList.remove('search-open');
+  if (btn) btn.setAttribute('aria-expanded', 'false');
+  if (keepFocus) {
+    const input = document.getElementById('globalSearchInput');
+    if (input) input.focus();
+  }
 }
 
 /* ==========================================================================
@@ -233,12 +314,23 @@ function initKeyboardShortcuts() {
   if (!searchInput) return;
 
   window.addEventListener('keydown', (e) => {
-    // '/' or 'Ctrl+K' / 'Cmd+K' to focus search
+    // Esc — закрыть мобильную панель поиска, если она открыта и фокус не в инпуте
+    // (Esc с фокусом в инпуте обрабатывается в initLiveSearch: очистка + blur)
+    if (e.key === 'Escape' && mobileSearchIsOpen() && document.activeElement !== searchInput) {
+      closeMobileSearchPanel();
+      return;
+    }
+
+    // '/' or 'Ctrl+K' / 'Cmd+K' — focus search (на мобильном — ещё и открыть панель)
     if ((e.key === '/' && document.activeElement !== searchInput) || 
         ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k')) {
       e.preventDefault();
-      searchInput.focus();
-      searchInput.select();
+      if (isMobileViewport()) {
+        openMobileSearchPanel(); // откроет дропдаун и поставит фокус на инпут
+      } else {
+        searchInput.focus();
+        searchInput.select();
+      }
     }
   });
 }

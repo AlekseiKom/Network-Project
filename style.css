@@ -430,7 +430,8 @@ body {
   color: #93c5fd;
 }
 
-.mobile-menu-btn {
+/* Кнопки мобильных действий: поиск + бургер (на десктопе скрыты) */
+.mobile-menu-btn, .mobile-search-btn {
   display: none;
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid var(--border-glass);
@@ -441,6 +442,15 @@ body {
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
+}
+
+.mobile-menu-btn:hover, .mobile-search-btn:hover {
+  background: rgba(255, 255, 255, 0.09);
+}
+
+.mobile-menu-btn:active, .mobile-search-btn:active {
+  transform: scale(0.94);
 }
 
 /* Top Progress Bar */
@@ -1353,24 +1363,59 @@ table.academic-table tr:hover td {
   }
 }
 
-/* --- Мобильная шапка (≤768px): поиск на отдельной строке, во всю ширину — без обрезки placeholder --- */
+/* --- Мобильная шапка (≤768px): одна строка — бренд + кнопки; иконка поиска открывает плавную панель-дропдаун под строкой --- */
 @media (max-width: 768px) {
+  /* Одна строка со стандартной высотой, чтобы drawer начинался ровно под ней */
   .site-header {
-    height: auto;
+    height: 72px;
   }
 
   .header-inner {
-    flex-wrap: wrap;
-    padding-top: 10px;
-    padding-bottom: 10px;
-    row-gap: 10px;
+    flex-wrap: nowrap;
+    padding-top: 0;
+    padding-bottom: 0;
+    row-gap: 0;
   }
 
-  /* Строка 1 — бренд и бургер (justify-content: space-between), строка 2 — поиск */
+  /* Компактная кнопка поиска рядом с бургером (того же размера) */
+  .mobile-search-btn {
+    display: flex;
+  }
+
+  /* Панель поиска — скрыта по умолчанию, плавно раскрывается под шапкой при открытии */
   .header-search {
-    order: 3;
-    flex: 1 1 100%;
+    position: absolute;
+    top: calc(100% - 1px);
+    left: 12px;
+    right: 12px;
+    z-index: 95;
     max-width: none;
+    background: rgba(8, 16, 34, 0.97);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border-bottom: 1px solid var(--border-glass);
+    box-shadow: 0 18px 32px rgba(2, 6, 23, 0.55);
+    padding: 10px 4px;
+    max-height: 0;
+    opacity: 0;
+    visibility: hidden;
+    overflow: hidden;
+    transform: translateY(-10px);
+    transition: max-height 0.38s cubic-bezier(0.4, 0, 0.2, 1),
+                transform 0.38s cubic-bezier(0.4, 0, 0.2, 1),
+                opacity 0.3s ease,
+                visibility 0s linear 0.38s;
+  }
+
+  /* Открытое состояние — класс .search-open вешает JS на #siteHeader */
+  #siteHeader.search-open .header-search {
+    max-height: 96px;
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    transition: max-height 0.38s cubic-bezier(0.4, 0, 0.2, 1),
+                transform 0.38s cubic-bezier(0.4, 0, 0.2, 1),
+                opacity 0.25s ease;
   }
 
   /* kbd скрыт → не резервируем его место справа, чуть меньше кегль */
@@ -1383,16 +1428,16 @@ table.academic-table tr:hover td {
     display: none;
   }
 
-  /* Мобильный drawer начинается под (выросшей) шапкой, слегка уходя за её край */
+  /* Мобильный drawer возвращается под стандартную (72px) шапку из блока ≤1024 */
   .sidebar {
-    top: 114px;
-    height: calc(100vh - 114px);
+    top: 72px;
+    height: calc(100vh - 72px);
   }
 }
 
 @media (max-width: 640px) {
   .header-inner {
-    padding: 10px 12px;
+    padding: 0 12px;
     gap: 12px;
   }
 
