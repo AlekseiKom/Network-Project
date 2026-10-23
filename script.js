@@ -15,6 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initPortLookup();
   initSvgViewer();
   initCardTools();
+  initBackToTop();
 });
 
 /* ==========================================================================
@@ -38,7 +39,7 @@ function initProgressBar() {
 function initLiveSearch() {
   const searchInput = document.getElementById('globalSearchInput');
   const noResultsPanel = document.getElementById('noResultsPanel');
-  const cards = document.querySelectorAll('.academic-card, .diagram-card');
+  const cards = document.querySelectorAll('.academic-card, .diagram-card, .tool-card');
   const sections = document.querySelectorAll('.academic-section');
 
   if (!searchInput) return;
@@ -69,7 +70,7 @@ function initLiveSearch() {
 
     // Check each section: if all cards inside are hidden, hide section header
     sections.forEach(sec => {
-      const visibleChildCards = sec.querySelectorAll('.academic-card:not(.hidden), .diagram-card:not(.hidden)');
+      const visibleChildCards = sec.querySelectorAll('.academic-card:not(.hidden), .diagram-card:not(.hidden), .tool-card:not(.hidden)');
       if (visibleChildCards.length === 0) {
         sec.classList.add('hidden');
       } else {
@@ -102,7 +103,7 @@ function initLiveSearch() {
    3. SCROLLSPY (SIDEBAR ACTIVE HIGHLIGHT)
    ========================================================================== */
 function initScrollSpy() {
-  const sections = document.querySelectorAll('.academic-section');
+  const sections = document.querySelectorAll('.academic-section, .tool-card[id], #sec-footer');
   const navLinks = document.querySelectorAll('.sidebar-nav-link');
 
   if (!sections.length || !navLinks.length) return;
@@ -415,9 +416,20 @@ function initCidrCalculator() {
     return 'Публичный (Internet Routable)';
   }
 
-  function update() {
+  function update(sourcePrefix) {
     let rawIp = ipInput.value.trim();
-    let prefix = parseInt(prefixSelect.value, 10);
+    let prefix;
+    if (typeof sourcePrefix === 'number' && !isNaN(sourcePrefix)) {
+      prefix = sourcePrefix;
+    } else {
+      prefix = parseInt(prefixSelect.value, 10);
+      if (isNaN(prefix)) {
+        prefix = parseInt(prefixSlider.value, 10);
+      }
+    }
+    if (isNaN(prefix) || prefix < 0) prefix = 24;
+    if (prefix > 32) prefix = 32;
+
     let prefixError = null;
 
     // If user pasted CIDR notation e.g. 192.168.1.50/26
@@ -437,7 +449,7 @@ function initCidrCalculator() {
 
     if (sliderLabel) sliderLabel.textContent = `/${prefix}`;
     prefixSlider.value = prefix;
-    prefixSelect.value = prefix;
+    prefixSelect.value = String(prefix);
 
     const ipInt = ipToInt(rawIp);
     const ipError = ipInt === null ? ipErrorMessage(rawIp) : null;
@@ -481,7 +493,15 @@ function initCidrCalculator() {
     }
 
     if (elNet) elNet.textContent = `${intToIp(netInt)} /${prefix}`;
-    if (elBcast) elBcast.textContent = intToIp(bcastInt);
+    if (elBcast) {
+      if (prefix === 31) {
+        elBcast.textContent = 'Отсутствует (PtP / RFC 3021)';
+      } else if (prefix === 32) {
+        elBcast.textContent = 'Отсутствует (Host-route)';
+      } else {
+        elBcast.textContent = intToIp(bcastInt);
+      }
+    }
     if (elMask) elMask.textContent = `${intToIp(maskInt)} (0x${maskInt.toString(16).toUpperCase()})`;
     if (elWildcard) elWildcard.textContent = intToIp(wildcardInt);
     if (elRange) elRange.textContent = `${intToIp(firstHostInt)} — ${intToIp(lastHostInt)}`;
@@ -496,14 +516,12 @@ function initCidrCalculator() {
     if (elBinMask) elBinMask.textContent = intToBinary(maskInt);
   }
 
-  ipInput.addEventListener('input', update);
+  ipInput.addEventListener('input', () => update());
   prefixSelect.addEventListener('change', (e) => {
-    prefixSlider.value = e.target.value;
-    update();
+    update(parseInt(e.target.value, 10));
   });
   prefixSlider.addEventListener('input', (e) => {
-    prefixSelect.value = e.target.value;
-    update();
+    update(parseInt(e.target.value, 10));
   });
 
   // Run on start
@@ -822,25 +840,48 @@ function describeCidrInPlainWords(prefix, networkIp, broadcastIp, totalHosts) {
   const hostBits = 32 - prefix;
 
   if (prefix === 0) {
-    return `Маска /0 означает: всё IPv4-пространство — все ~4,3 млрд адресов принадлежат одной «улице». Отдельных сетей здесь нет.`;
+    return `Маска /0 означает: всё IPv4-пространство — все ~4,3 млрд адресов принадлежат единому маршруту по умолчанию (Default Route). Отдельных изолированных сетей здесь нет.`;
   }
   if (prefix <= 8) {
     return `Маска /${prefix} — огромная сеть на миллионы адресов (масштаб класса A). Первые ${netBits} бит задают «улицу» (сеть), остальные ${hostBits} — «номер дома».`;
   }
   if (prefix === 32) {
-    return `Маска /32 означает: ровно один адрес (${networkIp}) для одного устройства. Соседей и широковещания здесь нет.`;
+    return `Маска /32 означает: ровно один конкретный хост (${networkIp}). Широковещательного адреса и соседних узлов в такой сети нет (Host Route / Loopback).`;
   }
-  if (prefix >= 31) {
-    return `Маска /${prefix} — точечная связь между двумя устройствами: всего два адреса — ${networkIp} и ${broadcastIp}. Оба можно выдать устройствам: широковещательного адреса на такой «улице» нет (RFC 3021).`;
+  if (prefix === 31) {
+    return `Маска /31 — прямая связь между двумя сетевыми узлами (Point-to-Point, RFC 3021): всего два адреса (${networkIp} и ${broadcastIp}), и оба назначаются интерфейсам роутеров без потерь на адрес сети и broadcast.`;
   }
 
   let what;
-  if (prefix <= 12) what = 'очень большая сеть для крупной корпорации или провайдера';
-  else if (prefix <= 16) what = 'крупная организация, кампус или дата-центр — десятки тысяч устройств';
-  else if (prefix === 24) what = 'типичная домашняя или офисная сеть';
-  else if (prefix <= 28) what = 'небольшая команда или лаборатория: десяток-другой устройств';
-  else what = 'очень маленькая группа устройств — хватает на несколько машин';
+  if (prefix <= 12) what = 'очень большая сеть для крупной корпорации или провайдера (миллионы адресов)';
+  else if (prefix <= 16) what = 'крупная организация, кампус или дата-центр (десятки тысяч устройств)';
+  else if (prefix <= 20) what = 'большой филиал или предприятие (от 4 до 32 тысяч адресов)';
+  else if (prefix === 24) what = 'типичная офисная или домашняя сеть (до 256 адресов)';
+  else if (prefix <= 28) what = 'небольшая команда или отдел (от 16 до 128 адресов)';
+  else what = 'точечная группа из нескольких машин (4–8 адресов)';
 
   const usable = totalHosts - 2;
   return `Маска /${prefix} означает: первые ${netBits} бит адреса — это «улица» (сеть), остальные ${hostBits} — «номер дома». Это ${what}: всего ${totalHosts.toLocaleString('ru-RU')} адресов, из них ${usable.toLocaleString('ru-RU')} можно выдать устройствам. Адрес ${networkIp} называет саму улицу, а ${broadcastIp} — это «крик всем на улице» (широковещательный).`;
 }
+
+/* ==========================================================================
+   13. BACK TO TOP BUTTON
+   ========================================================================== */
+function initBackToTop() {
+  const btn = document.getElementById('backToTopBtn');
+  if (!btn) return;
+
+  const toggleVisibility = () => {
+    if (window.scrollY > 400) {
+      btn.classList.add('visible');
+    } else {
+      btn.classList.remove('visible');
+    }
+  };
+
+  window.addEventListener('scroll', toggleVisibility, { passive: true });
+  btn.addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+}
+

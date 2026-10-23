@@ -1932,13 +1932,31 @@ Paths: (2 available, best #1)
               <div class="calc-field" style="flex: 2; min-width: 240px;">
                 <label for="cidrPrefixSelect">Маска подсети (CIDR)</label>
                 <select id="cidrPrefixSelect" class="calc-select">
-                  <option value="8">/8 — 255.0.0.0 (16 777 214 хостов)</option>
+                  <option value="0">/0 — 0.0.0.0 (Весь IPv4, ~4.3 млрд адресов)</option>
+                  <option value="1">/1 — 128.0.0.0 (~2.15 млрд адресов)</option>
+                  <option value="2">/2 — 192.0.0.0 (~1.07 млрд адресов)</option>
+                  <option value="3">/3 — 224.0.0.0 (~536 млн адресов)</option>
+                  <option value="4">/4 — 240.0.0.0 (~268 млн адресов)</option>
+                  <option value="5">/5 — 248.0.0.0 (~134 млн адресов)</option>
+                  <option value="6">/6 — 252.0.0.0 (~67.1 млн адресов)</option>
+                  <option value="7">/7 — 254.0.0.0 (~33.5 млн адресов)</option>
+                  <option value="8">/8 — 255.0.0.0 (16 777 214 хостов / Класс A)</option>
+                  <option value="9">/9 — 255.128.0.0 (8 388 606 хостов)</option>
+                  <option value="10">/10 — 255.192.0.0 (4 194 302 хоста)</option>
+                  <option value="11">/11 — 255.224.0.0 (2 097 150 хостов)</option>
                   <option value="12">/12 — 255.240.0.0 (1 048 574 хоста)</option>
-                  <option value="16">/16 — 255.255.0.0 (65 534 хоста)</option>
+                  <option value="13">/13 — 255.248.0.0 (524 286 хостов)</option>
+                  <option value="14">/14 — 255.252.0.0 (262 142 хоста)</option>
+                  <option value="15">/15 — 255.254.0.0 (131 070 хостов)</option>
+                  <option value="16">/16 — 255.255.0.0 (65 534 хоста / Класс B)</option>
+                  <option value="17">/17 — 255.255.128.0 (32 766 хостов)</option>
+                  <option value="18">/18 — 255.255.192.0 (16 382 хоста)</option>
+                  <option value="19">/19 — 255.255.224.0 (8 190 хостов)</option>
                   <option value="20">/20 — 255.255.240.0 (4 094 хоста)</option>
+                  <option value="21">/21 — 255.255.248.0 (2 046 хостов)</option>
                   <option value="22">/22 — 255.255.252.0 (1 022 хоста)</option>
                   <option value="23">/23 — 255.255.254.0 (510 хостов)</option>
-                  <option value="24" selected>/24 — 255.255.255.0 (254 хоста)</option>
+                  <option value="24" selected>/24 — 255.255.255.0 (254 хоста / Класс C)</option>
                   <option value="25">/25 — 255.255.255.128 (126 хостов)</option>
                   <option value="26">/26 — 255.255.255.192 (62 хоста)</option>
                   <option value="27">/27 — 255.255.255.224 (30 хостов)</option>
@@ -2720,7 +2738,7 @@ $ nft add rule inet filter forward tcp flags syn tcp option maxseg size set rt m
               </div>
             </div>
           </article>
-          <article class="card">
+          <article class="academic-card card-theory">
             <header class="card-header">
               <div class="card-title-group">
                 <h3 class="card-title">🧑 Firewall и защита TCP/UDP (на пальцах)</h3>
@@ -3717,7 +3735,7 @@ example.com.        86400   IN      RRSIG   A 13 2 86400 20261025000000 20261004
               </div>
             </div>
           </article>
-          <article class="card">
+          <article class="academic-card card-theory">
             <header class="card-header">
               <div class="card-title-group">
                 <h3 class="card-title">🔐 DNSSEC и DoT/DoH на пальцах</h3>
@@ -3982,7 +4000,7 @@ example.com.        86400   IN      RRSIG   A 13 2 86400 20261025000000 20261004
         <div class="footer-brand">
           <h4>Networks. Handbook</h4>
           <p>
-            Интерактивная памятка-коспект и краткое руководство по распределенным системам и компьютерным сетям. Создано
+            Интерактивная памятка-конспект и краткое руководство по распределенным системам и компьютерным сетям. Создано
             для
             инженеров, архитекторов и исследователей на базе классических трудов Computer Science.
           </p>
@@ -4058,6 +4076,13 @@ example.com.        86400   IN      RRSIG   A 13 2 86400 20261025000000 20261004
       </div>
     </div>
   </footer>
+
+  <!-- Back to Top Button -->
+  <button id="backToTopBtn" class="back-to-top" type="button" aria-label="Вернуться наверх" title="Вернуться наверх">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="18 15 12 9 6 15"></polyline>
+    </svg>
+  </button>
 
   <!-- Relative JavaScript link -->
   <script src="./script.js"></script>
