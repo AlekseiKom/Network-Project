@@ -34,29 +34,198 @@ function initProgressBar() {
 }
 
 /* ==========================================================================
-   2. LIVE SEARCH & FILTERING
+   2. SMART LIVE SEARCH & KEYWORD DIRECTORY
    ========================================================================== */
 function initLiveSearch() {
   const searchInput = document.getElementById('globalSearchInput');
+  const dropdown = document.getElementById('searchResultsDropdown');
   const noResultsPanel = document.getElementById('noResultsPanel');
   const cards = document.querySelectorAll('.academic-card, .diagram-card, .tool-card');
   const sections = document.querySelectorAll('.academic-section');
 
   if (!searchInput) return;
 
+  // Specific high-priority network dictionary
+  const KEYWORD_INDEX = [
+    // TCP Flags
+    { term: 'SYN', title: 'Флаг SYN (Synchronize)', category: 'Флаг TCP', badgeClass: 'badge-tcp', targetId: 'sec-l4', desc: 'Синхронизация номеров ISN, инициирует 3-Way Handshake TCP.' },
+    { term: 'ACK', title: 'Флаг ACK (Acknowledgment)', category: 'Флаг TCP', badgeClass: 'badge-tcp', targetId: 'sec-l4', desc: 'Подтверждение получения байтов (поле Acknowledgment Number).' },
+    { term: 'FIN', title: 'Флаг FIN (Finish)', category: 'Флаг TCP', badgeClass: 'badge-tcp', targetId: 'sec-l4', desc: 'Инициация корректного закрытия TCP-соединения (4-Way Close).' },
+    { term: 'RST', title: 'Флаг RST (Reset)', category: 'Флаг TCP', badgeClass: 'badge-tcp', targetId: 'sec-l4', desc: 'Аварийный немедленный сброс соединения при ошибке или атаке.' },
+    { term: 'PSH', title: 'Флаг PSH (Push)', category: 'Флаг TCP', badgeClass: 'badge-tcp', targetId: 'sec-l4', desc: 'Требование немедленно выдать данные приложению без ожидания буфера.' },
+    { term: 'URG', title: 'Флаг URG (Urgent)', category: 'Флаг TCP', badgeClass: 'badge-tcp', targetId: 'sec-l4', desc: 'Указатель на срочные внеполосные данные (Urgent Pointer).' },
+    { term: 'ECE', title: 'Флаг ECE (ECN-Echo)', category: 'Флаг TCP', badgeClass: 'badge-tcp', targetId: 'sec-l4', desc: 'Явное уведомление от роутера о возникновении затора в канале.' },
+    { term: 'CWR', title: 'Флаг CWR (Congestion Window Reduced)', category: 'Флаг TCP', badgeClass: 'badge-tcp', targetId: 'sec-l4', desc: 'Подтверждение отправителя об уменьшении окна cwnd.' },
+
+    // DNS Records
+    { term: 'A', title: 'DNS Запись A (IPv4 Address)', category: 'Запись DNS', badgeClass: 'badge-dns', targetId: 'sec-app', desc: 'Преобразует доменное имя в 32-битный IPv4-адрес.' },
+    { term: 'AAAA', title: 'DNS Запись AAAA (IPv6 Address)', category: 'Запись DNS', badgeClass: 'badge-dns', targetId: 'sec-app', desc: 'Преобразует доменное имя в 128-битный IPv6-адрес.' },
+    { term: 'CNAME', title: 'DNS Запись CNAME (Canonical Name)', category: 'Запись DNS', badgeClass: 'badge-dns', targetId: 'sec-app', desc: 'Канонический псевдоним (алиас) одного домена на другой.' },
+    { term: 'MX', title: 'DNS Запись MX (Mail Exchange)', category: 'Запись DNS', badgeClass: 'badge-dns', targetId: 'sec-app', desc: 'Почтовые серверы домена и их приоритеты для протокола SMTP.' },
+    { term: 'TXT', title: 'DNS Запись TXT (Text / SPF / DKIM)', category: 'Запись DNS', badgeClass: 'badge-dns', targetId: 'sec-app', desc: 'Текстовая информация: подтверждение прав, SPF, DKIM, DMARC.' },
+    { term: 'PTR', title: 'DNS Запись PTR (Pointer / Reverse DNS)', category: 'Запись DNS', badgeClass: 'badge-dns', targetId: 'sec-app', desc: 'Обратное разрешение: сопоставляет IP-адрес с доменным именем.' },
+    { term: 'NS', title: 'DNS Запись NS (Name Server)', category: 'Запись DNS', badgeClass: 'badge-dns', targetId: 'sec-app', desc: 'Указывает авторитетные DNS-серверы для делегированной зоны.' },
+    { term: 'SOA', title: 'DNS Запись SOA (Start of Authority)', category: 'Запись DNS', badgeClass: 'badge-dns', targetId: 'sec-app', desc: 'Параметры зоны: серийный номер, таймеры обновления и TTL.' },
+    { term: 'SRV', title: 'DNS Запись SRV (Service Locator)', category: 'Запись DNS', badgeClass: 'badge-dns', targetId: 'sec-app', desc: 'Указывает хост, порт и протокол для службы (SIP, LDAP, XMPP).' },
+    { term: 'CAA', title: 'DNS Запись CAA (Cert Authority Auth)', category: 'Запись DNS', badgeClass: 'badge-dns', targetId: 'sec-app', desc: 'Определяет удостоверяющие центры, имеющие право выпускать SSL.' },
+
+    // Modern Network Stack & Systems
+    { term: 'QUIC', title: 'QUIC (RFC 9000) over UDP', category: 'Современный стек', badgeClass: 'badge-modern', targetId: 'card-quic', desc: 'Транспорт веба нового поколения: 1-RTT handshake, без HoL blocking, Connection Migration.' },
+    { term: 'HTTP/3', title: 'HTTP/3 (RFC 9114)', category: 'Современный стек', badgeClass: 'badge-modern', targetId: 'card-quic', desc: 'Прикладной протокол поверх QUIC/UDP, заменяющий TCP в современном интернете.' },
+    { term: 'io_uring', title: 'io_uring (Linux 5.1+)', category: 'Современный стек', badgeClass: 'badge-modern', targetId: 'card-io-uring', desc: 'Истинный асинхронный I/O: кольцевые буферы SQ/CQ в mmap, режим SQPOLL, Zero-Copy.' },
+    { term: 'IPv6', title: 'IPv6 (RFC 8200)', category: 'Современный стек', badgeClass: 'badge-modern', targetId: 'card-ipv6', desc: '128-битная адресация нового поколения: GUA, ULA, Link-Local, без NAT и Broadcast.' },
+    { term: 'NDP', title: 'NDP (Neighbor Discovery Protocol)', category: 'Современный стек', badgeClass: 'badge-modern', targetId: 'ipv6-ndp', desc: 'Замена ARP в IPv6: ICMPv6 NS, NA, RS, RA на Solicited-Node Multicast.' },
+    { term: 'SLAAC', title: 'SLAAC (Stateless Autoconfig)', category: 'Современный стек', badgeClass: 'badge-modern', targetId: 'ipv6-slaac', desc: 'Автонастройка IPv6 хоста без DHCP-сервера с проверкой DAD.' },
+    { term: 'BGP', title: 'BGP-4 (Border Gateway Protocol)', category: 'Маршрутизация', badgeClass: 'badge-term', targetId: 'sec-l3', desc: 'Междоменная маршрутизация Интернета, вектор пути AS-Path, пиринг и транзит.' },
+    { term: 'eBGP', title: 'eBGP vs iBGP', category: 'Маршрутизация', badgeClass: 'badge-term', targetId: 'bgp-ebgp-vs-ibgp', desc: 'Внешние сессии между разными AS (TTL=1) vs внутренние сессии iBGP.' },
+    { term: 'iBGP', title: 'iBGP (Internal BGP)', category: 'Маршрутизация', badgeClass: 'badge-term', targetId: 'bgp-ebgp-vs-ibgp', desc: 'Внутренний обмен маршрутами внутри AS (TTL=255, Route Reflectors).' },
+    { term: 'IXP', title: 'IXP (Internet Exchange Points)', category: 'Маршрутизация', badgeClass: 'badge-term', targetId: 'bgp-peering-ixp', desc: 'Точки обмена трафиком (DE-CIX, MSK-IX): бесплатный взаимный пиринг сетей.' },
+    { term: 'RPKI', title: 'RPKI / ROA (Безопасность BGP)', category: 'Маршрутизация', badgeClass: 'badge-term', targetId: 'bgp-bestpath-rpki', desc: 'Криптографическая защита от перехвата префиксов (BGP Hijacking).' },
+    { term: 'OSPF', title: 'OSPF v2/v3 (IGP Routing)', category: 'Маршрутизация', badgeClass: 'badge-term', targetId: 'sec-l3', desc: 'Link-State протокол на алгоритме Дейкстры (SPF), Backbone Area 0.' },
+    { term: 'CIDR', title: 'Инженерный калькулятор CIDR / VLSM', category: 'Инструмент', badgeClass: 'badge-term', targetId: 'cidrCalculatorWidget', desc: 'Бесклассовая адресация подсетей, маски, wildcard, расчет диапазона хостов.' },
+    { term: 'MTU', title: 'MTU & MSS (Path MTU Discovery)', category: 'Метрика', badgeClass: 'badge-term', targetId: 'sec-l4', desc: 'Размеры пакетов, PMTUD, проблема черных дыр ICMP и MSS Clamping.' },
+    { term: 'Jitter', title: 'Джиттер (Jitter)', category: 'Метрика', badgeClass: 'badge-term', targetId: 'sec-intro', desc: 'Вариация задержки между пакетами: критична для VoIP, стриминга и онлайн-игр.' },
+    { term: 'Packet Loss', title: 'Потери пакетов (Packet Loss)', category: 'Метрика', badgeClass: 'badge-term', targetId: 'sec-intro', desc: 'Доля недоставленных пакетов (%), обрушивающая пропускную способность TCP.' },
+    { term: 'Latency', title: 'Задержка (Latency / RTT)', category: 'Метрика', badgeClass: 'badge-term', targetId: 'sec-intro', desc: 'Время доставки пакета туда и обратно (Round-Trip Time).' },
+    { term: 'L1', title: 'L1: Физический уровень', category: 'Сетевой стек', badgeClass: 'badge-term', targetId: 'sec-l2', desc: 'Витая пара, оптика SMF/MMF, Wi-Fi 6/7, кодирование NRZ/PAM-4, коллизии.' }
+  ];
+
+  let selectedIndex = -1;
+
+  function highlightMatches(text, query) {
+    if (!query) return text;
+    const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+    return text.replace(regex, '<mark>$1</mark>');
+  }
+
+  function jumpToTarget(targetId) {
+    if (!targetId) return;
+    const targetElem = document.getElementById(targetId);
+    if (!targetElem) return;
+
+    // Reset card filters to ensure target is visible
+    cards.forEach(card => card.classList.remove('hidden'));
+    sections.forEach(sec => sec.classList.remove('hidden'));
+    if (noResultsPanel) noResultsPanel.classList.remove('visible');
+
+    // If target is inside a collapsed <details>, open it!
+    const parentDetails = targetElem.closest('details.academic-accordion') || (targetElem.tagName === 'DETAILS' ? targetElem : null);
+    if (parentDetails) {
+      parentDetails.open = true;
+    }
+
+    // Scroll target into view
+    targetElem.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+    // Apply visual pulse highlight
+    targetElem.classList.remove('search-target-highlight');
+    void targetElem.offsetWidth; // trigger reflow
+    targetElem.classList.add('search-target-highlight');
+
+    setTimeout(() => {
+      targetElem.classList.remove('search-target-highlight');
+    }, 2500);
+
+    // Hide dropdown
+    hideDropdown();
+    if (searchInput) searchInput.blur();
+    closeMobileSearchPanel(false);
+  }
+
+  function hideDropdown() {
+    if (dropdown) {
+      dropdown.classList.remove('visible');
+      dropdown.innerHTML = '';
+    }
+    selectedIndex = -1;
+  }
+
+  function renderDropdown(matches, query) {
+    if (!dropdown) return;
+    if (matches.length === 0) {
+      hideDropdown();
+      return;
+    }
+
+    let html = `<div class="search-results-header"><span>Точные совпадения (${matches.length})</span><span>Быстрый переход</span></div><div class="search-results-list">`;
+    matches.forEach((item, idx) => {
+      html += `
+        <div class="search-result-item ${idx === selectedIndex ? 'selected' : ''}" data-target-id="${item.targetId}" data-index="${idx}" role="option">
+          <div class="search-result-top">
+            <span class="search-result-title">${highlightMatches(item.title, query)}</span>
+            <span class="search-result-badge ${item.badgeClass || ''}">${item.category}</span>
+          </div>
+          <div class="search-result-desc">${highlightMatches(item.desc, query)}</div>
+        </div>
+      `;
+    });
+    html += `</div>
+    <div class="search-dropdown-footer">
+      <div class="search-shortcut-item"><kbd>↑</kbd><kbd>↓</kbd> <span>выбор</span></div>
+      <div class="search-shortcut-item"><kbd>↵</kbd> <span>перейти</span></div>
+      <div class="search-shortcut-item"><kbd>Esc</kbd> <span>закрыть</span></div>
+    </div>`;
+
+    dropdown.innerHTML = html;
+    dropdown.classList.add('visible');
+
+    // Attach click events
+    dropdown.querySelectorAll('.search-result-item').forEach(itemElem => {
+      itemElem.addEventListener('click', () => {
+        const targetId = itemElem.getAttribute('data-target-id');
+        jumpToTarget(targetId);
+      });
+    });
+  }
+
+  // Handle Input
   searchInput.addEventListener('input', (e) => {
-    const query = e.target.value.trim().toLowerCase();
-    let totalVisible = 0;
+    const rawVal = e.target.value.trim();
+    const query = rawVal.toLowerCase();
+    selectedIndex = -1;
 
     if (!query) {
-      // Show everything
+      hideDropdown();
       cards.forEach(card => card.classList.remove('hidden'));
       sections.forEach(sec => sec.classList.remove('hidden'));
       if (noResultsPanel) noResultsPanel.classList.remove('visible');
       return;
     }
 
-    // Filter cards
+    // 1. Search in structured high-priority dictionary
+    const exactMatches = [];
+    KEYWORD_INDEX.forEach(item => {
+      const termLower = item.term.toLowerCase();
+      const titleLower = item.title.toLowerCase();
+      const descLower = item.desc.toLowerCase();
+      if (termLower === query || termLower.startsWith(query) || titleLower.includes(query) || descLower.includes(query)) {
+        exactMatches.push(item);
+      }
+    });
+
+    // 2. Also search dynamic cards
+    cards.forEach(card => {
+      const titleElem = card.querySelector('.card-title, .tool-card-title, .diagram-title');
+      const titleText = titleElem ? titleElem.textContent.trim() : '';
+      const text = card.textContent.toLowerCase();
+      if (text.includes(query) && titleText && exactMatches.length < 12) {
+        // avoid duplicating if card id already matched
+        if (!exactMatches.some(m => m.title === titleText)) {
+          const categoryBadge = card.querySelector('.card-category-badge, .tool-badge, .diagram-badge');
+          exactMatches.push({
+            term: query,
+            title: titleText,
+            category: categoryBadge ? categoryBadge.textContent.trim() : 'Раздел',
+            badgeClass: 'badge-term',
+            targetId: card.id || card.closest('section')?.id,
+            desc: card.querySelector('p')?.textContent.substring(0, 110) + '...' || ''
+          });
+        }
+      }
+    });
+
+    // Filter page cards visibility
+    let totalVisible = 0;
     cards.forEach(card => {
       const text = card.textContent.toLowerCase();
       const matches = text.includes(query);
@@ -68,7 +237,6 @@ function initLiveSearch() {
       }
     });
 
-    // Check each section: if all cards inside are hidden, hide section header
     sections.forEach(sec => {
       const visibleChildCards = sec.querySelectorAll('.academic-card:not(.hidden), .diagram-card:not(.hidden), .tool-card:not(.hidden)');
       if (visibleChildCards.length === 0) {
@@ -78,23 +246,60 @@ function initLiveSearch() {
       }
     });
 
-    // Show/hide empty state
     if (noResultsPanel) {
-      if (totalVisible === 0) {
+      if (totalVisible === 0 && exactMatches.length === 0) {
         noResultsPanel.classList.add('visible');
       } else {
         noResultsPanel.classList.remove('visible');
       }
     }
+
+    // Render instant dropdown
+    renderDropdown(exactMatches.slice(0, 8), query);
   });
 
-  // Clear on Escape (on mobile — also collapse the dropdown panel)
+  // Handle Keyboard Navigation in search input
   searchInput.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
+    const items = dropdown ? dropdown.querySelectorAll('.search-result-item') : [];
+
+    if (e.key === 'ArrowDown') {
+      if (items.length > 0) {
+        e.preventDefault();
+        selectedIndex = (selectedIndex + 1) % items.length;
+        items.forEach((it, idx) => it.classList.toggle('selected', idx === selectedIndex));
+        items[selectedIndex].scrollIntoView({ block: 'nearest' });
+      }
+    } else if (e.key === 'ArrowUp') {
+      if (items.length > 0) {
+        e.preventDefault();
+        selectedIndex = (selectedIndex - 1 + items.length) % items.length;
+        items.forEach((it, idx) => it.classList.toggle('selected', idx === selectedIndex));
+        items[selectedIndex].scrollIntoView({ block: 'nearest' });
+      }
+    } else if (e.key === 'Enter') {
+      if (items.length > 0) {
+        e.preventDefault();
+        const chosen = selectedIndex >= 0 ? items[selectedIndex] : items[0];
+        if (chosen) {
+          const targetId = chosen.getAttribute('data-target-id');
+          jumpToTarget(targetId);
+        }
+      }
+    } else if (e.key === 'Escape') {
       searchInput.value = '';
-      searchInput.dispatchEvent(new Event('input'));
+      hideDropdown();
+      cards.forEach(card => card.classList.remove('hidden'));
+      sections.forEach(sec => sec.classList.remove('hidden'));
+      if (noResultsPanel) noResultsPanel.classList.remove('visible');
       searchInput.blur();
       closeMobileSearchPanel(false);
+    }
+  });
+
+  // Close dropdown on click outside
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.header-search')) {
+      hideDropdown();
     }
   });
 }
@@ -176,35 +381,29 @@ function initMobileMenu() {
 
   if (!menuBtn || !sidebar) return;
 
-  // Create backdrop element
-  const backdrop = document.createElement('div');
-  backdrop.className = 'sidebar-backdrop';
-  backdrop.style.cssText = `
-    position: fixed;
-    top: 72px;
-    left: 0;
-    width: 100vw;
-    height: calc(100vh - 72px);
-    background: rgba(0, 0, 0, 0.7);
-    backdrop-filter: blur(8px);
-    z-index: 98;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.3s ease;
-  `;
-  document.body.appendChild(backdrop);
+  // Create or reuse backdrop element with CSS-driven classes
+  let backdrop = document.querySelector('.sidebar-backdrop');
+  if (!backdrop) {
+    backdrop = document.createElement('div');
+    backdrop.className = 'sidebar-backdrop';
+    document.body.appendChild(backdrop);
+  }
 
   function openSidebar() {
     closeMobileSearchPanel(); // панели взаимоисключающие: drawer закрывает поиск
     sidebar.classList.add('open');
-    backdrop.style.opacity = '1';
-    backdrop.style.pointerEvents = 'auto';
+    backdrop.classList.add('active');
+    menuBtn.classList.add('active');
+    menuBtn.setAttribute('aria-expanded', 'true');
+    document.body.classList.add('menu-open');
   }
 
   function closeSidebar() {
     sidebar.classList.remove('open');
-    backdrop.style.opacity = '0';
-    backdrop.style.pointerEvents = 'none';
+    backdrop.classList.remove('active');
+    menuBtn.classList.remove('active');
+    menuBtn.setAttribute('aria-expanded', 'false');
+    document.body.classList.remove('menu-open');
   }
 
   menuBtn.addEventListener('click', () => {
@@ -217,7 +416,7 @@ function initMobileMenu() {
 
   backdrop.addEventListener('click', closeSidebar);
 
-  // Close on nav link click in mobile
+  // Close on nav link click in mobile & tablet
   const navLinks = sidebar.querySelectorAll('.sidebar-nav-link');
   navLinks.forEach(link => {
     link.addEventListener('click', () => {
@@ -244,8 +443,9 @@ function initMobileMenu() {
     closeMobileSearchPanel();
   });
 
-  // При выходе из мобильного viewport закрываем панель, чтобы она не «висела» на десктопе
+  // При выходе из мобильного viewport закрываем drawer и поиск
   window.addEventListener('resize', () => {
+    if (window.innerWidth > 1024) closeSidebar();
     if (!isMobileViewport()) closeMobileSearchPanel();
   });
 }
@@ -272,10 +472,13 @@ function closeMobileDrawer() {
   const sidebar = document.getElementById('sidebar');
   if (sidebar) sidebar.classList.remove('open');
   const backdrop = document.querySelector('.sidebar-backdrop');
-  if (backdrop) {
-    backdrop.style.opacity = '0';
-    backdrop.style.pointerEvents = 'none';
+  if (backdrop) backdrop.classList.remove('active');
+  const menuBtn = document.getElementById('mobileMenuBtn');
+  if (menuBtn) {
+    menuBtn.classList.remove('active');
+    menuBtn.setAttribute('aria-expanded', 'false');
   }
+  document.body.classList.remove('menu-open');
 }
 
 function openMobileSearchPanel() {
@@ -315,19 +518,39 @@ function initKeyboardShortcuts() {
   if (!searchInput) return;
 
   window.addEventListener('keydown', (e) => {
-    // Esc — закрыть мобильную панель поиска, если она открыта и фокус не в инпуте
-    // (Esc с фокусом в инпуте обрабатывается в initLiveSearch: очистка + blur)
-    if (e.key === 'Escape' && mobileSearchIsOpen() && document.activeElement !== searchInput) {
-      closeMobileSearchPanel();
+    // Esc — закрыть открытый drawer сайдбара или мобильную панель поиска
+    if (e.key === 'Escape') {
+      const sidebar = document.getElementById('sidebar');
+      if (sidebar && sidebar.classList.contains('open')) {
+        closeMobileDrawer();
+        return;
+      }
+      if (mobileSearchIsOpen() && document.activeElement !== searchInput) {
+        closeMobileSearchPanel();
+        return;
+      }
+    }
+
+    // Проверяем, не вводит ли пользователь текст в другие поля (калькулятор, поиск портов)
+    const isEditing = ['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement?.tagName);
+
+    // '/' — фокус на поиск, только если пользователь не вводит текст в другое поле
+    if (e.key === '/' && !isEditing && document.activeElement !== searchInput) {
+      e.preventDefault();
+      if (isMobileViewport()) {
+        openMobileSearchPanel();
+      } else {
+        searchInput.focus();
+        searchInput.select();
+      }
       return;
     }
 
-    // '/' or 'Ctrl+K' / 'Cmd+K' — focus search (на мобильном — ещё и открыть панель)
-    if ((e.key === '/' && document.activeElement !== searchInput) || 
-        ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k')) {
+    // 'Ctrl+K' / 'Cmd+K' — глобальный шорткат поиска отовсюду
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
       e.preventDefault();
       if (isMobileViewport()) {
-        openMobileSearchPanel(); // откроет дропдаун и поставит фокус на инпут
+        openMobileSearchPanel();
       } else {
         searchInput.focus();
         searchInput.select();

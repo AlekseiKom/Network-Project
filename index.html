@@ -58,9 +58,11 @@
         <div class="search-input-wrapper">
           <span class="search-icon" aria-hidden="true">🔍</span>
           <input type="search" id="globalSearchInput" class="search-input"
-            placeholder="Поиск по протоколам, алгоритмам, RFC..." autocomplete="off" aria-label="Поиск по пособию">
+            placeholder="Поиск: TCP флаги, DNS записи, QUIC, BGP, RFC..." autocomplete="off" aria-label="Поиск по пособию">
           <kbd class="search-kbd">/</kbd>
         </div>
+        <!-- Smart Instant Search Results Dropdown -->
+        <div class="search-results-dropdown" id="searchResultsDropdown" role="listbox" aria-label="Результаты быстрого поиска"></div>
       </div>
 
       <!-- Mobile toggles: search (dropdown panel) + burger menu -->
@@ -72,7 +74,7 @@
             <line x1="21" y1="21" x2="16.5" y2="16.5"></line>
           </svg>
         </button>
-        <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Открыть навигацию">
+        <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Открыть навигацию" aria-expanded="false" aria-controls="sidebar">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
             stroke-linecap="round" stroke-linejoin="round">
             <line x1="3" y1="12" x2="21" y2="12"></line>
@@ -108,14 +110,14 @@
           <li>
             <a href="#sec-l2" class="sidebar-nav-link active">
               <span class="sidebar-icon">🧱</span>
-              <span>L1-L2: Модели & Канальный уровень</span>
+              <span>L1-L2: Физический & Канальный (Ethernet)</span>
               <span class="sidebar-number">01</span>
             </a>
           </li>
           <li>
             <a href="#sec-l3" class="sidebar-nav-link">
               <span class="sidebar-icon">🌐</span>
-              <span>L3: Сетевой уровень & Маршрутизация</span>
+              <span>L3: Сетевой (IPv4/IPv6, BGP, OSPF)</span>
               <span class="sidebar-number">02</span>
             </a>
           </li>
@@ -128,14 +130,14 @@
           <li>
             <a href="#sec-l4" class="sidebar-nav-link">
               <span class="sidebar-icon">⚡</span>
-              <span>L4: Транспортный уровень (TCP/UDP)</span>
+              <span>L4: Транспорт (TCP, UDP, QUIC / HTTP/3)</span>
               <span class="sidebar-number">03</span>
             </a>
           </li>
           <li>
             <a href="#sec-sockets" class="sidebar-nav-link">
               <span class="sidebar-icon">💻</span>
-              <span>Системное API: Sockets (POSIX)</span>
+              <span>Системное API: Sockets & io_uring</span>
               <span class="sidebar-number">04</span>
             </a>
           </li>
@@ -309,6 +311,83 @@
             </div>
           </article>
 
+          <!-- Card 0.2b: Hybrid 5-layer model vs OSI vs TCP/IP -->
+          <article class="academic-card card-theory">
+            <header class="card-header">
+              <div class="card-title-group">
+                <h3 class="card-title">📐 Модели стека: почему мы используем гибридную 5-уровневую модель</h3>
+              </div>
+              <span class="card-category-badge">Методология</span>
+            </header>
+            <div class="card-body">
+              <p>В учебниках часто возникает путаница между <strong>7-уровневой моделью OSI</strong> (ISO/IEC 7498-1) и <strong>4-уровневой моделью TCP/IP</strong> (RFC 1122). Чтобы избежать двусмысленности, в данном справочнике принят стандарт современной инженерной литературы (включая классический учебник Куроуза–Росса) — <strong>гибридная 5-уровневая модель</strong>:</p>
+
+              <div class="table-responsive">
+                <table class="academic-table">
+                  <thead>
+                    <tr>
+                      <th>Уровень (Обозначение)</th>
+                      <th>Модель OSI (7 уровней)</th>
+                      <th>Стек TCP/IP (4 уровня)</th>
+                      <th>Гибридная модель (принята здесь)</th>
+                      <th>Ключевые протоколы / Оборудование</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><strong>L7 / L5 (Верхний)</strong></td>
+                      <td>7. Application<br>6. Presentation<br>5. Session</td>
+                      <td rowspan="3"><strong>Application</strong><br>(Прикладной уровень)</td>
+                      <td rowspan="3"><strong>5. Application (L7)</strong><br>Функции представления данных и сессий поглощены протоколами L7 (TLS, HTTP).</td>
+                      <td>HTTP/1.1, HTTP/2, HTTP/3, DNS, TLS 1.3, SSH, WebSocket, SMTP, BGP</td>
+                    </tr>
+                    <tr>
+                      <td><em>L6</em></td>
+                      <td>6. Presentation (кодировки, шифрование)</td>
+                      <td>TLS / SSL, MIME, JSON, Protobuf (реализуются в коде библиотек)</td>
+                    </tr>
+                    <tr>
+                      <td><em>L5</em></td>
+                      <td>5. Session (управление сеансом)</td>
+                      <td>RPC-сессии, сокеты, cookies (управляются приложением)</td>
+                    </tr>
+                    <tr>
+                      <td><strong>L4</strong></td>
+                      <td>4. Transport (Транспортный)</td>
+                      <td><strong>Transport</strong></td>
+                      <td><strong>4. Transport</strong></td>
+                      <td>TCP, UDP, QUIC, SCTP, DCCP</td>
+                    </tr>
+                    <tr>
+                      <td><strong>L3</strong></td>
+                      <td>3. Network (Сетевой)</td>
+                      <td><strong>Internet</strong></td>
+                      <td><strong>3. Network (Сетевой)</strong></td>
+                      <td>IPv4, IPv6, ICMP, ICMPv6, OSPF, BGP, роутеры (маршрутизаторы)</td>
+                    </tr>
+                    <tr>
+                      <td><strong>L2</strong></td>
+                      <td>2. Data Link (Канальный)</td>
+                      <td rowspan="2"><strong>Network Access / Link</strong><br>(Сетевой доступ)</td>
+                      <td><strong>2. Data Link (Канальный)</strong></td>
+                      <td>Ethernet II, 802.1Q (VLAN), ARP, NDP, Wi-Fi MAC, коммутаторы (свитчи)</td>
+                    </tr>
+                    <tr>
+                      <td><strong>L1</strong></td>
+                      <td>1. Physical (Физический)</td>
+                      <td><strong>1. Physical (Физический)</strong></td>
+                      <td>Витая пара (UTP/STP), Оптика (SMF/MMF), Радиоэфир, хабы, трансиверы SFP+</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <div style="margin-top:14px; padding:12px 16px; background:rgba(59,130,246,0.08); border-left:3px solid #3b82f6; border-radius:4px; font-size:0.9rem; color:var(--text-main);">
+                <strong>💡 Почему в навигации и терминах остаются «L4» и «L7»?</strong> В индустрии термины закрепились исторически: «L4 Load Balancer» (балансировщик по портам TCP/UDP) и «L7 Proxy / WAF» (прокси с разбором HTTP-заголовков и cookies). Нумерация L1–L7 удобна как общепринятый профессиональный сленг сетевых инженеров и SRE.
+              </div>
+            </div>
+          </article>
+
           <!-- Card 0.3: Mini glossary of key terms -->
           <article class="academic-card card-theory">
             <header class="card-header">
@@ -369,7 +448,15 @@
                   </tr>
                   <tr>
                     <td><strong>Задержка (latency)</strong></td>
-                    <td>Время доставки пакета от отправителя к получателю.</td>
+                    <td>Время доставки пакета от отправителя к получателю (RTT — Round-Trip Time).</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Джиттер (jitter)</strong></td>
+                    <td>Вариация задержки между последовательными пакетами. Критичен для VoIP и гейминга: если пакеты приходят то через 10 мс, то через 80 мс — голос «заикается».</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Потери пакетов (packet loss)</strong></td>
+                    <td>Доля пакетов, не доставленных получателю (%). Даже 1–2% потерь обрушивают TCP-пропускную способность и делают VoIP неприемлемым.</td>
                   </tr>
                   <tr>
                     <td><strong>Поток (stream) / соединение</strong></td>
@@ -424,8 +511,9 @@
                   «алло, вы там?» → «да, слушаю» → «отлично, говорим». Без этого ни байта данных. (Раздел 03)</li>
                 <li><strong>Запечатывание (TLS handshake).</strong> Стороны проверяют сертификат сервера и
                   договариваются о ключах шифрования — дальше всё летит в «запечатанном конверте». (Раздел 05)</li>
+                <li style="color: #67e8f9;"><strong>⚡ Вектор 2026 (QUIC / HTTP/3):</strong> В более чем 50% современного интернет-трафика (Google, Cloudflare, YouTube, Meta) шаги 4 и 5 объединены в <strong>одно рукопожатие QUIC поверх UDP</strong> за 1 RTT (или 0-RTT при повторном визите).</li>
                 <li><strong>Запрос страницы (HTTP).</strong> Внутри зашифрованного канала клиент шлёт
-                  <code>GET / HTTP/1.1</code>, сервер отвечает HTML-кодом, картинками и стилями — тоже пакетами TCP.
+                  <code>GET / HTTP/1.1</code> (или фреймы HTTP/2 / HTTP/3), сервер отвечает HTML-кодом, картинками и стилями.
                   (Раздел 06)</li>
                 <li><strong>Обратный путь.</strong> Пакеты с данными идут обратно тем же маршрутом; браузер собирает их
                   по номерам последовательности в правильном порядке. (Раздел 03)</li>
@@ -527,6 +615,25 @@
                     round trip, обмен ключами через ECDHE (PFS). Шифрование начинается с первого пакета клиента: уже
                     после ClientHello даже сам handshake летит зашифрованным, а дальше в «конверте» внутри TCP-потока
                     идут HTTP-запрос и ответы.</p>
+                </div>
+              </details>
+
+              <details class="academic-accordion" id="journey-step-quic">
+                <summary class="accordion-summary">
+                  <div class="accordion-title-box"><span style="color:#67e8f9;">⚡</span><span>Современный путь: HTTP/3 + QUIC over UDP (1-RTT / 0-RTT)</span></div>
+                  <svg class="accordion-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                  </svg>
+                </summary>
+                <div class="accordion-content">
+                  <p><strong>Как это происходит в 2026 году:</strong> браузер проверяет DNS-запись <code>HTTPS</code> (RFC 9460) или получает заголовок <code>Alt-Svc: h3=":443"</code>. При следующем обращении браузер не тратит время на TCP Handshake и отдельный TLS Handshake!</p>
+                  <p><strong>Технически:</strong></p>
+                  <ul>
+                    <li>Клиент отправляет дейтаграмму <strong>UDP на порт 443</strong> с Initial-пакетом QUIC, несущим TLS 1.3 ClientHello + криптографические ключи Diffie-Hellman.</li>
+                    <li>Сервер отвечает пакетом Handshake с ServerHello и Finished. Соединение готово всего за <strong>1 RTT</strong> (вместо 2–3 RTT в связке TCP + TLS 1.2/1.3).</li>
+                    <li>При повторном визите работает <strong>0-RTT (Early Data)</strong>: HTTP GET летит прямо в самом первом UDP-пакете!</li>
+                    <li>Если по дороге теряется один пакет картинки, страница не «замирает»: QUIC изолирует каждый стрим, устраняя проблему <em>Head-of-Line Blocking</em>.</li>
+                  </ul>
                 </div>
               </details>
 
@@ -649,12 +756,15 @@
              ========================================================================== -->
         <section class="academic-section" id="sec-l2">
           <div class="section-header">
-            <span class="section-label">Раздел 01 • Data Link & Architectures</span>
-            <h2 class="section-title">🧱 Архитектура сетей и Канальный уровень</h2>
+            <span class="section-label">Раздел 01 • Physical & Data Link (L1–L2)</span>
+            <h2 class="section-title">🧱 L1–L2: Физический и Канальный уровни</h2>
             <p class="section-desc">
-              Фундаментальные концепции многоуровневой декомпозиции, эталонная модель OSI vs стек TCP/IP, физическая
-              инкапсуляция, архитектура коммутации Ethernet II и механизмы разрешения адресов ARP.
+              Физические среды передачи данных (L1), эталонная модель OSI vs гибридный стек TCP/IP, кодирование
+              сигналов, архитектура коммутации Ethernet II и механизмы разрешения адресов ARP.
             </p>
+            <div style="margin-top:14px; padding:12px 16px; background:rgba(6,182,212,0.08); border:1px solid rgba(6,182,212,0.25); border-radius:10px; font-size:0.88rem; color:#67e8f9;">
+              <strong>📐 О модели, используемой в этом справочнике:</strong> навигация использует нумерацию L1–L7 из 7-уровневой модели OSI, однако протоколы разбираются по гибридной <strong>5-уровневой модели</strong> (Physical → Data Link → Network → Transport → Application), принятой в стеке TCP/IP и учебнике Куроуза–Росса. Уровни 5 (Session) и 6 (Presentation) модели OSI объединены в Application layer. Это стандартная практика в современной инженерной литературе.
+            </div>
           </div>
 
           <!-- Card L0: Beginner guide to the Data Link Layer -->
@@ -692,6 +802,87 @@ arp -a
 # Linux/macOS: ARP-кэш
 ip neigh show
 # Увидите строки вида "192.168.1.1 dev en0 lladdr aa:bb:... REACHABLE"</code></pre>
+              </div>
+            </div>
+          </article>
+
+          <!-- Card 1.0b: L1 Physical Layer -->
+          <article class="academic-card card-theory">
+            <header class="card-header">
+              <div class="card-title-group">
+                <h3 class="card-title">⚡ L1: Физический уровень — среды, кодирование, коллизии</h3>
+              </div>
+              <span class="card-category-badge">Physical Layer</span>
+            </header>
+            <div class="card-body">
+              <p>Физический уровень (L1) — основа всего стека: он преобразует биты в физические сигналы (электрические импульсы, световые вспышки, радиоволны) и обратно. L2-коммутаторы и L3-роутеры зависят от L1 так же, как автомобиль зависит от дороги.</p>
+
+              <p><strong>Основные среды передачи данных:</strong></p>
+              <div class="table-responsive">
+                <table class="academic-table">
+                  <thead>
+                    <tr>
+                      <th>Среда</th>
+                      <th>Стандарт / Пример</th>
+                      <th>Дальность</th>
+                      <th>Типичная скорость</th>
+                      <th>Особенности</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><strong>Витая пара (UTP/STP)</strong></td>
+                      <td>1000BASE-T (Cat5e), 10GBASE-T (Cat6a)</td>
+                      <td>до 100 м</td>
+                      <td>1 Гбит/с — 10 Гбит/с</td>
+                      <td>Дешёво, удобно, подвержено EMI-помехам; скручивание пар снижает перекрёстные помехи (crosstalk).</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Оптическое волокно</strong></td>
+                      <td>10GBASE-LR (SM), 40/100GBASE-SR4 (MM)</td>
+                      <td>до 80 км (SM)</td>
+                      <td>10–400 Гбит/с</td>
+                      <td>Иммунитет к EMI, огромная полоса, высокая стоимость монтажа. SM (одномод) — дальняя связь, MM (многомод) — внутри ЦОД.</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Беспроводная (Wi-Fi)</strong></td>
+                      <td>IEEE 802.11ax (Wi-Fi 6), 802.11be (Wi-Fi 7)</td>
+                      <td>до ~100 м</td>
+                      <td>до 9,6 Гбит/с (теор.)</td>
+                      <td>Общая среда: все узлы «слышат» друг друга. Пользуется CSMA/CA для избегания коллизий (в отличие от проводного CSMA/CD).</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <p style="margin-top:16px;"><strong>Кодирование сигналов — как бит становится сигналом:</strong></p>
+              <ul>
+                <li><strong>NRZ (Non-Return-to-Zero):</strong> «1» = высокий уровень напряжения, «0» = низкий. Просто, но страдает от длинных серий одинаковых битов (проблема синхронизации тактового сигнала).</li>
+                <li><strong>Manchester / 4B5B:</strong> Каждый бит кодируется переходом сигнала в середине тактового интервала (самотактирование). Используется в 10BASE-T Ethernet.</li>
+                <li><strong>PAM-4 (Pulse Amplitude Modulation):</strong> Использует 4 уровня амплитуды — каждый символ кодирует 2 бита. Стандарт для 100GbE и 400GbE, позволяет удвоить пропускную способность при той же частоте.</li>
+              </ul>
+
+              <p><strong>Коллизионные домены vs Широковещательные домены:</strong></p>
+              <ul>
+                <li><strong>Коллизионный домен</strong> — группа узлов, которые «конкурируют» за одну общую среду. В старых сетях с хабами (Hub) весь сегмент — один коллизионный домен: если два узла одновременно передают, возникает коллизия (CSMA/CD). <strong>Каждый порт современного коммутатора = отдельный коллизионный домен</strong> (full-duplex, коллизий нет).</li>
+                <li><strong>Широковещательный домен</strong> — область, в которой распространяются broadcast-кадры (FF:FF:FF:FF:FF:FF). Ограничивается маршрутизатором (L3) или VLAN (L2).</li>
+              </ul>
+
+              <div class="code-block-wrapper">
+                <div class="code-block-header">
+                  <span class="code-lang-tag"><span>🔌</span> Определите тип кабеля и скорость порта (Linux)</span>
+                  <button type="button" class="code-copy-btn"><span>📋</span> Копировать</button>
+                </div>
+                <pre><code class="language-bash"># Просмотр физических параметров сетевого интерфейса
+ethtool eth0
+# Ключевые поля вывода:
+# Speed: 1000Mb/s       — текущая скорость согласования (link speed)
+# Duplex: Full          — полный дуплекс (нет коллизий)
+# Port: Twisted Pair    — витая пара
+# Link detected: yes    — L1 соединение установлено
+
+# Для Wi-Fi: тип PHY и частота канала
+iwconfig wlan0 | grep -E 'Frequency|Bit Rate|Mode'</code></pre>
               </div>
             </div>
           </article>
@@ -1816,6 +2007,188 @@ Broadcast:      11000000.10101000.00001010.10111111  -> 192.168.10.191
             </div>
           </article>
 
+          <!-- Card 2.4b: IPv6 — Full Section (NDP, SLAAC, address types) -->
+          <article class="academic-card card-theory" id="card-ipv6">
+            <header class="card-header">
+              <div class="card-title-group">
+                <h3 class="card-title">🌍 IPv6 (RFC 8200): Адресация нового поколения, NDP и SLAAC</h3>
+              </div>
+              <span class="card-category-badge">IPv6 • RFC 8200</span>
+            </header>
+            <div class="card-body">
+              <p>
+                В 2026 году IPv6-трафик составляет более 45% мирового интернет-трафика (Google IPv6 Statistics).
+                Адресное пространство IPv4 (2<sup>32</sup> ≈ 4.3 млрд адресов) исчерпано ещё в 2011 году.
+                <strong>IPv6</strong> решает эту проблему кардинально: 128-битные адреса дают <strong>3.4 × 10<sup>38</sup></strong>
+                уникальных адресов — по несколько на каждый атом Земли.
+              </p>
+
+              <p><strong>Ключевые улучшения IPv6 по сравнению с IPv4:</strong></p>
+              <div class="table-responsive">
+                <table class="academic-table">
+                  <thead>
+                    <tr>
+                      <th>Характеристика</th>
+                      <th>IPv4</th>
+                      <th>IPv6</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><strong>Длина адреса</strong></td>
+                      <td>32 бита (4 октета)</td>
+                      <td>128 бит (8 групп по 16 бит, hex)</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Заголовок</strong></td>
+                      <td>20–60 байт, переменный, с контрольной суммой</td>
+                      <td>Фиксированные 40 байт, без контрольной суммы (ускорение ASIC)</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Фрагментация</strong></td>
+                      <td>На транзитных роутерах (DF-бит)</td>
+                      <td>Только на отправителе (Path MTU Discovery обязателен)</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Разрешение адресов</strong></td>
+                      <td>ARP (broadcast, L2)</td>
+                      <td>NDP (ICMPv6, multicast, L3)</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Автоконфигурация</strong></td>
+                      <td>DHCP (обязательный сервер)</td>
+                      <td>SLAAC (без сервера) + DHCPv6 (опционально)</td>
+                    </tr>
+                    <tr>
+                      <td><strong>NAT</strong></td>
+                      <td>Почти всегда обязателен</td>
+                      <td>Не нужен: каждое устройство получает глобальный адрес</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <p style="margin-top:16px;"><strong>Типы IPv6 адресов:</strong></p>
+              <div class="table-responsive">
+                <table class="academic-table">
+                  <thead>
+                    <tr>
+                      <th>Тип адреса</th>
+                      <th>Префикс</th>
+                      <th>Пример</th>
+                      <th>Назначение</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><strong>Link-Local</strong></td>
+                      <td><code>fe80::/10</code></td>
+                      <td><code>fe80::1</code></td>
+                      <td>Только в пределах одного сегмента L2. Назначается автоматически при старте интерфейса. Необходим для NDP и SLAAC. Не маршрутизируется.</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Глобальный Unicast (GUA)</strong></td>
+                      <td><code>2000::/3</code></td>
+                      <td><code>2a02:6b8::1</code></td>
+                      <td>Глобально уникальный публичный адрес. Аналог публичного IPv4 — маршрутизируется в Интернете. Провайдер назначает префикс /48 или /56.</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Unique Local (ULA)</strong></td>
+                      <td><code>fc00::/7</code></td>
+                      <td><code>fd00::1</code></td>
+                      <td>Аналог RFC 1918 (приватных адресов IPv4). Уникален в пределах организации, не маршрутизируется в Интернете.</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Loopback</strong></td>
+                      <td><code>::1/128</code></td>
+                      <td><code>::1</code></td>
+                      <td>Аналог 127.0.0.1 — петлевой адрес самого хоста.</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Multicast</strong></td>
+                      <td><code>ff00::/8</code></td>
+                      <td><code>ff02::1</code> (All Nodes)</td>
+                      <td>Заменяет broadcast: <code>ff02::1</code> = все узлы, <code>ff02::2</code> = все роутеры, <code>ff02::1:ffXX:XXXX</code> = Solicited-Node (для NDP).</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <details class="academic-accordion" id="ipv6-ndp">
+                <summary class="accordion-summary">
+                  <div class="accordion-title-box"><span>🔄</span><span>NDP (Neighbor Discovery Protocol, RFC 4861) — IPv6 заменяет ARP</span></div>
+                  <svg class="accordion-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </summary>
+                <div class="accordion-content">
+                  <p>В IPv4 для разрешения IP→MAC использовался <strong>ARP</strong> (broadcast, EtherType 0x0806). В IPv6 его полностью заменяет <strong>NDP</strong> — набор ICMPv6-сообщений:</p>
+                  <ul>
+                    <li><strong>Neighbor Solicitation (NS, Type 135):</strong> аналог ARP Request. Отправляется на <em>Solicited-Node multicast</em> адрес (<code>ff02::1:ffXX:XXXX</code>) вместо broadcast — это значительно снижает нагрузку на хосты, не заинтересованные в запросе.</li>
+                    <li><strong>Neighbor Advertisement (NA, Type 136):</strong> аналог ARP Reply. Unicast-ответ с MAC-адресом.</li>
+                    <li><strong>Router Solicitation (RS, Type 133) / Router Advertisement (RA, Type 134):</strong> хост спрашивает роутер о префиксе сети и шлюзе по умолчанию. Используется SLAAC.</li>
+                    <li><strong>Redirect (Type 137):</strong> аналог ICMP Redirect в IPv4.</li>
+                  </ul>
+                  <div class="code-block-wrapper">
+                    <div class="code-block-header">
+                      <span class="code-lang-tag"><span>📡</span> NDP Neighbor Solicitation в Wireshark (аналог ARP Request)</span>
+                      <button type="button" class="code-copy-btn"><span>📋</span> Копировать</button>
+                    </div>
+                    <pre><code class="language-text">Frame 5: ICMPv6 Neighbor Solicitation
+Ethernet II, Src: aa:bb:cc:dd:ee:ff, Dst: 33:33:ff:01:00:01  ← Multicast MAC (не broadcast!)
+Internet Protocol Version 6
+    Src: fe80::1    Dst: ff02::1:ff01:0001  ← Solicited-Node Multicast
+ICMPv6 Neighbor Solicitation (Type 135)
+    Target Address: 2001:db8::1             ← Ищем MAC для этого адреса
+    Option: Source Link-Layer Address: aa:bb:cc:dd:ee:ff</code></pre>
+                  </div>
+                </div>
+              </details>
+
+              <details class="academic-accordion" id="ipv6-slaac">
+                <summary class="accordion-summary">
+                  <div class="accordion-title-box"><span>⚡</span><span>SLAAC — автоконфигурация без DHCP-сервера (RFC 4862)</span></div>
+                  <svg class="accordion-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </summary>
+                <div class="accordion-content">
+                  <p><strong>SLAAC (Stateless Address Autoconfiguration)</strong> — ключевое преимущество IPv6: хост может самостоятельно настроить себе глобальный адрес без DHCP-сервера:</p>
+                  <ol>
+                    <li><strong>Генерация Link-Local:</strong> хост создаёт <code>fe80::</code> + 64-битный Interface ID (из MAC по алгоритму EUI-64 или случайный — RFC 4941 Privacy Extensions).</li>
+                    <li><strong>DAD (Duplicate Address Detection):</strong> отправляет NS на свой будущий адрес. Если никто не ответил — адрес уникален.</li>
+                    <li><strong>Router Solicitation:</strong> хост отправляет RS на <code>ff02::2</code> (все роутеры).</li>
+                    <li><strong>Router Advertisement:</strong> роутер отвечает с префиксом (например, <code>2001:db8::/64</code>), MTU, и флагами: A=1 (использовать SLAAC), M=1 (использовать DHCPv6).</li>
+                    <li><strong>Формирование GUA:</strong> хост объединяет префикс роутера + свой Interface ID → получает глобальный адрес.</li>
+                  </ol>
+                  <p><strong>EUI-64 алгоритм:</strong> из MAC <code>aa:bb:cc:dd:ee:ff</code> формируется <code>aabb:ccff:fedd:eeff</code> (вставляется <code>ff:fe</code> в середину, 7-й бит MAC инвертируется).</p>
+                </div>
+              </details>
+
+              <div class="code-block-wrapper">
+                <div class="code-block-header">
+                  <span class="code-lang-tag"><span>🖥️</span> IPv6 на практике: диагностические команды</span>
+                  <button type="button" class="code-copy-btn"><span>📋</span> Копировать</button>
+                </div>
+                <pre><code class="language-bash"># Просмотр всех IPv6 адресов интерфейса
+ip -6 addr show dev eth0
+# Вывод: inet6 2001:db8::1/64 scope global dynamic  ← GUA (SLAAC)
+#         inet6 fe80::1/64 scope link                ← Link-Local (всегда есть)
+
+# IPv6 аналог ping
+ping6 2001:db8::1
+# Или универсальный ping на современных системах:
+ping -6 google.com
+
+# Таблица соседей NDP (аналог arp -a)
+ip -6 neigh show
+# Вывод: 2001:db8::2 dev eth0 lladdr aa:bb:cc:dd:ee:ff REACHABLE
+
+# IPv6 traceroute
+traceroute6 2606:4700:4700::1111   # Cloudflare DNS IPv6
+
+# Проверить Router Advertisement (Router Discovery)
+rdisc6 eth0</code></pre>
+              </div>
+            </div>
+          </article>
+
           <!-- Card 2.5: Dynamic Routing Protocols - OSPF (IGP) vs BGP (EGP) -->
           <article class="academic-card card-algo">
             <header class="card-header">
@@ -1902,6 +2275,150 @@ Paths: (2 available, best #1)
   Path #2: Received from Peer 203.0.113.1
     AS-Path: 65001 209 13335
     Origin IGP, metric 10, localpref 100, valid, external</code></pre>
+              </div>
+
+              <!-- BGP Deep-Dive Accordions -->
+              <details class="academic-accordion" id="bgp-as-and-peering">
+                <summary class="accordion-summary">
+                  <div class="accordion-title-box"><span>🌍</span><span>Анатомия Интернета: Автономные системы (AS), ASN и архитектура операторов</span></div>
+                  <svg class="accordion-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </summary>
+                <div class="accordion-content">
+                  <p>Интернет — это не монолитная сеть, а <strong>федерация более чем 100 000 независимых Автономных Систем (AS, RFC 1930)</strong>. Каждая AS — это совокупность IP-сетей и роутеров под единым техническим и административным управлением:</p>
+                  <ul>
+                    <li><strong>ASN (Autonomous System Number):</strong> Уникальный глобальный номер. 16-битные ASN (<code>1–64511</code> — публичные; <code>64512–65534</code> — приватные, аналог RFC 1918) и 32-битные ASN (RFC 4893, до 4.2 млрд, например <code>AS13335</code> Cloudflare, <code>AS15169</code> Google, <code>AS13238</code> Yandex).</li>
+                    <li><strong>Иерархия операторов (Tiers):</strong>
+                      <ul>
+                        <li><strong>Tier-1 (Глобальные магистрали):</strong> Около 15 компаний в мире (Lumen, Telia/Arelion, NTT, Cogent, Tata, Telecom Italia). Они не платят никому за транзит и соединены между собой полносвязным бесплатным пирингом.</li>
+                        <li><strong>Tier-2 (Национальные провайдеры):</strong> Покупают транзит у Tier-1 операторов и активно пирятся друг с другом на точках IXP.</li>
+                        <li><strong>Tier-3 (Провайдеры «последней мили»):</strong> Локальные интернет-провайдеры, обслуживающие конечных пользователей и покупающие доступ у Tier-2.</li>
+                      </ul>
+                    </li>
+                  </ul>
+                </div>
+              </details>
+
+              <details class="academic-accordion" id="bgp-ebgp-vs-ibgp">
+                <summary class="accordion-summary">
+                  <div class="accordion-title-box"><span>🔀</span><span>eBGP vs iBGP: междоменное и внутридоменное взаимодействие</span></div>
+                  <svg class="accordion-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </summary>
+                <div class="accordion-content">
+                  <p>BGP делится на два режима в зависимости от того, находятся ли соседи в одной AS:</p>
+                  <div class="table-responsive">
+                    <table class="academic-table">
+                      <thead>
+                        <tr>
+                          <th>Критерий</th>
+                          <th>eBGP (External BGP)</th>
+                          <th>iBGP (Internal BGP)</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td><strong>Область действия</strong></td>
+                          <td>Между разными AS (разные ASN)</td>
+                          <td>Внутри одной AS (одинаковый ASN)</td>
+                        </tr>
+                        <tr>
+                          <td><strong>IP TTL по умолчанию</strong></td>
+                          <td><strong>1</strong> (требуется прямая физическая связь; иначе <code>ebgp-multihop</code>)</td>
+                          <td><strong>255</strong> (маршрутизаторы могут быть разделены множеством IGP-хопов)</td>
+                        </tr>
+                        <tr>
+                          <td><strong>Модификация AS-Path</strong></td>
+                          <td>Дописывает свой ASN в начало цепочки (AS Prepend)</td>
+                          <td><strong>Не изменяет</strong> AS-Path</td>
+                        </tr>
+                        <tr>
+                          <td><strong>Next-Hop</strong></td>
+                          <td>Заменяет Next-Hop на свой собственный IP</td>
+                          <td>Не меняет Next-Hop (требует <code>next-hop-self</code> на пограничном роутере)</td>
+                        </tr>
+                        <tr>
+                          <td><strong>Защита от петель</strong></td>
+                          <td>Если в пришедшем AS-Path есть собственный ASN — маршрут отбрасывается</td>
+                          <td><strong>Split Horizon:</strong> маршрут от одного iBGP соседа не передается другому. Требует либо Full-Mesh, либо <em>Route Reflectors (RR)</em></td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </details>
+
+              <details class="academic-accordion" id="bgp-peering-ixp">
+                <summary class="accordion-summary">
+                  <div class="accordion-title-box"><span>🤝</span><span>Экономика Интернета: Пиринг (Peering), Транзит (Transit) и точки IXP</span></div>
+                  <svg class="accordion-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </summary>
+                <div class="accordion-content">
+                  <p>Трафик между сетями передается по двум фундаментально разным финансовым и техническим моделям:</p>
+                  <ul>
+                    <li><strong>IP Transit (Платный транзит):</strong> Провайдер покупает услугу «доставки до любого адреса в Интернете» (Full View, более 950 000 маршрутов) с оплатой за мегабит/с (95-й процентиль). Дорого, но гарантирует глобальную связность.</li>
+                    <li><strong>Settlement-Free Peering (Бесплатный взаимный пиринг):</strong> Две сети (например, Яндекс и Ростелеком, или Google и МегаФон) соединяются напрямую и обмениваются <em>только трафиком между своими клиентами</em> без взаимных оплат. Это снижает задержку с 40 мс до 1–2 мс и разгружает платные транзитные каналы.</li>
+                    <li><strong>IXP (Internet Exchange Points):</strong> Специализированные дата-центры с гигантской коммутационной Ethernet-фабрикой, где сотни сетей подключаются к общему свичу и поднимают сотни BGP-сессий (через Route Server):
+                      <ul>
+                        <li><strong>DE-CIX</strong> (Франкфурт) — пиковый трафик свыше 17 Тбит/с.</li>
+                        <li><strong>AMS-IX</strong> (Амстердам) — свыше 12 Тбит/с.</li>
+                        <li><strong>MSK-IX</strong> (Москва) — крупнейшая точка в РФ, свыше 5 Тбит/с.</li>
+                      </ul>
+                    </li>
+                  </ul>
+                </div>
+              </details>
+
+              <details class="academic-accordion" id="bgp-bestpath-rpki">
+                <summary class="accordion-summary">
+                  <div class="accordion-title-box"><span>⚖️</span><span>Алгоритм BGP Best Path Selection (9 шагов) и безопасность RPKI</span></div>
+                  <svg class="accordion-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </summary>
+                <div class="accordion-content">
+                  <p>В отличие от OSPF, BGP выбирает маршрут не по пропускной способности, а по строгой цепочке политик (Policy-Based Routing). Если получено несколько путей к одной подсети, роутер сравнивает атрибуты по порядку до первого несовпадения:</p>
+                  <ol>
+                    <li><strong>1. Weight (Вес):</strong> Локальный атрибут роутера (проприетарный Cisco, 0–65535). Выбирается <strong>наибольший</strong>.</li>
+                    <li><strong>2. Local Preference (Локальное предпочтение):</strong> Передается внутри всей AS по iBGP (по умолчанию 100). Выбирается <strong>наибольший</strong> (используется для предпочтения дешевого пиринга перед платным транзитом).</li>
+                    <li><strong>3. Locally Originated:</strong> Предпочтение отдается маршрутам, сгенерированным локально (командой <code>network</code> или <code>aggregate-address</code>).</li>
+                    <li><strong>4. AS-Path:</strong> Выбирается маршрут с <strong>наименьшей длиной цепочки ASN</strong>.</li>
+                    <li><strong>5. Origin Code:</strong> Предпочтение: <code>IGP (i)</code> &gt; <code>EGP (e)</code> &gt; <code>Incomplete (?)</code>.</li>
+                    <li><strong>6. MED (Multi-Exit Discriminator):</strong> Внешняя метрика от соседа для выбора точки входа при наличии нескольких линков. Выбирается <strong>наименьший</strong>.</li>
+                    <li><strong>7. eBGP перед iBGP:</strong> Внешний путь всегда надежнее внутреннего.</li>
+                    <li><strong>8. Lowest IGP Metric to Next-Hop:</strong> Выбирается путь с минимальной стоимостью OSPF/IS-IS до адреса BGP Next-Hop (Hot-Potato Routing — избавиться от пакета как можно быстрее).</li>
+                    <li><strong>9. Lowest BGP Router-ID:</strong> Тай-брейкер: наименьший IP-идентификатор маршрутизатора-соседа.</li>
+                  </ol>
+
+                  <div style="margin-top:14px; padding:12px 16px; background:rgba(239,68,68,0.08); border:1px solid rgba(239,68,68,0.3); border-radius:8px;">
+                    <strong style="color:#f87171;">🛡️ BGP Hijacking и защита RPKI / ROA:</strong>
+                    <p style="margin:6px 0 0; font-size:0.9rem; color:#fca5a5;">
+                      BGP исторически не имеет аутентификации: роутер безоговорочно верит тому, что ему анонсирует сосед. Известны случаи, когда ошибки конфигурации или атаки перехватывали трафик целых стран (например, перехват трафика YouTube через Пакистан в 2008 г., перехват префиксов Amazon DNS для кражи криптовалюты в 2018 г.).<br>
+                      <strong>Решение: RPKI (Resource Public Key Infrastructure)</strong>. Владельцы префиксов публикуют криптографически подписанные сертификаты <strong>ROA (Route Origin Authorization)</strong> в RIR (RIPE, ARIN, APNIC). Роутеры проверяют валидность пары {Префикс, ASN} и автоматически отбрасывают <code>RPKI Invalid</code> анонсы.
+                    </p>
+                  </div>
+                </div>
+              </details>
+
+              <div class="code-block-wrapper">
+                <div class="code-block-header">
+                  <span class="code-lang-tag"><span>💻</span> Настройка BGP в FRRouting / Quagga (Linux router)</span>
+                  <button type="button" class="code-copy-btn"><span>📋</span> Копировать</button>
+                </div>
+                <pre><code class="language-bash"># Вход в конфигуратор сетевого демона FRR
+vtysh
+conf t
+router bgp 65001                     # Наш ASN
+  bgp router-id 192.168.1.1
+  neighbor 198.51.100.2 remote-as 13335   # eBGP пир (Cloudflare)
+  neighbor 198.51.100.2 description Transit_Uplink
+  neighbor 10.0.0.2 remote-as 65001       # iBGP пир (внутренний роутер)
+  neighbor 10.0.0.2 next-hop-self
+  !
+  address-family ipv4 unicast
+    network 192.0.2.0/24             # Анонсировать нашу подсеть в мир
+    neighbor 198.51.100.2 activate
+  exit-address-family
+
+# Проверка сессий и маршрутов:
+show ip bgp summary                  # Состояние сессий (Active / Established)
+show ip bgp 1.1.1.0/24               # Детальный разбор пути и атрибутов</code></pre>
               </div>
             </div>
           </article>
@@ -2357,6 +2874,106 @@ Paths: (2 available, best #1)
                 </table>
               </div>
 
+              <!-- SVG DIAGRAM: TCP HEADER STRUCTURE -->
+              <div class="diagram-card" style="margin: 20px 0;">
+                <div class="diagram-header">
+                  <span class="diagram-title">
+                    <span>📐</span> Битовая структура заголовка TCP (RFC 9293, 20–60 байт)
+                  </span>
+                  <span class="diagram-badge">32-Bit Word Alignment</span>
+                </div>
+                <div class="svg-container">
+                  <svg viewBox="0 0 940 330" width="100%" height="auto" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Background -->
+                    <rect width="940" height="330" rx="12" fill="#070c18" stroke="rgba(255,255,255,0.08)" stroke-width="1" />
+
+                    <!-- Bit Ruler (0 .. 31) -->
+                    <g fill="#64748b" font-size="9" font-family="'JetBrains Mono', monospace">
+                      <text x="50" y="22">0</text>
+                      <text x="260" y="22">8</text>
+                      <text x="470" y="22">16</text>
+                      <text x="680" y="22">24</text>
+                      <text x="880" y="22">31 bit</text>
+                    </g>
+                    <line x1="50" y1="28" x2="890" y2="28" stroke="rgba(255,255,255,0.12)" stroke-width="1" />
+
+                    <!-- Row 1: Source Port (16) & Destination Port (16) -->
+                    <g transform="translate(50, 36)">
+                      <rect x="0" y="0" width="415" height="38" rx="5" fill="rgba(59,130,246,0.15)" stroke="#3b82f6" stroke-width="1.2" />
+                      <text x="207" y="23" fill="#93c5fd" font-size="11" font-weight="700" text-anchor="middle">Source Port (16 бит)</text>
+
+                      <rect x="425" y="0" width="415" height="38" rx="5" fill="rgba(6,182,212,0.15)" stroke="#06b6d4" stroke-width="1.2" />
+                      <text x="632" y="23" fill="#67e8f9" font-size="11" font-weight="700" text-anchor="middle">Destination Port (16 бит)</text>
+                    </g>
+
+                    <!-- Row 2: Sequence Number (32) -->
+                    <g transform="translate(50, 80)">
+                      <rect x="0" y="0" width="840" height="38" rx="5" fill="rgba(168,85,247,0.15)" stroke="#a855f7" stroke-width="1.2" />
+                      <text x="420" y="23" fill="#d8b4fe" font-size="11" font-weight="700" text-anchor="middle">Sequence Number (Порядковый номер байта — 32 бита)</text>
+                    </g>
+
+                    <!-- Row 3: Acknowledgment Number (32) -->
+                    <g transform="translate(50, 124)">
+                      <rect x="0" y="0" width="840" height="38" rx="5" fill="rgba(16,185,129,0.15)" stroke="#10b981" stroke-width="1.2" />
+                      <text x="420" y="23" fill="#6ee7b7" font-size="11" font-weight="700" text-anchor="middle">Acknowledgment Number (Номер подтверждения — 32 бита, валиден при ACK=1)</text>
+                    </g>
+
+                    <!-- Row 4: Data Offset (4), Reserved (4), Flags (8), Window Size (16) -->
+                    <g transform="translate(50, 168)">
+                      <!-- Data Offset (4) -->
+                      <rect x="0" y="0" width="95" height="42" rx="4" fill="rgba(245,158,11,0.15)" stroke="#f59e0b" stroke-width="1" />
+                      <text x="47" y="20" fill="#fbbf24" font-size="9" font-weight="700" text-anchor="middle">Data Offset</text>
+                      <text x="47" y="33" fill="#d97706" font-size="7.5" text-anchor="middle">(4 бита: длина)</text>
+
+                      <!-- Reserved (4) -->
+                      <rect x="100" y="0" width="70" height="42" rx="4" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.1)" stroke-width="1" />
+                      <text x="135" y="25" fill="#64748b" font-size="8.5" text-anchor="middle">Reserved</text>
+
+                      <!-- Flags (8 bits: CWR, ECE, URG, ACK, PSH, RST, SYN, FIN) -->
+                      <g transform="translate(175, 0)">
+                        <rect x="0" y="0" width="300" height="42" rx="4" fill="rgba(244,63,94,0.12)" stroke="#f43f5e" stroke-width="1.2" />
+                        <text x="150" y="14" fill="#fb7185" font-size="9" font-weight="700" text-anchor="middle">Контрольные флаги (8 бит)</text>
+
+                        <!-- Sub-flag cells -->
+                        <g font-size="7.5" font-family="'JetBrains Mono', monospace" font-weight="700" text-anchor="middle">
+                          <text x="18" y="32" fill="#cbd5e1">CWR</text>
+                          <text x="54" y="32" fill="#cbd5e1">ECE</text>
+                          <text x="90" y="32" fill="#cbd5e1">URG</text>
+                          <text x="126" y="32" fill="#34d399">ACK</text>
+                          <text x="162" y="32" fill="#cbd5e1">PSH</text>
+                          <text x="198" y="32" fill="#f87171">RST</text>
+                          <text x="234" y="32" fill="#60a5fa">SYN</text>
+                          <text x="275" y="32" fill="#f43f5e">FIN</text>
+                        </g>
+                      </g>
+
+                      <!-- Window Size (16) -->
+                      <rect x="480" y="0" width="360" height="42" rx="4" fill="rgba(59,130,246,0.15)" stroke="#3b82f6" stroke-width="1" />
+                      <text x="660" y="21" fill="#93c5fd" font-size="10" font-weight="700" text-anchor="middle">Window Size (16 бит)</text>
+                      <text x="660" y="34" fill="#60a5fa" font-size="8" text-anchor="middle">Размер доступного буфера приемника (rwnd)</text>
+                    </g>
+
+                    <!-- Row 5: Checksum (16) & Urgent Pointer (16) -->
+                    <g transform="translate(50, 216)">
+                      <rect x="0" y="0" width="415" height="38" rx="5" fill="rgba(16,185,129,0.12)" stroke="#10b981" stroke-width="1" />
+                      <text x="207" y="23" fill="#6ee7b7" font-size="10.5" font-weight="700" text-anchor="middle">Checksum (Контрольная сумма с псевдозаголовком IP — 16 бит)</text>
+
+                      <rect x="425" y="0" width="415" height="38" rx="5" fill="rgba(245,158,11,0.1)" stroke="rgba(245,158,11,0.4)" stroke-width="1" />
+                      <text x="632" y="23" fill="#fbbf24" font-size="10.5" font-weight="700" text-anchor="middle">Urgent Pointer (16 бит, активен при URG=1)</text>
+                    </g>
+
+                    <!-- Row 6: Options & Padding -->
+                    <g transform="translate(50, 260)">
+                      <rect x="0" y="0" width="840" height="36" rx="5" fill="rgba(148,163,184,0.08)" stroke="rgba(148,163,184,0.25)" stroke-width="1" stroke-dasharray="4,3" />
+                      <text x="420" y="22" fill="#cbd5e1" font-size="10" font-weight="600" text-anchor="middle">Опции TCP (0–40 байт: MSS=1460, Window Scale, SACK-Permitted, Timestamps) + Выравнивание (Padding)</text>
+                    </g>
+                  </svg>
+                </div>
+                <div class="diagram-caption">
+                  Рис. 3.0 — Битовая сетка заголовка TCP: 5 обязательных 32-битных строк (20 байт) + до 40 байт опций.
+                </div>
+              </div>
+
               <div class="code-block-wrapper">
                 <div class="code-block-header">
                   <span class="code-lang-tag">
@@ -2390,7 +3007,7 @@ Paths: (2 available, best #1)
                 <code>SYN</code> (Синхронизация номеров ISN), <code>ACK</code> (Подтверждение получения),
                 <code>FIN</code> (Инициация корректного закрытия), <code>RST</code> (Аварийный сброс соединения при
                 ошибке или атаке), <code>PSH</code> (Немедленная передача данных приложению без ожидания заполнения
-                буфера), <code>URG</code> (Указатель на срочные данные).
+                буфера), <code>URG</code> (Указатель на срочные данные), <code>ECE/CWR</code> (Явное уведомление о перегрузке Explicit Congestion Notification).
               </p>
             </div>
           </article>
@@ -2755,6 +3372,208 @@ $ nft add rule inet filter forward tcp flags syn tcp option maxseg size set rt m
               <p><b>Запомните:</b> порт открыт ≠ сервис защищён. Firewall управляет доступом; безопасность самого сервиса — отдельный вопрос.</p>
             </div>
           </article>
+
+          <!-- Card 3.4: QUIC (RFC 9000) & HTTP/3 -->
+          <article class="academic-card card-algo" id="card-quic">
+            <header class="card-header">
+              <div class="card-title-group">
+                <h3 class="card-title">🚀 QUIC (RFC 9000) & HTTP/3: Современная революция на базе UDP</h3>
+              </div>
+              <span class="card-category-badge">UDP Transport • RFC 9000 / 9114</span>
+            </header>
+            <div class="card-body">
+              <p>
+                Более 50% трафика современного веба (YouTube, Google, Meta, Cloudflare, Fastly) передаётся не по TCP, а по <strong>QUIC поверх UDP (порт 443)</strong>.
+                Разработанный Google и стандартизированный IETF в 2021 году (RFC 9000), QUIC стал фундаментальной заменой транспортного уровня для <strong>HTTP/3</strong>.
+              </p>
+
+              <div class="table-responsive">
+                <table class="academic-table">
+                  <thead>
+                    <tr>
+                      <th>Характеристика</th>
+                      <th>Классический стек (TCP + TLS 1.3)</th>
+                      <th>QUIC (HTTP/3 over UDP)</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><strong>Базовый транспорт</strong></td>
+                      <td>Ядро ОС, протокол TCP (IP proto 6)</td>
+                      <td>Пользовательское пространство (Userspace), UDP (IP proto 17)</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Время до первого байта (TTFB)</strong></td>
+                      <td><strong>2 RTT</strong> (1 RTT TCP handshake + 1 RTT TLS handshake)</td>
+                      <td><strong>1 RTT</strong> (совмещённый Handshake) или <strong>0-RTT</strong> (Reconnection)</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Head-of-Line (HoL) Blocking</strong></td>
+                      <td><strong>Есть на уровне TCP</strong>: потеря одного пакета блокирует чтение всех потоков HTTP/2</td>
+                      <td><strong>Устранён</strong>: потоки независимы, потеря пакета стрима А не тормозит стрим B</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Идентификация сессии</strong></td>
+                      <td>4-кортеж: <code>{Src IP, Src Port, Dst IP, Dst Port}</code></td>
+                      <td>64-битный <strong>Connection ID (CID)</strong></td>
+                    </tr>
+                    <tr>
+                      <td><strong>Миграция сети (Wi-Fi ↔ LTE)</strong></td>
+                      <td>Соединение разрывается (смена IP требует полного реконнекта)</td>
+                      <td><strong>Бесшовная миграция</strong>: сессия продолжается с новым IP без разрыва</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Шифрование заголовков</strong></td>
+                      <td>Заголовки TCP (флаги, Seq/Ack) передаются открытым текстом</td>
+                      <td>Шифруется почти всё: полезная нагрузка + номера пакетов + флаги</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <!-- SVG DIAGRAM: TCP vs QUIC HANDSHAKE -->
+              <div class="diagram-card" style="margin: 24px 0;">
+                <div class="diagram-header">
+                  <span class="diagram-title">
+                    <span>⚡</span> Сравнение времени установления соединения: TCP + TLS 1.3 (2 RTT) vs QUIC (1 RTT / 0-RTT)
+                  </span>
+                  <span class="diagram-badge">Latency Benchmark</span>
+                </div>
+                <div class="svg-container">
+                  <svg viewBox="0 0 940 380" width="100%" height="auto" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                      <marker id="arrow-q-blue" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                        <path d="M 0 0 L 10 5 L 0 10 z" fill="#38bdf8" />
+                      </marker>
+                      <marker id="arrow-q-green" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                        <path d="M 0 0 L 10 5 L 0 10 z" fill="#10b981" />
+                      </marker>
+                      <marker id="arrow-q-violet" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                        <path d="M 0 0 L 10 5 L 0 10 z" fill="#c084fc" />
+                      </marker>
+                    </defs>
+
+                    <!-- Background frame -->
+                    <rect width="940" height="380" rx="12" fill="#070c18" stroke="rgba(255,255,255,0.08)" stroke-width="1" />
+
+                    <!-- LEFT HALF: TCP + TLS 1.3 (2 RTT) -->
+                    <rect x="20" y="20" width="430" height="340" rx="8" fill="rgba(30,41,59,0.3)" stroke="rgba(148,163,184,0.15)" />
+                    <text x="235" y="48" fill="#94a3b8" font-size="13" font-weight="700" text-anchor="middle">КЛАССИКА: TCP + TLS 1.3 (2 RTT)</text>
+
+                    <!-- Timelines -->
+                    <line x1="80" y1="70" x2="80" y2="330" stroke="#475569" stroke-width="2" />
+                    <line x1="390" y1="70" x2="390" y2="330" stroke="#475569" stroke-width="2" />
+                    <text x="80" y="65" fill="#cbd5e1" font-size="11" font-weight="600" text-anchor="middle">Client</text>
+                    <text x="390" y="65" fill="#cbd5e1" font-size="11" font-weight="600" text-anchor="middle">Server</text>
+
+                    <!-- 1 RTT: TCP Handshake -->
+                    <line x1="80" y1="90" x2="390" y2="120" stroke="#38bdf8" stroke-width="1.8" marker-end="url(#arrow-q-blue)" />
+                    <text x="235" y="100" fill="#38bdf8" font-size="10" font-weight="600" text-anchor="middle">1. TCP SYN</text>
+
+                    <line x1="390" y1="125" x2="80" y2="155" stroke="#38bdf8" stroke-width="1.8" marker-end="url(#arrow-q-blue)" />
+                    <text x="235" y="135" fill="#38bdf8" font-size="10" font-weight="600" text-anchor="middle">2. TCP SYN-ACK</text>
+
+                    <rect x="35" y="105" width="28" height="45" rx="4" fill="rgba(56,189,248,0.15)" stroke="#38bdf8" stroke-width="1" />
+                    <text x="49" y="132" fill="#38bdf8" font-size="9" font-weight="700" text-anchor="middle">1 RTT</text>
+
+                    <!-- 2 RTT: TLS 1.3 Handshake -->
+                    <line x1="80" y1="160" x2="390" y2="190" stroke="#c084fc" stroke-width="1.8" marker-end="url(#arrow-q-violet)" />
+                    <text x="235" y="170" fill="#c084fc" font-size="10" font-weight="600" text-anchor="middle">3. TCP ACK + TLS ClientHello (ECDHE)</text>
+
+                    <line x1="390" y1="195" x2="80" y2="225" stroke="#c084fc" stroke-width="1.8" marker-end="url(#arrow-q-violet)" />
+                    <text x="235" y="205" fill="#c084fc" font-size="10" font-weight="600" text-anchor="middle">4. TLS ServerHello + Cert + Finished</text>
+
+                    <rect x="35" y="175" width="28" height="45" rx="4" fill="rgba(192,132,252,0.15)" stroke="#c084fc" stroke-width="1" />
+                    <text x="49" y="202" fill="#c084fc" font-size="9" font-weight="700" text-anchor="middle">2 RTT</text>
+
+                    <!-- First HTTP Data -->
+                    <line x1="80" y1="235" x2="390" y2="265" stroke="#10b981" stroke-width="2.5" marker-end="url(#arrow-q-green)" />
+                    <text x="235" y="248" fill="#10b981" font-size="11" font-weight="700" text-anchor="middle">5. ➔ HTTP GET / (Данные пошли!)</text>
+                    <rect x="130" y="280" width="210" height="26" rx="5" fill="rgba(239,68,68,0.15)" stroke="#ef4444" stroke-width="1" />
+                    <text x="235" y="297" fill="#fca5a5" font-size="10" font-weight="600" text-anchor="middle">⚠️ Итого: 2 RTT до полезных данных</text>
+
+                    <!-- RIGHT HALF: QUIC (1 RTT / 0-RTT) -->
+                    <rect x="490" y="20" width="430" height="340" rx="8" fill="rgba(6,182,212,0.06)" stroke="rgba(6,182,212,0.25)" />
+                    <text x="705" y="48" fill="#67e8f9" font-size="13" font-weight="700" text-anchor="middle">СОВРЕМЕННЫЙ QUIC / HTTP/3 (1 RTT)</text>
+
+                    <!-- Timelines -->
+                    <line x1="550" y1="70" x2="550" y2="330" stroke="#475569" stroke-width="2" />
+                    <line x1="860" y1="70" x2="860" y2="330" stroke="#475569" stroke-width="2" />
+                    <text x="550" y="65" fill="#cbd5e1" font-size="11" font-weight="600" text-anchor="middle">Client</text>
+                    <text x="860" y="65" fill="#cbd5e1" font-size="11" font-weight="600" text-anchor="middle">Server</text>
+
+                    <!-- Combined 1 RTT Handshake -->
+                    <line x1="550" y1="100" x2="860" y2="135" stroke="#06b6d4" stroke-width="2.2" marker-end="url(#arrow-q-blue)" />
+                    <text x="705" y="112" fill="#38bdf8" font-size="10" font-weight="700" text-anchor="middle">1. QUIC Initial (UDP 443)</text>
+                    <text x="705" y="125" fill="#94a3b8" font-size="8.5" text-anchor="middle">[TLS ClientHello + KeyShare + CID]</text>
+
+                    <line x1="860" y1="145" x2="550" y2="180" stroke="#06b6d4" stroke-width="2.2" marker-end="url(#arrow-q-blue)" />
+                    <text x="705" y="157" fill="#38bdf8" font-size="10" font-weight="700" text-anchor="middle">2. QUIC Handshake</text>
+                    <text x="705" y="170" fill="#94a3b8" font-size="8.5" text-anchor="middle">[TLS ServerHello + Cert + Finished]</text>
+
+                    <rect x="505" y="120" width="28" height="45" rx="4" fill="rgba(16,185,129,0.2)" stroke="#10b981" stroke-width="1" />
+                    <text x="519" y="147" fill="#34d399" font-size="9" font-weight="700" text-anchor="middle">1 RTT</text>
+
+                    <!-- Data starts right away -->
+                    <line x1="550" y1="195" x2="860" y2="230" stroke="#10b981" stroke-width="2.5" marker-end="url(#arrow-q-green)" />
+                    <text x="705" y="208" fill="#10b981" font-size="11" font-weight="700" text-anchor="middle">3. ➔ HTTP/3 Frames (Data Stream #0, #4)</text>
+
+                    <rect x="590" y="250" width="230" height="26" rx="5" fill="rgba(16,185,129,0.15)" stroke="#10b981" stroke-width="1" />
+                    <text x="705" y="267" fill="#34d399" font-size="10" font-weight="700" text-anchor="middle">⚡ Готово за 1 RTT (в 2 раза быстрее!)</text>
+
+                    <g transform="translate(540, 290)">
+                      <rect width="330" height="38" rx="6" fill="rgba(245,158,11,0.1)" stroke="rgba(245,158,11,0.3)" />
+                      <text x="165" y="16" fill="#fbbf24" font-size="10" font-weight="700" text-anchor="middle">0-RTT Resumption (Early Data):</text>
+                      <text x="165" y="30" fill="#cbd5e1" font-size="9" text-anchor="middle">При повторном визите HTTP GET летит прямо в пакете №1!</text>
+                    </g>
+                  </svg>
+                </div>
+                <div class="diagram-caption">
+                  Рис. 3.4 — QUIC объединяет транспортный и криптографический Handshake в один RTT по UDP, экономя сотни миллисекунд мобильной задержки.
+                </div>
+              </div>
+
+              <details class="academic-accordion" id="quic-hol-blocking">
+                <summary class="accordion-summary">
+                  <div class="accordion-title-box"><span>🛡️</span><span>Почему TCP тормозил HTTP/2: Head-of-Line Blocking и его решение в QUIC</span></div>
+                  <svg class="accordion-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </summary>
+                <div class="accordion-content">
+                  <p>В HTTP/2 появилась мультиплексирование: браузер отправляет сотни запросов параллельно через одно соединение. Но под капотом лежал <strong>TCP</strong> — а TCP гарантирует непрерывный байтовый поток. Если по дороге теряется один пакет, принадлежащий фоновому файлу CSS, ядро ОС блокирует чтение сокета для <em>всех остальных параллельных файлов</em>, пока потерянный пакет не будет повторно передан (RTO или Fast Retransmit). Это явление называется <strong>TCP Head-of-Line Blocking</strong>.</p>
+                  <p><strong>Решение QUIC:</strong> QUIC реализует многопоточность на транспортном уровне. Каждому запросу назначается свой независимый <code>Stream ID</code>. Потеря пакета в Stream 3 блокирует доставку только байтов Stream 3 — данные в Stream 7 и Stream 11 читаются приложением без малейших задержек.</p>
+                </div>
+              </details>
+
+              <details class="academic-accordion" id="quic-connection-migration">
+                <summary class="accordion-summary">
+                  <div class="accordion-title-box"><span>📱</span><span>Connection Migration: бесшовный переход с Wi-Fi на LTE без обрыва связи</span></div>
+                  <svg class="accordion-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </summary>
+                <div class="accordion-content">
+                  <p>Когда вы выходите из дома во время онлайн-звонка или просмотра видео, смартфон отключается от Wi-Fi и переходит на LTE. Ваш IP-адрес меняется (например, с <code>192.168.1.105</code> на <code>178.62.x.x</code>). В мире TCP сессия мгновенно «умирает»: роутеры отбрасывают пакеты с незнакомым IP, приложение вынуждено заново делать DNS, 3-Way Handshake и TLS Handshake (звонок прерывается на 3–5 секунд).</p>
+                  <p><strong>В QUIC сессия привязана к 64-битному Connection ID (CID)</strong>. При смене IP клиент отправляет пакет с тем же CID, подтверждая владение адресом через микро-челлендж <code>PATH_CHALLENGE / PATH_RESPONSE</code>. Сервер мгновенно перенаправляет поток на новый IP без единого потерянного кадра.</p>
+                </div>
+              </details>
+
+              <div class="code-block-wrapper">
+                <div class="code-block-header">
+                  <span class="code-lang-tag"><span>🔍</span> Как проверить работу HTTP/3 и QUIC в браузере и терминале</span>
+                  <button type="button" class="code-copy-btn"><span>📋</span> Копировать</button>
+                </div>
+                <pre><code class="language-bash"># Тестирование HTTP/3 с помощью современного curl (собранного с ngtcp2 или quiche)
+curl --http3 -IL https://cloudflare.com
+# Заголовок ответа покажет: HTTP/3 200
+
+# Просмотр анонса перехода на HTTP/3 в обычном HTTP/2 ответе:
+curl -I https://google.com | grep -i alt-svc
+# Вывод: alt-svc: h3=":443"; ma=2592000  (сервер сообщает: «я поддерживаю HTTP/3 на порту 443 UDP»)
+
+# В Google Chrome / Edge:
+# Откройте вкладку DevTools -> Network -> кликните правой кнопкой по заголовкам колонок -> выберите Protocol
+# Вы увидите: "h3" вместо "h2" для большинства ресурсов Google, Cloudflare, YouTube.</code></pre>
+              </div>
+            </div>
+          </article>
         </section>
 
 
@@ -3089,11 +3908,258 @@ ssize_t bytes_read = <span class="tok-fn">read</span>(client_fd, buffer, <span c
                 <strong>Эволюция высокопроизводительного I/O:</strong>
                 Классическая модель <em>Thread-per-Connection</em> не масштабируется на 100,000+ одновременных
                 подключений (проблема C10K). Вызов <code>select()</code> ограничен 1024 дескрипторами и имеет
-                вычислительную сложность <code>O(N)</code> на каждой итерации. Современные высокопроизводительные движки
-                (Nginx, Envoy, Node.js) используют <strong>epoll (Linux, <code>O(1)</code>)</strong> и <strong>kqueue
-                  (BSD/macOS)</strong>, где ядро регистрирует события готовности файловых дескрипторов в памяти через
-                красно-черные деревья и кольцевой буфер готовых событий.
+                вычислительную сложность <code>O(N)</code> на каждой итерации. Высокопроизводительные движки
+                (Nginx, Envoy, Node.js) традиционно использовали <strong>epoll (Linux, <code>O(1)</code>)</strong> и <strong>kqueue
+                  (BSD/macOS)</strong>. Однако в 2020-х годах архитектурный предел масштабирования был преодолён новым интерфейсом ядра Linux — <strong>io_uring</strong> (раздел ниже).
               </p>
+            </div>
+          </article>
+
+          <!-- Card 4.2: io_uring & Modern Async I/O in Linux -->
+          <article class="academic-card card-algo" id="card-io-uring">
+            <header class="card-header">
+              <div class="card-title-group">
+                <h3 class="card-title">🚀 Высоконагруженный асинхронный ввод-вывод: от epoll к io_uring (Linux 5.1+)</h3>
+              </div>
+              <span class="card-category-badge">Async I/O • Linux Kernel 5.1+</span>
+            </header>
+            <div class="card-body">
+              <p>
+                В классических серверах с <code>epoll</code> на каждый сетевой пакет расходуются системные вызовы:
+                сначала <code>epoll_wait()</code> сообщает о готовности дескриптора (<em>Readiness Notification</em>), затем процесс вызывает <code>read()</code> или <code>write()</code>.
+                На скоростях 10–100 Гбит/с и миллионах IOPS переключения контекста пользователь/ядро (Ring 3 ↔ Ring 0) и сбросы кешей CPU становятся главным узким местом системы.
+              </p>
+              <p>
+                В 2019 году в ядре Linux 5.1 появился <strong>io_uring</strong> (автор Jens Axboe) — подлинный асинхронный интерфейс на основе модели <em>Completion Notification</em> (уведомление о завершении), кардинально изменивший высоконагруженный сетевой стек.
+              </p>
+
+              <!-- COMPARISON TABLE: select vs poll vs epoll vs io_uring -->
+              <div class="table-responsive">
+                <table class="academic-table">
+                  <thead>
+                    <tr>
+                      <th>Характеристика</th>
+                      <th>select()</th>
+                      <th>poll()</th>
+                      <th>epoll()</th>
+                      <th>io_uring (Linux 5.1+)</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><strong>Сложность проверки</strong></td>
+                      <td><code>O(N)</code></td>
+                      <td><code>O(N)</code></td>
+                      <td><code>O(1)</code></td>
+                      <td><code>O(1)</code> (Lock-free Ring)</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Модель I/O</strong></td>
+                      <td>Readiness (готовность к I/O)</td>
+                      <td>Readiness</td>
+                      <td>Readiness</td>
+                      <td><strong>Completion (I/O уже выполнен)</strong></td>
+                    </tr>
+                    <tr>
+                      <td><strong>Лимит дескрипторов</strong></td>
+                      <td>1024 (FD_SETSIZE)</td>
+                      <td>Не ограничен</td>
+                      <td>Не ограничен (память ядра)</td>
+                      <td>Не ограничен + регистрируемые FD</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Системные вызовы на I/O</strong></td>
+                      <td>Syscall на вызов + <code>read/write</code></td>
+                      <td>Syscall на вызов + <code>read/write</code></td>
+                      <td>Syscall на <code>epoll_wait</code> + <code>read/write</code></td>
+                      <td><strong>0 вызовов</strong> в режиме SQPOLL!</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Общая память (Shared Memory)</strong></td>
+                      <td>Нет (копирование структур)</td>
+                      <td>Нет (копирование массива pollfd)</td>
+                      <td>Нет</td>
+                      <td><strong>Да (mmap SQ/CQ Ring Buffers)</strong></td>
+                    </tr>
+                    <tr>
+                      <td><strong>Поддержка файлов на диске</strong></td>
+                      <td>Нет (всегда готовы, блокируют)</td>
+                      <td>Нет (блокируют поток)</td>
+                      <td>Нет (блокируют поток)</td>
+                      <td><strong>Да (полноценный Async File I/O)</strong></td>
+                    </tr>
+                    <tr>
+                      <td><strong>Zero-Copy Networking</strong></td>
+                      <td>Нет</td>
+                      <td>Нет</td>
+                      <td>Нет</td>
+                      <td><strong>Да (<code>IORING_OP_SEND_ZC</code>)</strong></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <!-- SVG DIAGRAM: io_uring Shared Memory Architecture -->
+              <div class="diagram-card" style="margin: 24px 0;">
+                <div class="diagram-header">
+                  <span class="diagram-title">
+                    <span>🔄</span> Архитектура разделяемой памяти io_uring: Кольцевые буферы SQ (Submission) и CQ (Completion)
+                  </span>
+                  <span class="diagram-badge">Shared Memory Architecture</span>
+                </div>
+                <div class="svg-container">
+                  <svg viewBox="0 0 940 440" width="100%" height="auto" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                      <marker id="arrow-u-blue" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                        <path d="M 0 0 L 10 5 L 0 10 z" fill="#38bdf8" />
+                      </marker>
+                      <marker id="arrow-u-green" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                        <path d="M 0 0 L 10 5 L 0 10 z" fill="#10b981" />
+                      </marker>
+                    </defs>
+
+                    <!-- Background Frame -->
+                    <rect width="940" height="440" rx="14" fill="#070c18" stroke="rgba(255,255,255,0.08)" stroke-width="1" />
+
+                    <!-- TOP SECTION: USERSPACE APPLICATION -->
+                    <rect x="30" y="25" width="880" height="85" rx="10" fill="rgba(59,130,246,0.08)" stroke="rgba(59,130,246,0.3)" stroke-width="1.2" />
+                    <text x="50" y="52" fill="#93c5fd" font-size="13" font-weight="700">ПРОСТРАНСТВО ПОЛЬЗОВАТЕЛЯ (USER SPACE): ПРИКЛАДНОЙ ПРОЦЕСС</text>
+                    <text x="50" y="74" fill="#cbd5e1" font-size="11">Процесс напрямую пишет запросы (SQE) и читает результаты (CQE) в разделяемую память без вызова переключения контекста.</text>
+
+                    <!-- MIDDLE SECTION: SHARED MEMORY RING BUFFERS (mmap) -->
+                    <rect x="30" y="130" width="880" height="180" rx="12" fill="rgba(6,182,212,0.05)" stroke="#06b6d4" stroke-width="1.5" stroke-dasharray="6,4" />
+                    <text x="470" y="155" fill="#38bdf8" font-size="12" font-weight="700" text-anchor="middle" letter-spacing="1">РАЗДЕЛЯЕМАЯ ПАМЯТЬ ЯДРО ↔ ПРОЦЕСС (mmap ring buffers — ZERO SYSCALL OVERHEAD)</text>
+
+                    <!-- SQ Ring Buffer (Submission Queue) -->
+                    <g transform="translate(60, 175)">
+                      <rect width="380" height="115" rx="8" fill="rgba(15,23,42,0.85)" stroke="#38bdf8" stroke-width="1.2" />
+                      <text x="20" y="26" fill="#7dd3fc" font-size="12" font-weight="700">1. Submission Queue Ring (SQ)</text>
+                      <text x="20" y="44" fill="#94a3b8" font-size="9.5">Процесс добавляет SQE: [OP_SEND, fd=5, buf=0x7fff...]</text>
+
+                      <!-- Slots in SQ Ring -->
+                      <g transform="translate(20, 58)">
+                        <rect x="0" y="0" width="75" height="32" rx="4" fill="#1e3a8a" stroke="#60a5fa" stroke-width="1" />
+                        <text x="37" y="16" fill="#bfdbfe" font-size="9" font-weight="700" text-anchor="middle">SQE #0</text>
+                        <text x="37" y="27" fill="#93c5fd" font-size="7.5" text-anchor="middle">SEND_ZC</text>
+
+                        <rect x="85" y="0" width="75" height="32" rx="4" fill="#1e3a8a" stroke="#60a5fa" stroke-width="1" />
+                        <text x="122" y="16" fill="#bfdbfe" font-size="9" font-weight="700" text-anchor="middle">SQE #1</text>
+                        <text x="122" y="27" fill="#93c5fd" font-size="7.5" text-anchor="middle">RECV</text>
+
+                        <rect x="170" y="0" width="75" height="32" rx="4" fill="#1e3a8a" stroke="#60a5fa" stroke-width="1" />
+                        <text x="207" y="16" fill="#bfdbfe" font-size="9" font-weight="700" text-anchor="middle">SQE #2</text>
+                        <text x="207" y="27" fill="#93c5fd" font-size="7.5" text-anchor="middle">ACCEPT</text>
+
+                        <rect x="255" y="0" width="75" height="32" rx="4" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.2)" stroke-dasharray="2,2" />
+                        <text x="292" y="20" fill="#64748b" font-size="8" text-anchor="middle">Свободно</text>
+                      </g>
+                    </g>
+
+                    <!-- CQ Ring Buffer (Completion Queue) -->
+                    <g transform="translate(500, 175)">
+                      <rect width="380" height="115" rx="8" fill="rgba(15,23,42,0.85)" stroke="#10b981" stroke-width="1.2" />
+                      <text x="20" y="26" fill="#a7f3d0" font-size="12" font-weight="700">2. Completion Queue Ring (CQ)</text>
+                      <text x="20" y="44" fill="#94a3b8" font-size="9.5">Ядро пишет CQE: [res=1460 bytes, flags=0, user_data=42]</text>
+
+                      <!-- Slots in CQ Ring -->
+                      <g transform="translate(20, 58)">
+                        <rect x="0" y="0" width="75" height="32" rx="4" fill="#064e3b" stroke="#10b981" stroke-width="1" />
+                        <text x="37" y="16" fill="#a7f3d0" font-size="9" font-weight="700" text-anchor="middle">CQE #0</text>
+                        <text x="37" y="27" fill="#6ee7b7" font-size="7.5" text-anchor="middle">+1460 b</text>
+
+                        <rect x="85" y="0" width="75" height="32" rx="4" fill="#064e3b" stroke="#10b981" stroke-width="1" />
+                        <text x="122" y="16" fill="#a7f3d0" font-size="9" font-weight="700" text-anchor="middle">CQE #1</text>
+                        <text x="122" y="27" fill="#6ee7b7" font-size="7.5" text-anchor="middle">+512 b</text>
+
+                        <rect x="170" y="0" width="75" height="32" rx="4" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.2)" stroke-dasharray="2,2" />
+                        <text x="207" y="20" fill="#64748b" font-size="8" text-anchor="middle">Ожидает</text>
+
+                        <rect x="255" y="0" width="75" height="32" rx="4" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.2)" stroke-dasharray="2,2" />
+                        <text x="292" y="20" fill="#64748b" font-size="8" text-anchor="middle">Свободно</text>
+                      </g>
+                    </g>
+
+                    <!-- BOTTOM SECTION: KERNEL SPACE & HARDWARE -->
+                    <rect x="30" y="330" width="880" height="85" rx="10" fill="rgba(168,85,247,0.08)" stroke="rgba(168,85,247,0.3)" stroke-width="1.2" />
+                    <text x="50" y="358" fill="#d8b4fe" font-size="13" font-weight="700">ПРОСТРАНСТВО ЯДРА LINUX (KERNEL SPACE) & АППАРАТНЫЙ СЕТЕВОЙ СТЕК</text>
+                    <text x="50" y="380" fill="#cbd5e1" font-size="11">Ядерный поток-поллер [io_uring-sq] вычитывает SQE без системных вызовов ➔ NIC DMA передает пакеты напрямую (Zero-Copy) ➔ Ядро пишет CQE в кольцо.</text>
+
+                    <!-- Connecting Flow Arrows -->
+                    <path d="M 250 110 L 250 170" stroke="#38bdf8" stroke-width="2.2" marker-end="url(#arrow-u-blue)" />
+                    <text x="260" y="125" fill="#38bdf8" font-size="9" font-weight="700">Write SQE</text>
+
+                    <path d="M 250 295 L 250 330" stroke="#38bdf8" stroke-width="2.2" marker-end="url(#arrow-u-blue)" />
+                    <text x="260" y="318" fill="#38bdf8" font-size="9" font-weight="700">Kernel consume</text>
+
+                    <path d="M 690 330 L 690 295" stroke="#10b981" stroke-width="2.2" marker-end="url(#arrow-u-green)" />
+                    <text x="700" y="318" fill="#34d399" font-size="9" font-weight="700">Write CQE</text>
+
+                    <path d="M 690 170 L 690 110" stroke="#10b981" stroke-width="2.2" marker-end="url(#arrow-u-green)" />
+                    <text x="700" y="125" fill="#34d399" font-size="9" font-weight="700">Read result</text>
+                  </svg>
+                </div>
+                <div class="diagram-caption">
+                  Рис. 4.2 — Архитектура разделяемой памяти io_uring: приложение и ядро общаются через кольцевые буферы SQ и CQ, исключая необходимость системных вызовов в горячем цикле обработки пакетов.
+                </div>
+              </div>
+
+              <details class="academic-accordion" id="io-uring-sqpoll">
+                <summary class="accordion-summary">
+                  <div class="accordion-title-box"><span>⚡</span><span>Режим SQPOLL: абсолютный ноль системных вызовов в горячем цикле</span></div>
+                  <svg class="accordion-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </summary>
+                <div class="accordion-content">
+                  <p>В обычном режиме при заполнении SQ процесс всё же вызывает один syscall: <code>io_uring_enter()</code>, чтобы разбудить ядро. Однако при флаге <code>IORING_SETUP_SQPOLL</code> ядро создаёт <strong>выделенный поток ядра (kernel thread <code>[io_uring-sq]</code>)</strong>, привязанный к отдельному ядру CPU:</p>
+                  <ul>
+                    <li>Поток ядра непрерывно опрашивает SQ. Как только приложение записывает новый SQE и атомарно сдвигает указатель хвоста (tail), поток ядра немедленно берет задачу в исполнение.</li>
+                    <li>Приложение проверяет CQ аналогично — просто читая заголовок очереди CQ.</li>
+                    <li><strong>Результат:</strong> в горячем цикле передачи миллионов пакетов процессор <strong>не совершает ни одного системного вызова</strong>. Стоимость I/O падает до скорости записи в оперативную память.</li>
+                  </ul>
+                </div>
+              </details>
+
+              <details class="academic-accordion" id="io-uring-zerocopy">
+                <summary class="accordion-summary">
+                  <div class="accordion-title-box"><span>🚀</span><span>Zero-Copy Networking: отправка и приём без промежуточных копирований</span></div>
+                  <svg class="accordion-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </summary>
+                <div class="accordion-content">
+                  <p>В классическом <code>send()</code> память приложения копируется в ядерные буферы сокета (<code>sk_buff</code>), а оттуда через DMA отправляется в сетевую карту. На скоростях 40–100GbE пропускная способность памяти DDR4/DDR5 становится «бутылочным горлышком».</p>
+                  <p>В Linux 6.0+ с помощью оператора <code>IORING_OP_SEND_ZC</code> ядро «блокирует» (pins) страницы памяти процесса в RAM и отдаёт дескрипторы страниц сетевой карте. DMA-контроллер сетевой карты читает байты прямо из буфера программы. Уведомление о том, что буфер можно переиспользовать, возвращается в CQE.</p>
+                </div>
+              </details>
+
+              <div class="code-block-wrapper">
+                <div class="code-block-header">
+                  <span class="code-lang-tag"><span>💻</span> Практический пример использования io_uring в C (библиотека liburing)</span>
+                  <button type="button" class="code-copy-btn"><span>📋</span> Копировать</button>
+                </div>
+                <pre><code class="language-c">#include &lt;liburing.h&gt;
+
+struct io_uring ring;
+// 1. Инициализация кольца с глубиной очереди 256 слотов
+io_uring_queue_init(256, &amp;ring, 0);
+
+// 2. Получение свободного слота Submission Queue Entry (SQE)
+struct io_uring_sqe *sqe = io_uring_get_sqe(&amp;ring);
+
+// 3. Подготовка асинхронной отправки данных в сокет (Zero-Copy)
+char message[] = "HTTP/1.1 200 OK\r\nContent-Length: 2\r\n\r\nOK";
+io_uring_prep_send(sqe, client_fd, message, sizeof(message), 0);
+sqe-&gt;user_data = 1001; // Идентификатор для сопоставления в ответе
+
+// 4. Отправка заданий ядру (в режиме SQPOLL этот вызов не нужен!)
+io_uring_submit(&amp;ring);
+
+// 5. Извлечение результата из Completion Queue (CQE)
+struct io_uring_cqe *cqe;
+io_uring_wait_cqe(&amp;ring, &amp;cqe);
+if (cqe-&gt;res &gt; 0) {
+    printf("Успешно отправлено %d байт без блокировки!\n", cqe-&gt;res);
+}
+io_uring_cqe_seen(&amp;ring, cqe); // Освободить слот в очереди CQ
+io_uring_queue_exit(&amp;ring);</code></pre>
+              </div>
             </div>
           </article>
         </section>

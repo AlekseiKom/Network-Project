@@ -395,14 +395,35 @@ body {
 .search-kbd {
   position: absolute;
   right: 12px;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.14);
   border-radius: 6px;
   padding: 2px 7px;
   font-size: 0.72rem;
+  font-weight: 600;
   color: var(--text-dim);
-  font-family: inherit;
+  font-family: 'JetBrains Mono', monospace;
   pointer-events: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+/* Hide shortcut hint when input is focused or has content so it doesn't overlap text or clear-button */
+.search-input:focus ~ .search-kbd,
+.search-input:not(:placeholder-shown) ~ .search-kbd {
+  opacity: 0;
+  transform: scale(0.85);
+  pointer-events: none;
+}
+
+/* Touch devices without a hardware keyboard don't have a dedicated '/' key */
+@media (hover: none) and (pointer: coarse) {
+  .search-kbd {
+    display: none !important;
+  }
 }
 
 /* Header Right Extras */
@@ -442,15 +463,71 @@ body {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: background 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
+  transition: background 0.2s ease, border-color 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+  position: relative;
 }
 
 .mobile-menu-btn:hover, .mobile-search-btn:hover {
   background: rgba(255, 255, 255, 0.09);
+  border-color: rgba(255, 255, 255, 0.2);
 }
 
 .mobile-menu-btn:active, .mobile-search-btn:active {
   transform: scale(0.94);
+}
+
+.mobile-menu-btn.active {
+  background: rgba(59, 130, 246, 0.25);
+  border-color: var(--blue-primary);
+  color: #60a5fa;
+  box-shadow: 0 0 14px rgba(59, 130, 246, 0.4);
+}
+
+/* Animated burger lines to cross */
+.mobile-menu-btn svg line {
+  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease;
+  transform-origin: 12px 12px;
+}
+
+.mobile-menu-btn.active svg line:nth-child(1) {
+  transform: translateY(6px) rotate(45deg);
+}
+
+.mobile-menu-btn.active svg line:nth-child(2) {
+  opacity: 0;
+  transform: scaleX(0);
+}
+
+.mobile-menu-btn.active svg line:nth-child(3) {
+  transform: translateY(-6px) rotate(-45deg);
+}
+
+/* Mobile Drawer Backdrop Declarative Styles */
+.sidebar-backdrop {
+  position: fixed;
+  top: 72px;
+  left: 0;
+  width: 100vw;
+  height: calc(100vh - 72px);
+  background: rgba(3, 7, 18, 0.78);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 1002;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+              visibility 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.sidebar-backdrop.active {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+body.menu-open {
+  overflow: hidden;
 }
 
 /* Top Progress Bar */
@@ -1332,21 +1409,49 @@ table.academic-table tr:hover td {
    RESPONSIVENESS (Mobile, Tablet, 2K+)
    ========================================================================== */
 @media (max-width: 1024px) {
+  /* Header remains on top of backdrop layers */
+  .site-header {
+    z-index: 1008;
+  }
+
+  /* Hide edition badge on tablet to give ample breathing room for search input */
+  .badge-tag-edition {
+    display: none;
+  }
+
+  /* Prevent app-layout from creating an isolated stacking context trapping fixed drawer */
+  .app-layout {
+    position: static;
+  }
+
   .sidebar {
     position: fixed;
-    left: -320px;
+    left: -330px;
     top: 72px;
-    z-index: 99;
-    height: calc(100vh - 72px); /* выдвижная панель на всю высоту */
+    width: min(320px, 85vw);
+    max-width: 320px;
+    z-index: 1005;
+    height: calc(100vh - 72px);
     margin: 0;
-    border-radius: 0 18px 18px 0;
-    background: rgba(6, 11, 24, 0.95);
-    transition: left var(--trans-normal);
-    box-shadow: 10px 0 30px rgba(0, 0, 0, 0.7);
+    border-radius: 0 20px 20px 0;
+    border-left: none;
+    border-top: none;
+    border-bottom: none;
+    border-right: 1px solid var(--border-glass-bright);
+    background: linear-gradient(180deg, rgba(8, 16, 36, 0.98) 0%, rgba(5, 10, 24, 0.98) 100%);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    transition: left 0.32s cubic-bezier(0.16, 1, 0.3, 1),
+                visibility 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 12px 0 40px rgba(0, 0, 0, 0.8), 0 0 25px rgba(59, 130, 246, 0.15);
+    visibility: hidden;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
 
   .sidebar.open {
     left: 0;
+    visibility: visible;
   }
 
   .mobile-menu-btn {
@@ -1516,8 +1621,32 @@ table.academic-table tr:hover td {
     border-radius: 14px;
   }
 
-  /* Плашка сверху, заголовок ниже — на всю ширину блока (паттерн tool-карточек) */
-  .card-header,
+  /* Плашка сверху слева, действия справа, заголовок ниже — на всю ширину блока */
+  .card-header {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+
+  .card-title-group {
+    order: 2;
+    width: 100%;
+  }
+
+  .card-category-badge {
+    order: 1;
+    align-self: center;
+  }
+
+  .card-actions {
+    order: 1;
+    margin-left: auto;
+  }
+
   .diagram-header {
     flex-direction: column-reverse;
     align-items: stretch;
@@ -2038,5 +2167,197 @@ table.academic-table tr:hover td {
   }
 }
 
+/* ==========================================================================
+   SMART INSTANT SEARCH DROPDOWN & RESULTS POPUP
+   ========================================================================== */
+.header-search {
+  position: relative;
+}
 
+.search-results-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  max-height: 480px;
+  overflow-y: auto;
+  background: rgba(10, 18, 38, 0.98);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border-glass-bright);
+  border-radius: var(--radius-md);
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.65), 0 0 25px rgba(6, 182, 212, 0.25);
+  z-index: 1010;
+  display: none;
+  flex-direction: column;
+}
+
+.search-results-dropdown.visible {
+  display: flex;
+}
+
+.search-results-header {
+  padding: 10px 14px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  background: rgba(255, 255, 255, 0.02);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.search-results-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.search-result-item {
+  padding: 11px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-decoration: none;
+  color: inherit;
+}
+
+.search-result-item:last-child {
+  border-bottom: none;
+}
+
+.search-result-item:hover,
+.search-result-item.selected {
+  background: rgba(6, 182, 212, 0.14);
+}
+
+.search-result-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.search-result-title {
+  font-weight: 700;
+  font-size: 0.92rem;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.search-result-badge {
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  background: rgba(59, 130, 246, 0.18);
+  color: #93c5fd;
+  border: 1px solid rgba(59, 130, 246, 0.35);
+  white-space: nowrap;
+}
+
+.search-result-badge.badge-tcp {
+  background: rgba(244, 63, 94, 0.15);
+  color: #fb7185;
+  border-color: rgba(244, 63, 94, 0.35);
+}
+
+.search-result-badge.badge-dns {
+  background: rgba(168, 85, 247, 0.15);
+  color: #d8b4fe;
+  border-color: rgba(168, 85, 247, 0.35);
+}
+
+.search-result-badge.badge-modern {
+  background: rgba(6, 182, 212, 0.15);
+  color: #67e8f9;
+  border-color: rgba(6, 182, 212, 0.35);
+}
+
+.search-result-badge.badge-term {
+  background: rgba(16, 185, 129, 0.15);
+  color: #6ee7b7;
+  border-color: rgba(16, 185, 129, 0.35);
+}
+
+.search-result-desc {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.search-result-desc mark,
+.search-result-title mark {
+  background: rgba(6, 182, 212, 0.35);
+  color: #67e8f9;
+  font-weight: 700;
+  padding: 0 2px;
+  border-radius: 2px;
+}
+
+/* Keyboard shortcuts hint bar in search dropdown */
+.search-dropdown-footer {
+  padding: 8px 14px;
+  background: rgba(6, 11, 24, 0.95);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 14px;
+  font-size: 0.72rem;
+  color: var(--text-dim);
+}
+
+.search-shortcut-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.search-shortcut-item kbd {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 4px;
+  padding: 1px 5px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #93c5fd;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+}
+
+@media (max-width: 640px) {
+  .search-dropdown-footer {
+    justify-content: center;
+    gap: 10px;
+    font-size: 0.68rem;
+  }
+}
+
+/* Pulsing highlight effect when user jumps to element */
+@keyframes searchHighlightPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(6, 182, 212, 0.9);
+    border-color: #06b6d4 !important;
+  }
+  50% {
+    box-shadow: 0 0 40px 10px rgba(6, 182, 212, 0.6);
+    border-color: #67e8f9 !important;
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(6, 182, 212, 0);
+  }
+}
+
+.search-target-highlight {
+  animation: searchHighlightPulse 2.2s cubic-bezier(0.4, 0, 0.2, 1) 1;
+  border-color: #06b6d4 !important;
+}
 
