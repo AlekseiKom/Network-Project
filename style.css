@@ -457,6 +457,8 @@ body {
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid var(--border-glass);
   border-radius: var(--radius-sm);
+  backdrop-filter: var(--glass-blur); /* тот же фон/blur, что у .mode-switch-btn — единый гарнитур */
+  -webkit-backdrop-filter: var(--glass-blur);
   color: var(--text-white);
   width: 40px;
   height: 40px;
@@ -483,10 +485,12 @@ body {
   box-shadow: 0 0 14px rgba(59, 130, 246, 0.4);
 }
 
-/* Animated burger lines to cross */
+/* Animated burger lines to cross: каждая линия вращается вокруг СВОЕГО центра (fill-box) —
+   так X собирается ровно посередине кнопки, без смещения и наложений */
 .mobile-menu-btn svg line {
   transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease;
-  transform-origin: 12px 12px;
+  transform-box: fill-box;
+  transform-origin: center;
 }
 
 .mobile-menu-btn.active svg line:nth-child(1) {
@@ -1487,6 +1491,48 @@ table.academic-table tr:hover td {
     display: flex;
   }
 
+  /* Режим Pro / Новичок без надписей: одна иконка-индикатор текущего режима в квадрате 40×40 —
+     тот же гарнитур, что у кнопок поиска/бургера. Полное название доступно через title/aria-label */
+  .mode-switch-btn {
+    width: 40px;
+    padding: 0;
+  }
+
+  .mode-pill,
+  .mode-opt {
+    display: none;
+  }
+
+  .mode-icon {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    transition: opacity 0.2s ease, transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  /* Новичок по умолчанию — зелёная книга */
+  .mode-icon-full { color: #6ee7b7; }
+
+  body.pro-mode .mode-icon-full {
+    opacity: 0;
+    transform: scale(0.7) rotate(18deg);
+  }
+
+  /* Pro — синяя молния (скрыта по умолчанию, видна в pro-режиме) */
+  .mode-icon-pro {
+    color: #93c5fd;
+    opacity: 0;
+    transform: scale(0.7) rotate(-18deg);
+  }
+
+  body.pro-mode .mode-icon-pro {
+    opacity: 1;
+    transform: none;
+  }
+
   /* Панель поиска — скрыта по умолчанию, плавно раскрывается под шапкой при открытии */
   .header-search {
     position: absolute;
@@ -2169,11 +2215,9 @@ table.academic-table tr:hover td {
 
 /* ==========================================================================
    SMART INSTANT SEARCH DROPDOWN & RESULTS POPUP
+   (якорь для .search-results-dropdown — базовое position: relative в блоке
+   шапки выше; на мобильных ≤768px его заменяет @media-блок панели поиска)
    ========================================================================== */
-.header-search {
-  position: relative;
-}
-
 .search-results-dropdown {
   position: absolute;
   top: calc(100% + 8px);
@@ -2361,3 +2405,93 @@ table.academic-table tr:hover td {
   border-color: #06b6d4 !important;
 }
 
+
+
+/* ================================================================ */
+/* PRO / BEGINNER MODE TOGGLE (31.10)                               */
+/* body.pro-mode hides .beginner-content blocks                    */
+/* ================================================================ */
+
+.mode-switch-wrap {
+  display: inline-flex;
+}
+
+.mode-switch-btn {
+  --opt-w: 78px;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  padding: 4px;
+  height: 40px; /* = высота кнопок-иконок шапки (.mobile-menu-btn/.mobile-search-btn) */
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-sm); /* те же скругления, что у кнопок-иконок шапки */
+  background: rgba(255, 255, 255, 0.05); /* тот же фон + blur, что у иконок — единый гарнитур */
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  cursor: pointer;
+  font-family: inherit;
+  transition: border-color var(--trans-fast), background var(--trans-fast);
+}
+
+.mode-switch-btn:hover {
+  border-color: var(--border-glass-hover); /* = hover-граница кнопок-иконок шапки */
+  background: rgba(255, 255, 255, 0.08); /* = hover-фон кнопок-иконок шапки */
+}
+
+.mode-switch-btn:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+.mode-pill {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  width: var(--opt-w);
+  height: calc(100% - 8px);
+  border-radius: calc(var(--radius-sm) - 4px); /* вписано в скругление кнопки (инсет = padding 4px) */
+  background: linear-gradient(90deg, rgba(59, 130, 246, 0.85) 0%, rgba(139, 92, 246, 0.85) 100%);
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.35);
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  transform: translateX(var(--opt-w)); /* default: "Новичок" active */
+}
+
+body.pro-mode .mode-pill {
+  transform: translateX(0); /* Pro active */
+}
+
+.mode-opt {
+  position: relative;
+  z-index: 1;
+  width: var(--opt-w);
+  text-align: center;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.mode-opt-pro { color: var(--text-muted); }
+.mode-opt-full { color: #ffffff; }
+body.pro-mode .mode-opt-pro { color: #ffffff; }
+body.pro-mode .mode-opt-full { color: var(--text-muted); }
+
+/* Иконки режима — только для мобильной шапки (≤768px): на десктопе видны надписи, иконки скрыты */
+@media (min-width: 769px) {
+  .mode-icon { display: none; }
+}
+
+/* Pro mode — hide beginner-oriented blocks */
+body.pro-mode .beginner-content { display: none; }
+
+/* Pro category in sidebar (always visible) */
+.sidebar-category-pro {
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+  padding-top: 14px;
+}
+
+.sidebar-category-pro .sidebar-heading { color: #93c5fd; }
+
+@media (max-width: 720px) {
+  .mode-switch-btn { --opt-w: 64px; }
+  .mode-opt { font-size: 0.7rem; }
+}

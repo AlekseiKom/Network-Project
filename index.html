@@ -65,6 +65,30 @@
         <div class="search-results-dropdown" id="searchResultsDropdown" role="listbox" aria-label="Результаты быстрого поиска"></div>
       </div>
 
+      <!-- Pro / Beginner mode switch -->
+      <div class="mode-switch-wrap">
+        <button type="button" id="modeToggle" class="mode-switch-btn" aria-pressed="false"
+                aria-label="Режим Pro / Новичок — переключить" title="Pro — без бытовых аналогий; Новичок — полный конспект">
+          <span class="mode-pill"></span>
+          <span class="mode-opt mode-opt-pro"><span class="mode-text">Pro</span></span>
+          <span class="mode-opt mode-opt-full"><span class="mode-text">Новичок</span></span>
+          <!-- Компактные иконки-индикаторы: видны только в мобильной шапке (≤768px) -->
+          <span class="mode-icon mode-icon-pro" aria-hidden="true">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+            </svg>
+          </span>
+          <span class="mode-icon mode-icon-full" aria-hidden="true">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+              <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+            </svg>
+          </span>
+        </button>
+      </div>
+
       <!-- Mobile toggles: search (dropdown panel) + burger menu -->
       <div class="header-actions">
         <button class="mobile-search-btn" id="mobileSearchBtn" aria-label="Открыть поиск" aria-expanded="false">
@@ -77,8 +101,9 @@
         <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Открыть навигацию" aria-expanded="false" aria-controls="sidebar">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
             stroke-linecap="round" stroke-linejoin="round">
-            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <!-- Порядок линий = визуальный (верх/середина/низ): CSS-анимация бургера привязана к nth-child -->
             <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="12" x2="21" y2="12"></line>
             <line x1="3" y1="18" x2="21" y2="18"></line>
           </svg>
         </button>
@@ -165,12 +190,46 @@
             <a href="#sec-footer" class="sidebar-nav-link">
               <span class="sidebar-icon">📖</span>
               <span>Литература & Справочники</span>
-              <span class="sidebar-number">07</span>
+              <span class="sidebar-number">11</span>
             </a>
           </li>
         </ul>
       </div>
 
+
+      <div class="sidebar-category sidebar-category-pro">
+        <div class="sidebar-heading">Pro • Хардкор (всегда виден)</div>
+        <ul class="sidebar-nav-list">
+          <li>
+            <a href="#sec-kernel" class="sidebar-nav-link">
+              <span class="sidebar-icon">🐧</span>
+              <span>Linux Kernel & Low-Level Networking</span>
+              <span class="sidebar-number">07</span>
+            </a>
+          </li>
+          <li>
+            <a href="#sec-pivot" class="sidebar-nav-link">
+              <span class="sidebar-icon">🕳️</span>
+              <span>Pivoting, Tunnels & NAT</span>
+              <span class="sidebar-number">08</span>
+            </a>
+          </li>
+          <li>
+            <a href="#sec-enterprise" class="sidebar-nav-link">
+              <span class="sidebar-icon">🏢</span>
+              <span>BGP, Anycast & Kubernetes CNI</span>
+              <span class="sidebar-number">09</span>
+            </a>
+          </li>
+          <li>
+            <a href="#sec-debug" class="sidebar-nav-link">
+              <span class="sidebar-icon">🔬</span>
+              <span>Troubleshooting & Deep Inspection</span>
+              <span class="sidebar-number">10</span>
+            </a>
+          </li>
+        </ul>
+      </div>
       <div class="sidebar-category">
         <div class="sidebar-heading">Инструменты & Калькуляторы</div>
         <ul class="sidebar-nav-list">
@@ -258,7 +317,7 @@
           </div>
 
           <!-- Card 0.1: What is a network (plain analogy) -->
-          <article class="academic-card card-theory">
+          <article class="academic-card beginner-content card-theory">
             <header class="card-header">
               <div class="card-title-group">
                 <h3 class="card-title">📮 Что такое сеть простыми словами</h3>
@@ -285,7 +344,7 @@
           </article>
 
           <!-- Card 0.2: Anatomy of a packet (envelope analogy) -->
-          <article class="academic-card card-theory">
+          <article class="academic-card beginner-content card-theory">
             <header class="card-header">
               <div class="card-title-group">
                 <h3 class="card-title">✉️ Анатомия пакета: письмо в конвертах</h3>
@@ -491,7 +550,7 @@
           </div>
 
           <!-- Card J1: Plain-language walkthrough -->
-          <article class="academic-card card-theory">
+          <article class="academic-card beginner-content card-theory">
             <header class="card-header">
               <div class="card-title-group">
                 <h3 class="card-title">🚶 Сценарий на пальцах (8 шагов)</h3>
@@ -541,7 +600,7 @@
                   </svg>
                 </summary>
                 <div class="accordion-content">
-                  <p><strong>На пальцах:</strong> браузер сначала смотрит в локальный кэш, затем спрашивает DNS-сервер
+                  <p class="beginner-content"><strong>На пальцах:</strong> браузер сначала смотрит в локальный кэш, затем спрашивает DNS-сервер
                     провайдера (его адрес вы получили от DHCP). Тот обходит цепочку: корневой сервер → сервер зоны .com
                     → авторитетный сервер example.com. Ответ — IP-адрес сайта.</p>
                   <p><strong>Технически:</strong> запрос UDP/53 с флагом рекурсии (RD); ответ кэшируется на время TTL.
@@ -558,7 +617,7 @@
                   </svg>
                 </summary>
                 <div class="accordion-content">
-                  <p><strong>На пальцах:</strong> компьютер знает IP шлюза (например, 192.168.1.1), но Ethernet работает
+                  <p class="beginner-content"><strong>На пальцах:</strong> компьютер знает IP шлюза (например, 192.168.1.1), но Ethernet работает
                     по MAC-адресам. Поэтому он «кричит» в локальной сети: «Кто имеет IP 192.168.1.1?» — и роутер
                     отвечает своим MAC.</p>
                   <p><strong>Технически:</strong> ARP-запрос — broadcast-кадр (FF:FF:FF:FF:FF:FF) с EtherType 0x0806;
@@ -574,7 +633,7 @@
                   </svg>
                 </summary>
                 <div class="accordion-content">
-                  <p><strong>На пальцах:</strong> каждый роутер смотрит только на IP получателя и свою таблицу
+                  <p class="beginner-content"><strong>На пальцах:</strong> каждый роутер смотрит только на IP получателя и свою таблицу
                     маршрутов: «В эту сторону — через порт X». Как почта: каждое отделение перекладывает письмо в
                     машину, едущую дальше по маршруту.</p>
                   <p><strong>Технически:</strong> Longest Prefix Match в таблице FIB; на каждом хопе TTL уменьшается на
@@ -591,7 +650,7 @@
                   </svg>
                 </summary>
                 <div class="accordion-content">
-                  <p><strong>На пальцах:</strong> перед передачей данных стороны «проверяют связь»: клиент стучится
+                  <p class="beginner-content"><strong>На пальцах:</strong> перед передачей данных стороны «проверяют связь»: клиент стучится
                     (SYN), сервер отвечает (SYN-ACK), клиент подтверждает (ACK). Только теперь канал готов.</p>
                   <p><strong>Технически:</strong> 3-Way Handshake на порту 443; договариваются начальные номера
                     последовательности (ISN) и размер окна. Дальше каждый байт нумеруется, а сервер шлёт ACK — это даёт
@@ -608,7 +667,7 @@
                   </svg>
                 </summary>
                 <div class="accordion-content">
-                  <p><strong>На пальцах:</strong> клиент проверяет сертификат сервера («вы действительно example.com, а
+                  <p class="beginner-content"><strong>На пальцах:</strong> клиент проверяет сертификат сервера («вы действительно example.com, а
                     не подделка?») и стороны договариваются о ключах. Дальше всё шифруется — как письмо в запечатанном
                     конверте.</p>
                   <p><strong>Технически:</strong> TLS 1.3: ClientHello → ServerHello + сертификат + Finished — за один
@@ -645,7 +704,7 @@
                   </svg>
                 </summary>
                 <div class="accordion-content">
-                  <p><strong>На пальцах:</strong> внутри «конверта» клиент пишет записку: «Дай мне главную страницу».
+                  <p class="beginner-content"><strong>На пальцах:</strong> внутри «конверта» клиент пишет записку: «Дай мне главную страницу».
                     Сервер отвечает кодом страницы и списком ресурсов (картинки, CSS, JS).</p>
                   <p><strong>Технически:</strong> <code>GET / HTTP/1.1</code> + заголовки Host/User-Agent; ответ
                     <code>200 OK</code> с телом HTML. Картинки и стили запрашиваются отдельными GET-запросами (часто
@@ -661,7 +720,7 @@
                   </svg>
                 </summary>
                 <div class="accordion-content">
-                  <p><strong>На пальцах:</strong> пакеты с данными едут обратно через те же «города». Часть может
+                  <p class="beginner-content"><strong>На пальцах:</strong> пакеты с данными едут обратно через те же «города». Часть может
                     задержаться или прийти не по порядку — но у каждого пакета есть номер, и браузер собирает их в
                     правильную последовательность.</p>
                   <p><strong>Технически:</strong> TCP гарантирует порядок и целостность: дубликаты отбрасываются по
@@ -678,7 +737,7 @@
                   </svg>
                 </summary>
                 <div class="accordion-content">
-                  <p><strong>На пальцах:</strong> браузер строит из HTML дерево, применяет CSS и загружает недостающие
+                  <p class="beginner-content"><strong>На пальцах:</strong> браузер строит из HTML дерево, применяет CSS и загружает недостающие
                     ресурсы. Когда всё готово — вы видите страницу.</p>
                   <p><strong>Технически:</strong> DOM → CSSOM → Render Tree → layout → paint. Время до первой отрисовки
                     (FCP) складывается из DNS + TCP + TLS + времени ответа сервера (TTFB) + загрузки ресурсов — все
@@ -768,7 +827,7 @@
           </div>
 
           <!-- Card L0: Beginner guide to the Data Link Layer -->
-          <article class="academic-card card-theory">
+          <article class="academic-card beginner-content card-theory">
             <header class="card-header">
               <div class="card-title-group">
                 <h3 class="card-title">🧭 Канальный уровень простыми словами</h3>
@@ -896,7 +955,7 @@ iwconfig wlan0 | grep -E 'Frequency|Bit Rate|Mode'</code></pre>
               <span class="diagram-badge">Архитектурная схема</span>
             </div>
             <div class="svg-container" id="svg-OSI">
-              <svg viewBox="0 0 920 480" width="100%" height="auto" xmlns="http://www.w3.org/2000/svg">
+              <svg viewBox="0 0 920 480" width="100%" xmlns="http://www.w3.org/2000/svg">
                 <defs>
                   <linearGradient id="grad-osi-blue" x1="0%" y1="0%" x2="100%" y2="100%">
                     <stop offset="0%" stop-color="#1d4ed8" stop-opacity="0.8" />
@@ -1128,7 +1187,7 @@ iwconfig wlan0 | grep -E 'Frequency|Bit Rate|Mode'</code></pre>
           </div>
 
           <!-- Card 1.1: Theory - OSI vs TCP/IP & Encapsulation -->
-          <article class="academic-card card-theory">
+          <article class="academic-card beginner-content card-theory">
             <header class="card-header">
               <div class="card-title-group">
                 <h3 class="card-title">📌 Теоретический базис: Эталонные модели OSI и TCP/IP</h3>
@@ -1216,6 +1275,40 @@ iwconfig wlan0 | grep -E 'Frequency|Bit Rate|Mode'</code></pre>
                   </p>
                 </div>
               </details>
+            </div>
+          </article>
+
+<!-- Quick reference TCP/IP (always visible, Pro + Beginner) -->
+          <article class="academic-card card-theory">
+            <header class="card-header">
+              <div class="card-title-group">
+                <h3 class="card-title">📡 TCP/IP — шпаргалка: сборка пакета и потеря</h3>
+              </div>
+              <span class="card-category-badge">Справочник</span>
+            </header>
+            <div class="card-body">
+              <p>Порядок «сборки» от приложения к проводу — что происходит на каждом уровне, и как обрабатывается потерянный пакет.</p>
+
+              <ol>
+                <li><strong>Приложение (L7)</strong> передаёт данные в <code>TCP/UDP</code>: порт назначения определяет сервис.</li>
+                <li><strong>Транспортный уровень (L4, TCP)</strong> разбивает поток на сегменты, нумерует (<code>seq</code>) и ждёт подтверждений (<code>ACK</code>); по таймауту — повтор с backoff. UDP не повторяет: решение за приложением.</li>
+                <li><strong>Сетевой уровень (L3, IP)</strong> оборачивает сегмент в пакет: исходный и целевой IP. Путь выбирает каждый роутер сам, на каждом скачке.</li>
+                <li><strong>Канальный уровень (L2, Ethernet)</strong> добавляет MAC-заголовок — адрес следующего узла; каждый роутер строит собственный L2-кадр независимо.</li>
+              </ol>
+
+              <div class="table-responsive">
+                <table class="academic-table">
+                  <thead><tr><th>Уровень</th><th>Единица данных (PDU)</th></tr></thead>
+                  <tbody>
+                    <tr><td>L7 Приложение</td><td>данные приложения</td></tr>
+                    <tr><td>L4 Транспорт</td><td>сегмент (TCP) / датаграмма (UDP)</td></tr>
+                    <tr><td>L3 Сеть</td><td>пакет (датаграмма IP)</td></tr>
+                    <tr><td>L2 Канал</td><td>кадр</td></tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <p><strong>Потеря пакета:</strong> TCP не получил ACK вовремя — таймаут, повторная передача (экспоненциальный backoff). UDP механизма повторов не имеет: решение принимает приложение.</p>
             </div>
           </article>
 
@@ -1482,7 +1575,7 @@ Internet Protocol Version 4, Src: 10.100.1.25, Dst: 10.100.1.1</code></pre>
           </div>
 
           <!-- Card L0: Beginner guide to the Network Layer -->
-          <article class="academic-card card-theory">
+          <article class="academic-card beginner-content card-theory">
             <header class="card-header">
               <div class="card-title-group">
                 <h3 class="card-title">🧭 Сетевой уровень простыми словами</h3>
@@ -1518,7 +1611,7 @@ Internet Protocol Version 4, Src: 10.100.1.25, Dst: 10.100.1.1</code></pre>
               <span class="diagram-badge">Динамика транзитных узлов</span>
             </div>
             <div class="svg-container" id="svg-Routing">
-              <svg viewBox="0 0 940 450" width="100%" height="auto" xmlns="http://www.w3.org/2000/svg">
+              <svg viewBox="0 0 940 450" width="100%" xmlns="http://www.w3.org/2000/svg">
                 <defs>
                   <linearGradient id="grad-node-host" x1="0%" y1="0%" x2="100%" y2="100%">
                     <stop offset="0%" stop-color="#1e3a8a" />
@@ -2588,7 +2681,7 @@ show ip bgp 1.1.1.0/24               # Детальный разбор пути 
           </div>
 
           <!-- Card L0: Beginner guide to the Transport Layer -->
-          <article class="academic-card card-theory">
+          <article class="academic-card beginner-content card-theory">
             <header class="card-header">
               <div class="card-title-group">
                 <h3 class="card-title">🧭 Транспортный уровень простыми словами</h3>
@@ -2624,7 +2717,7 @@ show ip bgp 1.1.1.0/24               # Детальный разбор пути 
               <span class="diagram-badge">Диаграмма состояний TCP</span>
             </div>
             <div class="svg-container" id="svg-Handshake">
-              <svg viewBox="0 0 920 620" width="100%" height="auto" xmlns="http://www.w3.org/2000/svg">
+              <svg viewBox="0 0 920 620" width="100%" xmlns="http://www.w3.org/2000/svg">
                 <defs>
                   <marker id="arrow-ladder-right" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6"
                     orient="auto-start-reverse">
@@ -2883,7 +2976,7 @@ show ip bgp 1.1.1.0/24               # Детальный разбор пути 
                   <span class="diagram-badge">32-Bit Word Alignment</span>
                 </div>
                 <div class="svg-container">
-                  <svg viewBox="0 0 940 330" width="100%" height="auto" xmlns="http://www.w3.org/2000/svg">
+                  <svg viewBox="0 0 940 330" width="100%" xmlns="http://www.w3.org/2000/svg">
                     <!-- Background -->
                     <rect width="940" height="330" rx="12" fill="#070c18" stroke="rgba(255,255,255,0.08)" stroke-width="1" />
 
@@ -3021,7 +3114,7 @@ show ip bgp 1.1.1.0/24               # Детальный разбор пути 
               <span class="diagram-badge">Динамика Congestion Control</span>
             </div>
             <div class="svg-container" id="svg-Congestion">
-              <svg viewBox="0 0 940 480" width="100%" height="auto" xmlns="http://www.w3.org/2000/svg">
+              <svg viewBox="0 0 940 480" width="100%" xmlns="http://www.w3.org/2000/svg">
                 <defs>
                   <linearGradient id="grad-area-blue" x1="0%" y1="0%" x2="0%" y2="100%">
                     <stop offset="0%" stop-color="#3b82f6" stop-opacity="0.35" />
@@ -3355,7 +3448,7 @@ $ nft add rule inet filter forward tcp flags syn tcp option maxseg size set rt m
               </div>
             </div>
           </article>
-          <article class="academic-card card-theory">
+          <article class="academic-card beginner-content card-theory">
             <header class="card-header">
               <div class="card-title-group">
                 <h3 class="card-title">🧑 Firewall и защита TCP/UDP (на пальцах)</h3>
@@ -3440,7 +3533,7 @@ $ nft add rule inet filter forward tcp flags syn tcp option maxseg size set rt m
                   <span class="diagram-badge">Latency Benchmark</span>
                 </div>
                 <div class="svg-container">
-                  <svg viewBox="0 0 940 380" width="100%" height="auto" xmlns="http://www.w3.org/2000/svg">
+                  <svg viewBox="0 0 940 380" width="100%" xmlns="http://www.w3.org/2000/svg">
                     <defs>
                       <marker id="arrow-q-blue" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
                         <path d="M 0 0 L 10 5 L 0 10 z" fill="#38bdf8" />
@@ -3592,7 +3685,7 @@ curl -I https://google.com | grep -i alt-svc
           </div>
 
           <!-- Card L0: Beginner guide to POSIX Sockets -->
-          <article class="academic-card card-theory">
+          <article class="academic-card beginner-content card-theory">
             <header class="card-header">
               <div class="card-title-group">
                 <h3 class="card-title">🧭 Сокеты простыми словами</h3>
@@ -3630,7 +3723,7 @@ curl -I https://google.com | grep -i alt-svc
               <span class="diagram-badge">POSIX Kernel Space</span>
             </div>
             <div class="svg-container" id="svg-Sockets">
-              <svg viewBox="0 0 940 560" width="100%" height="auto" xmlns="http://www.w3.org/2000/svg">
+              <svg viewBox="0 0 940 560" width="100%" xmlns="http://www.w3.org/2000/svg">
                 <defs>
                   <marker id="arrow-sock-blue" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6"
                     orient="auto-start-reverse">
@@ -4008,7 +4101,7 @@ ssize_t bytes_read = <span class="tok-fn">read</span>(client_fd, buffer, <span c
                   <span class="diagram-badge">Shared Memory Architecture</span>
                 </div>
                 <div class="svg-container">
-                  <svg viewBox="0 0 940 440" width="100%" height="auto" xmlns="http://www.w3.org/2000/svg">
+                  <svg viewBox="0 0 940 440" width="100%" xmlns="http://www.w3.org/2000/svg">
                     <defs>
                       <marker id="arrow-u-blue" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
                         <path d="M 0 0 L 10 5 L 0 10 z" fill="#38bdf8" />
@@ -4180,7 +4273,7 @@ io_uring_queue_exit(&amp;ring);</code></pre>
           </div>
 
           <!-- Card L0: Beginner guide to TLS -->
-          <article class="academic-card card-theory">
+          <article class="academic-card beginner-content card-theory">
             <header class="card-header">
               <div class="card-title-group">
                 <h3 class="card-title">🧭 TLS простыми словами</h3>
@@ -4231,7 +4324,7 @@ curl -vI https://example.com
               <span class="diagram-badge">Криптографический протокол</span>
             </div>
             <div class="svg-container" id="svg-TLS">
-              <svg viewBox="0 0 940 560" width="100%" height="auto" xmlns="http://www.w3.org/2000/svg">
+              <svg viewBox="0 0 940 560" width="100%" xmlns="http://www.w3.org/2000/svg">
                 <defs>
                   <marker id="arrow-tls-blue" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6"
                     orient="auto-start-reverse">
@@ -4558,7 +4651,7 @@ ClientHello
           </div>
 
           <!-- Card L0: Beginner guide to the Application Layer -->
-          <article class="academic-card card-theory">
+          <article class="academic-card beginner-content card-theory">
             <header class="card-header">
               <div class="card-title-group">
                 <h3 class="card-title">🧭 Прикладной уровень простыми словами</h3>
@@ -4801,7 +4894,7 @@ example.com.        86400   IN      RRSIG   A 13 2 86400 20261025000000 20261004
               </div>
             </div>
           </article>
-          <article class="academic-card card-theory">
+          <article class="academic-card beginner-content card-theory">
             <header class="card-header">
               <div class="card-title-group">
                 <h3 class="card-title">🔐 DNSSEC и DoT/DoH на пальцах</h3>

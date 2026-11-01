@@ -15,6 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initPortLookup();
   initSvgViewer();
   initCardTools();
+  initModeToggle();
   initBackToTop();
 });
 
@@ -114,8 +115,12 @@ function initLiveSearch() {
       parentDetails.open = true;
     }
 
-    // Scroll target into view
-    targetElem.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    // Scroll target into view.
+    // Sections are tall — centering them leaves the heading off-screen, so align
+    // sections to the top (scroll-margin-top handles header offset); keep centering
+    // for smaller targets (cards, accordions) inside sections.
+    const isSection = Array.from(sections).includes(targetElem) || targetElem.classList.contains('academic-section');
+    targetElem.scrollIntoView({ behavior: 'smooth', block: isSection ? 'start' : 'center' });
 
     // Apply visual pulse highlight
     targetElem.classList.remove('search-target-highlight');
@@ -1108,3 +1113,28 @@ function initBackToTop() {
   });
 }
 
+
+/* ==========================================================================
+   PRO / BEGINNER MODE TOGGLE (persisted in localStorage)
+   ========================================================================== */
+function initModeToggle() {
+  const modeBtn = document.getElementById('modeToggle');
+  if (!modeBtn) return;
+
+  const KEY = 'np-mode'; // 'pro' | 'full'
+
+  function applyMode(mode, persist) {
+    document.body.classList.toggle('pro-mode', mode === 'pro');
+    modeBtn.setAttribute('aria-pressed', String(mode === 'pro'));
+    if (persist) { try { localStorage.setItem(KEY, mode); } catch (e) {} }
+  }
+
+  let stored = null;
+  try { stored = localStorage.getItem(KEY); } catch (e) {}
+  applyMode(stored === 'pro' ? 'pro' : 'full', false);
+
+  modeBtn.addEventListener('click', () => {
+    const next = document.body.classList.contains('pro-mode') ? 'full' : 'pro';
+    applyMode(next, true);
+  });
+}
