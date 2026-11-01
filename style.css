@@ -1484,6 +1484,13 @@ table.academic-table tr:hover td {
     padding-top: 0;
     padding-bottom: 0;
     row-gap: 0;
+    gap: 12px; /* = зазор внутри кластера кнопок справа (режим/поиск/бургер) */
+  }
+
+  /* Кластер из трёх кнопок (режим, поиск, бургер) прижат правее: auto-маржа
+     собирает всё свободное место между логотипом и кластером, зазоры равны 12px */
+  .mode-switch-wrap {
+    margin-left: auto;
   }
 
   /* Компактная кнопка поиска рядом с бургером (того же размера) */
@@ -2494,4 +2501,36 @@ body.pro-mode .beginner-content { display: none; }
 @media (max-width: 720px) {
   .mode-switch-btn { --opt-w: 64px; }
   .mode-opt { font-size: 0.7rem; }
+}
+
+/* ================================================================ */
+/* ДЕСКТОПНАЯ ШАПКА (≥1025px): логотип слева, поиск точно по центру,   */
+/* кнопка режима справа — симметрично от краёв, как логотип           */
+/* Grid 1fr/auto/1fr: боковые колонки равны → середина поисковика     */
+/* совпадает с серединой экрана независимо от ширины сторон.          */
+/* (На 769–1024 базовый flex+space-between работает корректно,        */
+/* т.к. .header-actions там не пустой — в нём виден бургер.)          */
+/* ================================================================ */
+@media (min-width: 1025px) {
+  .header-inner {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+  }
+
+  .header-brand {
+    justify-self: start; /* левый край = padding .header-inner (24px) */
+  }
+
+  .header-search {
+    width: 480px; /* фиксированная середина (flex-свойства в grid не действуют) */
+  }
+
+  .mode-switch-wrap {
+    justify-self: end; /* правый край = тот же padding, что у логотипа слева */
+  }
+
+  .header-actions {
+    display: none; /* на десктопе содержит только скрытые мобильные кнопки — пустой блок ломал space-between */
+  }
 }
