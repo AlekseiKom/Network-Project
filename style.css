@@ -573,7 +573,9 @@ body.menu-open {
   padding: 24px 16px 32px 20px;
   border-radius: 18px;
   border: 1px solid var(--border-glass);
-  background: linear-gradient(180deg, rgba(17, 33, 70, 0.85) 0%, rgba(9, 19, 42, 0.78) 100%);
+  background:
+    radial-gradient(120% 55% at 0% 0%, rgba(96, 165, 250, 0.16), transparent 68%),
+    linear-gradient(180deg, rgba(17, 33, 70, 0.85) 0%, rgba(9, 19, 42, 0.78) 100%);
   backdrop-filter: var(--glass-blur);
   -webkit-backdrop-filter: var(--glass-blur);
   box-shadow: var(--shadow-glass), inset 0 1px 0 rgba(255, 255, 255, 0.1);
@@ -681,9 +683,13 @@ body.menu-open {
   border-radius: var(--radius-lg);
   position: relative;
   overflow: hidden;
-  background: linear-gradient(135deg, rgba(20, 44, 96, 0.8) 0%, rgba(38, 20, 78, 0.62) 100%);
+  background:
+    radial-gradient(100% 80% at 0% 0%, rgba(147, 197, 253, 0.14), transparent 65%),
+    linear-gradient(135deg, rgba(20, 44, 96, 0.8) 0%, rgba(38, 20, 78, 0.62) 100%);
   border: 1px solid var(--border-glass);
-  box-shadow: var(--shadow-glass), inset 0 1px 2px rgba(255, 255, 255, 0.2);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  box-shadow: var(--shadow-glass), var(--rim-top), var(--rim-bottom), inset 0 0 36px rgba(59, 130, 246, 0.07);
 }
 
 .hero-glow-blob {
@@ -792,22 +798,25 @@ body.menu-open {
 
 /* Base Academic Card */
 .academic-card {
-  background: var(--bg-surface);
+  background:
+    radial-gradient(110% 75% at 0% 0%, rgba(147, 197, 253, 0.12), transparent 62%),
+    radial-gradient(90% 70% at 100% 100%, rgba(59, 130, 246, 0.08), transparent 68%),
+    linear-gradient(145deg, rgba(18, 38, 78, 0.82), rgba(11, 24, 52, 0.78) 58%, rgba(12, 21, 48, 0.84));
   backdrop-filter: var(--glass-blur);
   -webkit-backdrop-filter: var(--glass-blur);
   border: 1px solid var(--border-glass);
   border-radius: 18px;
   padding: 28px;
   margin-bottom: 24px;
-  box-shadow: var(--shadow-glass), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  box-shadow: var(--shadow-glass), var(--rim-top), var(--rim-bottom), inset 0 0 28px rgba(59, 130, 246, 0.035);
   transition: all var(--trans-normal);
   position: relative;
   overflow: hidden;
 }
 
 .academic-card:hover {
-  border-color: rgba(255, 255, 255, 0.14);
-  box-shadow: var(--shadow-glass-lg);
+  border-color: rgba(147, 197, 253, 0.38);
+  box-shadow: var(--shadow-glass-lg), var(--rim-top), inset 0 0 32px rgba(59, 130, 246, 0.07);
   transform: translateY(-2px);
 }
 
@@ -824,6 +833,39 @@ body.menu-open {
   display: flex;
   align-items: center;
   gap: 10px;
+}
+
+@media (min-width: 1025px) {
+  .sidebar {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(96, 165, 250, 0.45) transparent;
+    scrollbar-gutter: stable;
+  }
+
+  .sidebar::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .sidebar::-webkit-scrollbar-track {
+    margin-block: 12px;
+    background: transparent;
+  }
+
+  .sidebar::-webkit-scrollbar-thumb {
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 999px;
+    background: rgba(96, 165, 250, 0.45);
+  }
+
+  .card-header {
+    align-items: center;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .card-title-group {
+    min-width: 0;
+  }
 }
 
 .card-title {
@@ -1139,11 +1181,14 @@ table.academic-table tr:hover td {
 .diagram-card {
   margin: 28px 0;
   padding: 24px;
-  background: var(--bg-surface);
+  background:
+    radial-gradient(100% 70% at 0% 0%, rgba(96, 165, 250, 0.12), transparent 65%),
+    linear-gradient(145deg, rgba(16, 34, 72, 0.84), rgba(9, 20, 44, 0.82));
   backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
   border: 1px solid rgba(59, 130, 246, 0.25);
   border-radius: var(--radius-lg);
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5), inset 0 0 20px rgba(59, 130, 246, 0.05);
+  box-shadow: var(--shadow-glass), var(--rim-top), var(--rim-bottom), inset 0 0 24px rgba(59, 130, 246, 0.06);
 }
 
 .diagram-header {
@@ -1442,12 +1487,14 @@ table.academic-table tr:hover td {
     border-top: none;
     border-bottom: none;
     border-right: 1px solid var(--border-glass-bright);
-    background: linear-gradient(180deg, rgba(8, 16, 36, 0.98) 0%, rgba(5, 10, 24, 0.98) 100%);
-    backdrop-filter: blur(24px);
-    -webkit-backdrop-filter: blur(24px);
+    background:
+      radial-gradient(120% 55% at 0% 0%, rgba(96, 165, 250, 0.2), transparent 72%),
+      linear-gradient(180deg, rgba(13, 30, 62, 0.94) 0%, rgba(7, 16, 36, 0.94) 100%);
+    backdrop-filter: blur(28px) saturate(180%);
+    -webkit-backdrop-filter: blur(28px) saturate(180%);
     transition: left 0.32s cubic-bezier(0.16, 1, 0.3, 1),
                 visibility 0.32s cubic-bezier(0.16, 1, 0.3, 1);
-    box-shadow: 12px 0 40px rgba(0, 0, 0, 0.8), 0 0 25px rgba(59, 130, 246, 0.15);
+    box-shadow: 12px 0 40px rgba(0, 0, 0, 0.8), 0 0 25px rgba(59, 130, 246, 0.15), inset -1px 0 rgba(255, 255, 255, 0.14);
     visibility: hidden;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
@@ -1797,14 +1844,16 @@ table.academic-table tr:hover td {
 /* Карточка интерактивного инструмента (CIDR-калькулятор и реестр портов IANA) —
    стеклянный блок наравне с .academic-card: скругление, отступы, blur */
 .tool-card {
-  background: linear-gradient(135deg, rgba(16, 34, 76, 0.82) 0%, rgba(12, 24, 54, 0.72) 100%);
+  background:
+    radial-gradient(105% 75% at 0% 0%, rgba(147, 197, 253, 0.14), transparent 65%),
+    linear-gradient(135deg, rgba(16, 34, 76, 0.82) 0%, rgba(12, 24, 54, 0.72) 100%);
   backdrop-filter: var(--glass-blur);
   -webkit-backdrop-filter: var(--glass-blur);
   border: 1px solid rgba(96, 165, 250, 0.38);
   border-radius: var(--radius-lg);
   padding: 28px;
   margin-bottom: 24px;
-  box-shadow: var(--shadow-glass), inset 0 1px 2px rgba(255, 255, 255, 0.16);
+  box-shadow: var(--shadow-glass), var(--rim-top), var(--rim-bottom), inset 0 0 28px rgba(59, 130, 246, 0.05);
   position: relative;
   overflow: hidden;
 }
