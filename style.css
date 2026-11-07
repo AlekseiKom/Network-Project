@@ -8,6 +8,7 @@
   /* Color Palette: Rich Vibrant Sapphire Blue & Electric Accents */
   --bg-primary: #0a1428;
   --bg-surface: rgba(13, 26, 56, 0.12);
+  --bg-card-surface: linear-gradient(135deg, rgba(15, 23, 42, 0.2) 0%, rgba(22, 18, 38, 0.14) 100%);
   --bg-surface-elevated: rgba(20, 38, 78, 0.78);
   --bg-surface-subtle: rgba(16, 32, 66, 0.48);
   
@@ -48,6 +49,7 @@
   --shadow-neon-blue: 0 0 28px rgba(59, 130, 246, 0.35);
   --shadow-neon-violet: 0 0 28px rgba(139, 92, 246, 0.3);
   --glass-blur: blur(24px) saturate(190%);
+  --glass-card-blur: blur(10px) saturate(105%);
 
   /* Radius scale (unified glass corners) */
   --radius-sm: 8px;
@@ -571,11 +573,9 @@ body.menu-open {
   padding: 24px 16px 32px 20px;
   border-radius: 18px;
   border: 1px solid var(--border-glass);
-  background:
-    radial-gradient(120% 55% at 0% 0%, rgba(96, 165, 250, 0.1), transparent 68%),
-    linear-gradient(180deg, rgba(17, 33, 70, 0.34) 0%, rgba(9, 19, 42, 0.27) 100%);
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
+  background: var(--bg-card-surface);
+  backdrop-filter: var(--glass-card-blur);
+  -webkit-backdrop-filter: var(--glass-card-blur);
   box-shadow: var(--shadow-glass), inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
@@ -681,12 +681,10 @@ body.menu-open {
   border-radius: var(--radius-lg);
   position: relative;
   overflow: hidden;
-  background:
-    radial-gradient(100% 80% at 0% 0%, rgba(147, 197, 253, 0.14), transparent 65%),
-    linear-gradient(135deg, rgba(20, 44, 96, 0.8) 0%, rgba(38, 20, 78, 0.62) 100%);
+  background: var(--bg-card-surface);
   border: 1px solid var(--border-glass);
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-card-blur);
+  -webkit-backdrop-filter: var(--glass-card-blur);
   box-shadow: var(--shadow-glass), var(--rim-top), var(--rim-bottom), inset 0 0 36px rgba(59, 130, 246, 0.07);
 }
 
@@ -796,9 +794,9 @@ body.menu-open {
 
 /* Base Academic Card */
 .academic-card {
-  background: var(--bg-surface);
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
+  background: var(--bg-card-surface);
+  backdrop-filter: var(--glass-card-blur);
+  -webkit-backdrop-filter: var(--glass-card-blur);
   border: 1px solid var(--border-glass);
   border-radius: 18px;
   padding: 28px;
@@ -1176,9 +1174,9 @@ table.academic-table tr:hover td {
 .diagram-card {
   margin: 28px 0;
   padding: 24px;
-  background: var(--bg-surface);
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
+  background: var(--bg-card-surface);
+  backdrop-filter: var(--glass-card-blur);
+  -webkit-backdrop-filter: var(--glass-card-blur);
   border: 1px solid var(--border-glass);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-glass), inset 0 1px 0 rgba(255, 255, 255, 0.14);
@@ -1481,11 +1479,9 @@ table.academic-table tr:hover td {
     border-top: none;
     border-bottom: none;
     border-right: none;
-    background:
-      radial-gradient(120% 55% at 100% 0%, rgba(96, 165, 250, 0.2), transparent 72%),
-      linear-gradient(180deg, rgba(13, 30, 62, 0.94) 0%, rgba(7, 16, 36, 0.94) 100%);
-    backdrop-filter: blur(28px) saturate(180%);
-    -webkit-backdrop-filter: blur(28px) saturate(180%);
+    background: var(--bg-card-surface);
+    backdrop-filter: var(--glass-card-blur);
+    -webkit-backdrop-filter: var(--glass-card-blur);
     transition: right 0.32s cubic-bezier(0.16, 1, 0.3, 1),
                 visibility 0.32s cubic-bezier(0.16, 1, 0.3, 1);
     box-shadow: -12px 0 40px rgba(0, 0, 0, 0.8), 0 0 25px rgba(59, 130, 246, 0.15), inset 1px 0 rgba(255, 255, 255, 0.14);
@@ -1838,9 +1834,9 @@ table.academic-table tr:hover td {
 /* Карточка интерактивного инструмента (CIDR-калькулятор и реестр портов IANA) —
    стеклянный блок наравне с .academic-card: скругление, отступы, blur */
 .tool-card {
-  background: var(--bg-surface);
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
+  background: var(--bg-card-surface);
+  backdrop-filter: var(--glass-card-blur);
+  -webkit-backdrop-filter: var(--glass-card-blur);
   border: 1px solid var(--border-glass);
   border-radius: var(--radius-lg);
   padding: 28px;
@@ -2218,10 +2214,10 @@ table.academic-table tr:hover td {
   height: 44px;
   border-radius: 50%;
   background:
-    radial-gradient(circle at 30% 20%, rgba(191, 219, 254, 0.2), transparent 48%),
-    linear-gradient(145deg, rgba(37, 99, 235, 0.34), rgba(30, 41, 90, 0.42) 58%, rgba(91, 33, 182, 0.32));
-  backdrop-filter: blur(24px) saturate(190%) brightness(1.12);
-  -webkit-backdrop-filter: blur(24px) saturate(190%) brightness(1.12);
+    radial-gradient(circle at 30% 20%, rgba(191, 219, 254, 0.18), transparent 48%),
+    var(--bg-card-surface);
+  backdrop-filter: var(--glass-card-blur);
+  -webkit-backdrop-filter: var(--glass-card-blur);
   border: 1px solid rgba(191, 219, 254, 0.38);
   color: var(--text-white);
   display: flex;
@@ -2253,8 +2249,8 @@ table.academic-table tr:hover td {
 
 .back-to-top:hover {
   background:
-    radial-gradient(circle at 30% 20%, rgba(219, 234, 254, 0.28), transparent 48%),
-    linear-gradient(145deg, rgba(59, 130, 246, 0.46), rgba(30, 64, 140, 0.56) 58%, rgba(109, 40, 217, 0.42));
+    radial-gradient(circle at 30% 20%, rgba(219, 234, 254, 0.24), transparent 48%),
+    linear-gradient(135deg, rgba(15, 23, 42, 0.3) 0%, rgba(22, 18, 38, 0.22) 100%);
   border-color: rgba(219, 234, 254, 0.56);
   color: #ffffff;
   box-shadow:
@@ -2267,8 +2263,8 @@ table.academic-table tr:hover td {
 
 .back-to-top:active {
   background:
-    radial-gradient(circle at 30% 20%, rgba(219, 234, 254, 0.34), transparent 48%),
-    linear-gradient(145deg, rgba(59, 130, 246, 0.52), rgba(30, 64, 140, 0.62) 58%, rgba(109, 40, 217, 0.48));
+    radial-gradient(circle at 30% 20%, rgba(219, 234, 254, 0.12), transparent 48%),
+    linear-gradient(135deg, rgba(15, 23, 42, 0.36) 0%, rgba(22, 18, 38, 0.28) 100%);
   box-shadow:
     0 4px 12px rgba(0, 0, 0, 0.38),
     0 0 14px rgba(59, 130, 246, 0.3),
