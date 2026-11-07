@@ -1468,33 +1468,34 @@ table.academic-table tr:hover td {
 
   .sidebar {
     position: fixed;
-    left: -330px;
+    left: auto;
+    right: -330px;
     top: 72px;
     width: min(320px, 85vw);
     max-width: 320px;
     z-index: 1005;
     height: calc(100vh - 72px);
     margin: 0;
-    border-radius: 0 20px 20px 0;
-    border-left: none;
+    border-radius: 20px 0 0 20px;
+    border-left: 1px solid var(--border-glass-bright);
     border-top: none;
     border-bottom: none;
-    border-right: 1px solid var(--border-glass-bright);
+    border-right: none;
     background:
-      radial-gradient(120% 55% at 0% 0%, rgba(96, 165, 250, 0.2), transparent 72%),
+      radial-gradient(120% 55% at 100% 0%, rgba(96, 165, 250, 0.2), transparent 72%),
       linear-gradient(180deg, rgba(13, 30, 62, 0.94) 0%, rgba(7, 16, 36, 0.94) 100%);
     backdrop-filter: blur(28px) saturate(180%);
     -webkit-backdrop-filter: blur(28px) saturate(180%);
-    transition: left 0.32s cubic-bezier(0.16, 1, 0.3, 1),
+    transition: right 0.32s cubic-bezier(0.16, 1, 0.3, 1),
                 visibility 0.32s cubic-bezier(0.16, 1, 0.3, 1);
-    box-shadow: 12px 0 40px rgba(0, 0, 0, 0.8), 0 0 25px rgba(59, 130, 246, 0.15), inset -1px 0 rgba(255, 255, 255, 0.14);
+    box-shadow: -12px 0 40px rgba(0, 0, 0, 0.8), 0 0 25px rgba(59, 130, 246, 0.15), inset 1px 0 rgba(255, 255, 255, 0.14);
     visibility: hidden;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
   }
 
   .sidebar.open {
-    left: 0;
+    right: 0;
     visibility: visible;
   }
 
