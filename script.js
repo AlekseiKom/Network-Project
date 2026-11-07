@@ -1100,7 +1100,7 @@ function initBackToTop() {
   if (!btn) return;
 
   const toggleVisibility = () => {
-    if (window.scrollY > 400) {
+    if (window.scrollY > 80) {
       btn.classList.add('visible');
     } else {
       btn.classList.remove('visible');
@@ -1108,8 +1108,13 @@ function initBackToTop() {
   };
 
   window.addEventListener('scroll', toggleVisibility, { passive: true });
+  toggleVisibility();
   btn.addEventListener('click', () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      window.scrollTo({ top: 0, behavior: 'instant' });
+    } else {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   });
 }
 

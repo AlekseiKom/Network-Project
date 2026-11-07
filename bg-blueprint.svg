@@ -32,7 +32,7 @@
   <rect width="1400" height="900" fill="url(#glowSpot2)" />
 
   <!-- Subtle Blueprint Tech Grid Gridlines -->
-  <g stroke="rgba(56, 189, 248, 0.05)" stroke-width="1">
+  <g stroke="rgba(56, 189, 248, 0.12)" stroke-width="1">
     <line x1="0" y1="100" x2="1400" y2="100" />
     <line x1="0" y1="200" x2="1400" y2="200" />
     <line x1="0" y1="300" x2="1400" y2="300" />
