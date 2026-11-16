@@ -7,6 +7,11 @@
   <title>Компьютерные сети — Памятка-конспект</title>
   <meta name="description"
     content="Памятка по компьютерным сетям: модели OSI/TCP-IP, протоколы L2-L7, алгоритмы маршрутизации, TCP, Sockets API, криптография TLS 1.3.">
+  <meta name="theme-color" content="#03050a">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Компьютерные сети — Памятка-конспект">
+  <meta property="og:description"
+    content="Интерактивный конспект по сетям: OSI/TCP-IP, L2–L7, CIDR/VLSM-калькулятор, BDP/MTU-калькулятор, CLI-траблшутинг и реестр портов.">
 
   <!-- Favicon (SVG) -->
   <link rel="icon" type="image/svg+xml" href="./favicon.svg">
@@ -26,6 +31,7 @@
 
   <!-- Ambient Deep Background (80% Blue / 20% Violet animated mesh) -->
   <div class="ambient-background" aria-hidden="true">
+    <canvas id="networkBgCanvas" class="network-bg-canvas" aria-hidden="true"></canvas>
     <div class="ambient-orb ambient-orb-1"></div>
     <div class="ambient-orb ambient-orb-2"></div>
     <div class="ambient-orb ambient-orb-3"></div>
@@ -88,6 +94,20 @@
           </span>
         </button>
       </div>
+
+      <!-- Theme toggle (dark / light) -->
+      <button type="button" id="themeToggle" class="theme-toggle-btn" aria-label="Переключить светлую / тёмную тему" title="Светлая / тёмная тема">
+        <svg class="theme-icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="5"></circle>
+          <line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+          <line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+        </svg>
+        <svg class="theme-icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+        </svg>
+      </button>
 
       <!-- Mobile toggles: search (dropdown panel) + burger menu -->
       <div class="header-actions">
@@ -2093,6 +2113,15 @@ Broadcast:      11000000.10101000.00001010.10111111  -> 192.168.10.191
 192.168.1.92:51234         | 203.0.113.15:40002          | 93.184.216.34:80 (Example)   | TCP
 192.168.1.12:61005         | 203.0.113.15:40003          | 1.1.1.1:53 (Cloudflare DNS)  | UDP</code></pre>
               </div>
+
+              <p>
+                <strong>SNAT vs DNAT и проблема Symmetric NAT для P2P:</strong>
+              </p>
+              <ul>
+                <li><strong>SNAT (Source NAT)</strong> — подмена адреса отправителя при выходе из локальной сети в Интернет (маскарадинг).</li>
+                <li><strong>DNAT (Destination NAT)</strong> — подмена адреса/порта получателя на входе (Port Forwarding / публикация локального веб-сервера наружу).</li>
+                <li><strong>Symmetric NAT (и CGNAT):</strong> для каждого нового внешнего адреса/порта назначения роутер выделяет <em>новый</em> внешний порт. Поэтому трюк STUN (узнать свой внешний IP:порт и передать собеседнику) не работает — пакеты от другого пира придут на старый порт и будут отброшены. Для P2P в этом случае нужен relay-сервер (<strong>TURN</strong>).</li>
+              </ul>
 
               <p>
                 <em>Архитектурный компромисс:</em> NAT нарушил классический <strong>сквозной принцип Интернета
@@ -4957,194 +4986,53 @@ example.com.        86400   IN      RRSIG   A 13 2 86400 20261025000000 20261004
                     <th>Назначение и инженерные нюансы</th>
                   </tr>
                 </thead>
-                <tbody>
-                  <tr class="port-data-row" data-port-cat="infra">
-                    <td><span class="port-num-badge">20 / 21</span></td>
-                    <td><strong>FTP</strong> (File Transfer)</td>
-                    <td>TCP</td>
-                    <td><span class="badge-tag">Инфраструктура</span></td>
-                    <td>RFC 959</td>
-                    <td>Порт 21 для команд, порт 20 для данных (Active mode). Передает пароли в открытом виде; устарел в
-                      пользу SFTP.</td>
-                  </tr>
-                  <tr class="port-data-row" data-port-cat="sec">
-                    <td><span class="port-num-badge">22</span></td>
-                    <td><strong>SSH / SFTP</strong> (Secure Shell)</td>
-                    <td>TCP</td>
-                    <td><span class="badge-tag">Безопасность</span></td>
-                    <td>RFC 4253</td>
-                    <td>Криптографически защищенное удаленное управление ОС, передача файлов и туннелирование портов.
-                    </td>
-                  </tr>
-                  <tr class="port-data-row" data-port-cat="mail">
-                    <td><span class="port-num-badge">25</span></td>
-                    <td><strong>SMTP</strong> (Mail Relay)</td>
-                    <td>TCP</td>
-                    <td><span class="badge-tag">Почта</span></td>
-                    <td>RFC 5321</td>
-                    <td>Межсерверный релей электронной почты (Server-to-Server MTA). Большинством провайдеров
-                      блокируется для борьбы со спамом.</td>
-                  </tr>
-                  <tr class="port-data-row" data-port-cat="infra">
-                    <td><span class="port-num-badge">53</span></td>
-                    <td><strong>DNS</strong> (Domain Name System)</td>
-                    <td>UDP & TCP</td>
-                    <td><span class="badge-tag">Инфраструктура</span></td>
-                    <td>RFC 1035 / 5966</td>
-                    <td>UDP для быстрых запросов до 512 байт (EDNS0 до 1232–4096). TCP для трансфера зон AXFR и крупных
-                      ответов DNSSEC.</td>
-                  </tr>
-                  <tr class="port-data-row" data-port-cat="infra">
-                    <td><span class="port-num-badge">67 / 68</span></td>
-                    <td><strong>DHCP / BOOTP</strong></td>
-                    <td>UDP</td>
-                    <td><span class="badge-tag">Инфраструктура</span></td>
-                    <td>RFC 2131</td>
-                    <td>Порт 67 слушает DHCP-сервер, порт 68 — клиент. Процесс автоматического получения сетевого адреса
-                      (DORA).</td>
-                  </tr>
-                  <tr class="port-data-row" data-port-cat="web">
-                    <td><span class="port-num-badge">80</span></td>
-                    <td><strong>HTTP</strong> (Cleartext Web)</td>
-                    <td>TCP</td>
-                    <td><span class="badge-tag">Web & API</span></td>
-                    <td>RFC 9110</td>
-                    <td>Передача гипертекста без шифрования. В публичном вебе в основном используется для HTTP 301
-                      редиректа на HTTPS, а также для прохождения ACME-проверок (Let's Encrypt).</td>
-                  </tr>
-                  <tr class="port-data-row" data-port-cat="mail">
-                    <td><span class="port-num-badge">110</span></td>
-                    <td><strong>POP3</strong> (Post Office Protocol)</td>
-                    <td>TCP</td>
-                    <td><span class="badge-tag">Почта</span></td>
-                    <td>RFC 1939</td>
-                    <td>Скачивание почты на клиентское устройство (обычно с удалением с почтового сервера).</td>
-                  </tr>
-                  <tr class="port-data-row" data-port-cat="infra">
-                    <td><span class="port-num-badge">123</span></td>
-                    <td><strong>NTP</strong> (Network Time Protocol)</td>
-                    <td>UDP</td>
-                    <td><span class="badge-tag">Инфраструктура</span></td>
-                    <td>RFC 5905</td>
-                    <td>Высокоточная синхронизация системных часов с серверами точного времени (Stratum 1–3). Критичен
-                      для TLS и Kerberos.</td>
-                  </tr>
-                  <tr class="port-data-row" data-port-cat="mail">
-                    <td><span class="port-num-badge">143</span></td>
-                    <td><strong>IMAP</strong> (Internet Message Access)</td>
-                    <td>TCP</td>
-                    <td><span class="badge-tag">Почта</span></td>
-                    <td>RFC 3501</td>
-                    <td>Двусторонняя синхронизация почтовых ящиков и папок между клиентом и сервером без удаления писем.
-                    </td>
-                  </tr>
-                  <tr class="port-data-row" data-port-cat="infra">
-                    <td><span class="port-num-badge">161 / 162</span></td>
-                    <td><strong>SNMP</strong> (Network Management)</td>
-                    <td>UDP</td>
-                    <td><span class="badge-tag">Инфраструктура</span></td>
-                    <td>RFC 1157 / 3416</td>
-                    <td>Опрос сетевого оборудования (свитчи, роутеры, ИБП). Порт 161 — Polling (GET/SET), 162 — SNMP
-                      Traps.</td>
-                  </tr>
-                  <tr class="port-data-row" data-port-cat="infra">
-                    <td><span class="port-num-badge">179</span></td>
-                    <td><strong>BGP-4</strong> (Border Gateway)</td>
-                    <td>TCP</td>
-                    <td><span class="badge-tag">Инфраструктура</span></td>
-                    <td>RFC 4271</td>
-                    <td>Протокол динамической маршрутизации между Автономными Системами глобального Интернета.</td>
-                  </tr>
-                  <tr class="port-data-row" data-port-cat="web">
-                    <td><span class="port-num-badge">443</span></td>
-                    <td><strong>HTTPS / HTTP/3 (QUIC)</strong></td>
-                    <td>TCP & UDP</td>
-                    <td><span class="badge-tag">Web & API</span></td>
-                    <td>RFC 8446 / 9114</td>
-                    <td>Шифрованный веб-трафик. TCP для HTTP/1.1 и HTTP/2 через TLS; UDP для современного HTTP/3 (QUIC).
-                    </td>
-                  </tr>
-                  <tr class="port-data-row" data-port-cat="mail">
-                    <td><span class="port-num-badge">465 / 587</span></td>
-                    <td><strong>SMTPS / Submission</strong></td>
-                    <td>TCP</td>
-                    <td><span class="badge-tag">Почта</span></td>
-                    <td>RFC 8314 / 6409</td>
-                    <td>Клиентская отправка почты с обязательной аутентификацией и шифрованием TLS (STARTTLS).</td>
-                  </tr>
-                  <tr class="port-data-row" data-port-cat="sec">
-                    <td><span class="port-num-badge">853</span></td>
-                    <td><strong>DoT</strong> (DNS over TLS)</td>
-                    <td>TCP</td>
-                    <td><span class="badge-tag">Безопасность</span></td>
-                    <td>RFC 7858</td>
-                    <td>Шифрование DNS-запросов на системном транспортном уровне (Android Private DNS, Unbound,
-                      CoreDNS).</td>
-                  </tr>
-                  <tr class="port-data-row" data-port-cat="sec">
-                    <td><span class="port-num-badge">993</span></td>
-                    <td><strong>IMAPS</strong> (IMAP over SSL/TLS)</td>
-                    <td>TCP</td>
-                    <td><span class="badge-tag">Безопасность</span></td>
-                    <td>RFC 8314</td>
-                    <td>Защищенная синхронизация почтовых ящиков с немедленным TLS-рукопожатием при подключении.</td>
-                  </tr>
-                  <tr class="port-data-row" data-port-cat="sec">
-                    <td><span class="port-num-badge">995</span></td>
-                    <td><strong>POP3S</strong> (POP3 over SSL/TLS)</td>
-                    <td>TCP</td>
-                    <td><span class="badge-tag">Безопасность</span></td>
-                    <td>RFC 8314</td>
-                    <td>Защищенное получение почты с немедленным шифрованием TLS.</td>
-                  </tr>
-                  <tr class="port-data-row" data-port-cat="infra">
-                    <td><span class="port-num-badge">3306</span></td>
-                    <td><strong>MySQL / MariaDB</strong></td>
-                    <td>TCP</td>
-                    <td><span class="badge-tag">Инфраструктура</span></td>
-                    <td>—</td>
-                    <td>СУБД MySQL. В продакшене порт закрывается от внешнего Интернета и слушает только
-                      <code>127.0.0.1</code> или приватный VPN/VPC.
-                    </td>
-                  </tr>
-                  <tr class="port-data-row" data-port-cat="infra">
-                    <td><span class="port-num-badge">5432</span></td>
-                    <td><strong>PostgreSQL</strong></td>
-                    <td>TCP</td>
-                    <td><span class="badge-tag">Инфраструктура</span></td>
-                    <td>—</td>
-                    <td>СУБД PostgreSQL. Поддерживает SSL-подключения (<code>sslmode=require</code>), требует строгой
-                      настройки <code>pg_hba.conf</code>.</td>
-                  </tr>
-                  <tr class="port-data-row" data-port-cat="infra">
-                    <td><span class="port-num-badge">6379</span></td>
-                    <td><strong>Redis Cache / Broker</strong></td>
-                    <td>TCP</td>
-                    <td><span class="badge-tag">Инфраструктура</span></td>
-                    <td>—</td>
-                    <td>In-memory база данных и брокер сообщений. Крайне уязвим при открытии наружу (RCE атаки без
-                      пароля); доступ только внутри закрытого контура.</td>
-                  </tr>
-                  <tr class="port-data-row" data-port-cat="web">
-                    <td><span class="port-num-badge">8080</span></td>
-                    <td><strong>HTTP-Alt / Proxy</strong></td>
-                    <td>TCP</td>
-                    <td><span class="badge-tag">Web & API</span></td>
-                    <td>RFC 9110</td>
-                    <td>Альтернативный HTTP-порт (бэкенды Node.js, Spring Boot, Tomcat, Nginx reverse proxy).</td>
-                  </tr>
-                  <tr class="port-data-row" data-port-cat="web">
-                    <td><span class="port-num-badge">8443</span></td>
-                    <td><strong>HTTPS-Alt</strong></td>
-                    <td>TCP</td>
-                    <td><span class="badge-tag">Web & API</span></td>
-                    <td>RFC 8446</td>
-                    <td>Альтернативный порт HTTPS (панели управления, Kubernetes API сервер, тестовые TLS сервисы).</td>
-                  </tr>
-                </tbody>
+                <tbody><!-- Rendered by initPortLookup() from ports-data.js --></tbody>
               </table>
             </div>
           </div>
+
+          <!-- Card: CLI Troubleshooting Cheat Sheet -->
+          <article class="academic-card card-practice" id="card-cli-troubleshooting">
+            <header class="card-header">
+              <div class="card-title-group">
+                <h3 class="card-title">🛠️ Диагностика в 1 клик: CLI-шпаргалка по сетевому траблшутингу</h3>
+              </div>
+              <span class="card-category-badge">Практика L2–L7</span>
+            </header>
+            <div class="card-body">
+              <div class="beginner-content">
+                <p><strong>На пальцах:</strong> когда «интернет не работает», инженер не гадает, а последовательно проверяет: есть ли IP-адрес → доходит ли сигнал до роутера → отвечает ли DNS → открыт ли нужный порт.</p>
+              </div>
+              <div class="code-block-wrapper">
+                <div class="code-block-header">
+                  <span class="code-lang-tag"><span>🐧</span> Linux (iproute2, ss, tcpdump, mtr, dig)</span>
+                  <button type="button" class="code-copy-btn"><span>📋</span> Копировать</button>
+                </div>
+                <pre><code class="language-bash">ip a                          # Интерфейсы и IP-адреса
+ip r                          # Таблица маршрутизации (default gateway)
+ss -tulpn                     # Открытые порты и процессы (TCP/UDP)
+tcpdump -ni any port 443      # Перехват TLS/HTTPS-трафика в реальном времени
+mtr -rwzbc 20 1.1.1.1         # Комбинация ping + traceroute с потерями по хопам
+dig +trace example.com        # Полная цепочка DNS-резолвинга от корневых серверов</code></pre>
+              </div>
+              <div class="code-block-wrapper">
+                <div class="code-block-header">
+                  <span class="code-lang-tag"><span>🪟</span> Windows (PowerShell &amp; CMD)</span>
+                  <button type="button" class="code-copy-btn"><span>📋</span> Копировать</button>
+                </div>
+                <pre><code class="language-powershell">Test-NetConnection example.com -Port 443   # Проверка TCP-порта и маршрута
+tracert -d 8.8.8.8                         # Трассировка маршрута без обратного DNS
+route print                                # Таблица маршрутизации Windows
+netsh int ipv4 show interfaces             # Список интерфейсов и их MTU</code></pre>
+              </div>
+              <p><strong>Типовые сценарии диагностики:</strong></p>
+              <ul>
+                <li><strong>Нет интернета:</strong> проверь <code>ip a</code> (есть ли IP) → <code>ping &lt;gateway&gt;</code> (работает ли L2/L3 до роутера) → <code>ping 1.1.1.1</code> (есть ли выход наружу) → <code>dig example.com</code> (работает ли DNS).</li>
+                <li><strong>Порт закрыт vs таймаут (REJECT vs DROP):</strong> мгновенный <code>Connection refused</code> = пришёл TCP RST / ICMP Unreachable (порт закрыт, хост жив). Долгий <code>Timed out</code> = пакеты тихо отбрасываются фаерволом (<code>DROP</code>) или теряются по пути.</li>
+                <li><strong>MTU / Blackhole (сайт открывается, но большие файлы/TLS зависают):</strong> проверь <code>ping -M do -s 1472 1.1.1.1</code> (Linux) или <code>ping -f -l 1472 1.1.1.1</code> (Windows) и включи <strong>MSS clamping</strong> на роутере.</li>
+              </ul>
+            </div>
+          </article>
         </section>
 
       </div>
@@ -5246,6 +5134,7 @@ example.com.        86400   IN      RRSIG   A 13 2 86400 20261025000000 20261004
   </button>
 
   <!-- Relative JavaScript link -->
+  <script src="./ports-data.js"></script>
   <script src="./script.js"></script>
 </body>
 

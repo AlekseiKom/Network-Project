@@ -93,7 +93,7 @@ html {
 body {
   min-height: 100vh;
   position: relative;
-  overflow-x: hidden;
+  overflow-x: clip;
   background-color: var(--bg-primary);
 }
 
@@ -225,29 +225,34 @@ body {
 }
 
 /* ==========================================================================
-   BACKGROUND VARIANT: BLUEPRINT (bg-blueprint.svg) — АКТИВЕН
+   BACKGROUND VARIANT: BLUEPRINT (bg-blueprint.svg) — ЗАКОММЕНТИРОВАН
    --------------------------------------------------------------------------
-   Заменяет исходный тёмно-синий ambient-фон на статичную SVG-сцену.
-   Чтобы вернуть исходный анимированный фон — удали или закомментируй этот
-   блок целиком: все оригинальные стили (.ambient-background / .ambient-orb* /
-   .ambient-grid) не тронуты и снова заработают как есть.
+   Чтобы откатиться на статичную SVG-сцену, раскомментируй этот блок
+   и убери/скрой <canvas id="networkBgCanvas"> в index.html.
    ========================================================================== */
+/*
 .ambient-background {
-  /* Запасной цвет на случай, если SVG не загрузится (совпадает с базовым градиентом сцены) */
   background-color: #07122b;
   background-image: url('./bg-blueprint.svg');
   background-repeat: no-repeat;
   background-position: center;
-  /* Масштабируется под любое разрешение без растяжения и пустых зон — десктоп и мобильные */
   background-size: cover;
-  /* Лёгкий blur сохраняет резкость стеклянных блоков, а фон остаётся заметен сквозь них. */
   filter: brightness(1.15) blur(2px);
 }
 
-/* Прячем анимированные орбы и сетку, чтобы не перекрывали собственные свечения/сетку SVG */
 .ambient-orb,
 .ambient-grid {
   display: none;
+}
+*/
+
+.network-bg-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
 }
 
 /* ВАЖНО: .ambient-background имеет z-index:-1 — он рисуется ЗА непрозрачным фоном body
@@ -2580,8 +2585,9 @@ body.pro-mode .beginner-content { display: none; }
 @media (min-width: 1025px) {
   .header-inner {
     display: grid;
-    grid-template-columns: 1fr auto 1fr;
+    grid-template-columns: 1fr auto 1fr auto;
     align-items: center;
+    gap: 16px;
   }
 
   .header-brand {
@@ -2599,4 +2605,207 @@ body.pro-mode .beginner-content { display: none; }
   .header-actions {
     display: none; /* на десктопе содержит только скрытые мобильные кнопки — пустой блок ломал space-between */
   }
+}
+
+/* ================================================================ */
+/* THEME TOGGLE, LIGHT THEME, VLSM/BDP/CLI & PRINT CSS              */
+/* ================================================================ */
+
+.theme-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  border: 1px solid var(--border-subtle, rgba(148, 163, 184, 0.25));
+  background: var(--bg-surface, rgba(15, 23, 42, 0.7));
+  color: var(--text-primary, #e2e8f0);
+  cursor: pointer;
+  transition: transform 0.15s ease, border-color 0.2s ease;
+}
+.theme-toggle-btn:hover { border-color: var(--accent, #38bdf8); transform: translateY(-1px); }
+.theme-icon-sun { display: none; }
+[data-theme="light"] .theme-icon-sun { display: block; color: #d97706; }
+[data-theme="light"] .theme-icon-moon { display: none; }
+
+/* VLSM & Overlap Check */
+.calc-advanced-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+  margin-top: 18px;
+  padding-top: 18px;
+  border-top: 1px solid rgba(148, 163, 184, 0.2);
+}
+.calc-subpanel {
+  background: rgba(15, 23, 42, 0.45);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 12px;
+  padding: 14px;
+}
+.calc-subpanel-title { margin: 0 0 10px; font-size: 0.95rem; }
+.calc-inline-controls, .calc-overlap-inputs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.calc-input-sm, .calc-select-sm {
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  background: rgba(2, 6, 23, 0.7);
+  color: inherit;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.85rem;
+}
+.vlsm-results-list { display: flex; flex-direction: column; gap: 6px; max-height: 220px; overflow-y: auto; }
+.vlsm-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 0.8rem;
+  padding: 6px 8px;
+  border-radius: 6px;
+  background: rgba(30, 41, 59, 0.5);
+}
+.overlap-result-box { padding: 10px; border-radius: 8px; font-size: 0.85rem; }
+.overlap-ok { background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.4); }
+.overlap-bad { background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.4); }
+.overlap-warn { background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.4); }
+
+/* BDP & MTU/MSS Calculator */
+.bdp-calc-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin-top: 12px; }
+.bdp-inputs { display: flex; flex-direction: column; gap: 10px; }
+.bdp-inputs label { display: flex; justify-content: space-between; align-items: center; gap: 10px; font-size: 0.9rem; }
+.bdp-results { display: flex; flex-direction: column; gap: 10px; justify-content: center; }
+.bdp-stat {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: rgba(15, 23, 42, 0.5);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+/* CLI Troubleshooting Grid */
+.cli-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-bottom: 14px; }
+.cli-col h4 { margin: 0 0 8px; }
+
+/* Light Theme */
+[data-theme="light"] {
+  --bg-body: #f1f5f9;
+  --bg-deep: #f8fafc;
+  --bg-surface: rgba(255, 255, 255, 0.92);
+  --bg-surface-hover: #e2e8f0;
+  --text-white: #0f172a;
+  --text-main: #1e293b;
+  --text-dim: #475569;
+  --text-primary: #0f172a;
+  --text-secondary: #334155;
+  --text-muted: #475569;
+  --border-subtle: #cbd5e1;
+  --border-glass: rgba(15, 23, 42, 0.14);
+  --accent: #0284c7;
+  --accent-blue: #2563eb;
+  --accent-cyan: #0284c7;
+}
+[data-theme="light"] body { background: #f1f5f9; color: #0f172a; }
+[data-theme="light"] .site-header,
+[data-theme="light"] .sidebar,
+[data-theme="light"] .academic-card,
+[data-theme="light"] .glass-panel,
+[data-theme="light"] .calc-subpanel,
+[data-theme="light"] .bdp-stat,
+[data-theme="light"] .vlsm-row {
+  background: rgba(255, 255, 255, 0.92);
+  color: #0f172a;
+  border-color: #cbd5e1;
+}
+[data-theme="light"] .search-input,
+[data-theme="light"] .calc-input-sm,
+[data-theme="light"] .calc-select-sm {
+  background: #f8fafc;
+  color: #0f172a;
+  border-color: #94a3b8;
+}
+[data-theme="light"] .search-input::placeholder {
+  color: #64748b;
+}
+[data-theme="light"] .nav-link,
+[data-theme="light"] .mode-switch-btn,
+[data-theme="light"] .theme-toggle-btn {
+  color: #1e293b;
+}
+[data-theme="light"] .theme-toggle-btn {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+}
+[data-theme="light"] pre,
+[data-theme="light"] code {
+  background: #dbeafe;
+  color: #1e3a8a;
+}
+[data-theme="light"] body {
+  background: #eff6ff;
+  color: #0f172a;
+}
+[data-theme="light"] .table-wrapper,
+[data-theme="light"] table {
+  background: #ffffff;
+  border-color: #bfdbfe;
+  color: #0f172a;
+}
+[data-theme="light"] th {
+  background: #dbeafe;
+  color: #1e3a8a;
+  border-bottom: 1px solid #93c5fd;
+}
+[data-theme="light"] td {
+  color: #0f172a;
+  border-bottom-color: #dbeafe;
+}
+[data-theme="light"] tbody tr:nth-child(even) {
+  background: #f0f7ff;
+}
+[data-theme="light"] .callout,
+[data-theme="light"] .diagram-container,
+[data-theme="light"] .code-block,
+[data-theme="light"] .glossary-item,
+[data-theme="light"] .term-card {
+  background: #eff6ff;
+  border-color: #bfdbfe;
+  color: #0f172a;
+}
+[data-theme="light"] .code-block-header,
+[data-theme="light"] .diagram-header {
+  background: #dbeafe;
+  color: #1e3a8a;
+  border-bottom-color: #93c5fd;
+}
+[data-theme="light"] .site-footer {
+  background: linear-gradient(180deg, #eff6ff 0%, #dbeafe 100%);
+  border-top: 1px solid #93c5fd;
+  color: #0f172a;
+}
+[data-theme="light"] .site-footer a {
+  color: #1d4ed8;
+}
+[data-theme="light"] .site-footer p,
+[data-theme="light"] .site-footer li {
+  color: #1e293b;
+}
+
+/* Print CSS */
+@media print {
+  .site-header, .sidebar, .back-to-top, .copy-btn, .theme-toggle-btn, .mode-switch-wrap {
+    display: none !important;
+  }
+  body, .academic-card { background: #ffffff !important; color: #000000 !important; box-shadow: none !important; }
+  .main-layout { display: block !important; }
+  .academic-card { break-inside: avoid; border: 1px solid #ccc !important; }
 }

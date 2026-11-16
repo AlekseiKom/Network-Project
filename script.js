@@ -16,7 +16,12 @@ document.addEventListener('DOMContentLoaded', () => {
   initSvgViewer();
   initCardTools();
   initModeToggle();
+  initThemeToggle();
+  initBdpMssCalculator();
+  initVlsmAndOverlap();
+  initUrlParams();
   initBackToTop();
+  initNetworkBackground();
 });
 
 /* ==========================================================================
@@ -762,8 +767,15 @@ function initCidrCalculator() {
 function initPortLookup() {
   const searchInput = document.getElementById('portLookupSearch');
   const filterBtns = document.querySelectorAll('.port-filter-btn');
-  const tableRows = document.querySelectorAll('.port-data-row');
+  const tbody = document.getElementById('ianaPortsBody');
 
+  if (tbody && Array.isArray(window.IANA_PORTS) && !tbody.querySelector('.port-data-row')) {
+    tbody.innerHTML = window.IANA_PORTS.map(p =>
+      `<tr class="port-data-row" data-port-cat="${p.cat}"><td><code>${p.port}</code></td><td>${p.proto}</td><td><strong>${p.service}</strong></td><td>${p.desc}</td></tr>`
+    ).join('');
+  }
+
+  const tableRows = document.querySelectorAll('.port-data-row');
   if (!searchInput || !tableRows.length) return;
 
   let currentCategory = 'all';
@@ -832,7 +844,15 @@ function initSvgViewer() {
     window.addEventListener('pointercancel', onPointerUp);
     overlay.addEventListener('wheel', onWheel, { passive: false });
     document.addEventListener('keydown', (e) => {
+      if (!overlay.classList.contains('open')) return;
       if (e.key === 'Escape') closeViewer();
+      else if (e.key === '+' || e.key === '=') { e.preventDefault(); zoomAt(window.innerWidth / 2, window.innerHeight / 2, 1.25); }
+      else if (e.key === '-') { e.preventDefault(); zoomAt(window.innerWidth / 2, window.innerHeight / 2, 0.8); }
+      else if (e.key === '0') { e.preventDefault(); resetView(); }
+      else if (e.key === 'ArrowLeft') { e.preventDefault(); tx += 60; applyTransform(); }
+      else if (e.key === 'ArrowRight') { e.preventDefault(); tx -= 60; applyTransform(); }
+      else if (e.key === 'ArrowUp') { e.preventDefault(); ty += 60; applyTransform(); }
+      else if (e.key === 'ArrowDown') { e.preventDefault(); ty -= 60; applyTransform(); }
     });
   }
 
@@ -1142,4 +1162,421 @@ function initModeToggle() {
     const next = document.body.classList.contains('pro-mode') ? 'full' : 'pro';
     applyMode(next, true);
   });
+}
+
+/* ==========================================================================
+   THEME TOGGLE (DARK / LIGHT) & SVG KEYBOARD A11Y
+   ========================================================================== */
+function initThemeToggle() {
+  const btn = document.getElementById('themeToggle');
+  if (btn) {
+    const KEY = 'np-theme';
+    const applyTheme = (theme, persist) => {
+      if (theme === 'light') document.documentElement.setAttribute('data-theme', 'light');
+      else document.documentElement.removeAttribute('data-theme');
+      btn.setAttribute('aria-pressed', String(theme === 'light'));
+      if (persist) { try { localStorage.setItem(KEY, theme); } catch (e) {} }
+    };
+    let stored = null;
+    try { stored = localStorage.getItem(KEY); } catch (e) {}
+    applyTheme(stored === 'light' ? 'light' : 'dark', false);
+    btn.addEventListener('click', () => {
+      const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+      applyTheme(isLight ? 'dark' : 'light', true);
+    });
+  }
+
+  // Keyboard a11y for SVG viewer (+ / - / 0)
+  document.querySelectorAll('.svg-viewer-modal, .svg-zoom-controls').forEach(el => {
+    el.querySelectorAll('button').forEach(b => {
+      if (!b.getAttribute('aria-label') && b.title) b.setAttribute('aria-label', b.title);
+    });
+  });
+  document.addEventListener('keydown', (e) => {
+    const modal = document.querySelector('.svg-viewer-modal.open, .svg-modal.active');
+    if (!modal) return;
+    if (e.key === '+' || e.key === '=') modal.querySelector('[data-zoom="in"], .zoom-in-btn')?.click();
+    if (e.key === '-') modal.querySelector('[data-zoom="out"], .zoom-out-btn')?.click();
+    if (e.key === '0') modal.querySelector('[data-zoom="reset"], .zoom-reset-btn')?.click();
+  });
+}
+
+/* ==========================================================================
+   BDP & MTU/MSS CALCULATOR + URL PARAMS
+   ========================================================================== */
+function initBdpMssCalculator() {
+  const bwEl = document.getElementById('bdpBandwidth');
+  const rttEl = document.getElementById('bdpRtt');
+  const mtuEl = document.getElementById('bdpMtu');
+  const tunEl = document.getElementById('bdpTunnel');
+  const ipVerEl = document.getElementById('bdpIpVer');
+  const outEl = document.getElementById('bdpResults');
+  if (!bwEl || !rttEl || !mtuEl || !tunEl || !ipVerEl || !outEl) return;
+
+  function calc() {
+    const bwMbps = Math.max(0.1, Number(bwEl.value) || 100);
+    const rttMs = Math.max(0.1, Number(rttEl.value) || 40);
+    const baseMtu = Math.max(576, Number(mtuEl.value) || 1500);
+    const tunOverhead = Number(tunEl.value) || 0;
+    const ipHeader = Number(ipVerEl.value) || 20;
+    const bdpBytes = Math.round((bwMbps * 1e6 * (rttMs / 1000)) / 8);
+    const effMtu = baseMtu - tunOverhead;
+    const mss = effMtu - ipHeader - 20;
+    outEl.innerHTML = `
+      <div class="bdp-stat"><span>BDP (TCP Window / RWIN):</span><strong>${bdpBytes.toLocaleString('ru-RU')} байт (${(bdpBytes / 1024).toFixed(1)} КБ)</strong></div>
+      <div class="bdp-stat"><span>Эффективный MTU:</span><strong>${effMtu} байт</strong></div>
+      <div class="bdp-stat"><span>Реальный TCP MSS:</span><strong>${mss} байт</strong></div>
+    `;
+  }
+  [bwEl, rttEl, mtuEl, tunEl, ipVerEl].forEach(el => el.addEventListener('input', calc));
+  calc();
+}
+
+function initUrlParams() {
+  const params = new URLSearchParams(window.location.search);
+  const cidr = params.get('cidr');
+  const q = params.get('q');
+  if (cidr) {
+    const parts = cidr.split('/');
+    const ipEl = document.getElementById('cidrIpInput');
+    const prefEl = document.getElementById('cidrPrefixSelect');
+    if (ipEl && parts[0]) {
+      ipEl.value = parts[0];
+      if (prefEl && parts[1]) prefEl.value = parts[1];
+      ipEl.dispatchEvent(new Event('input', { bubbles: true }));
+      if (prefEl) prefEl.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+  }
+  if (q) {
+    const searchEl = document.getElementById('searchInput') || document.getElementById('portLookupSearch');
+    if (searchEl) {
+      searchEl.value = q;
+      searchEl.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+  }
+}
+
+/* ==========================================================================
+   VLSM / SUBNET SPLITTER, OVERLAP CHECK & EXTENDED ADDRESS SCOPE
+   ========================================================================== */
+function initVlsmAndOverlap() {
+  const ipInput = document.getElementById('cidrIpInput');
+  const prefixSelect = document.getElementById('cidrPrefixSelect');
+  const targetSelect = document.getElementById('vlsmTargetPrefix');
+  const vlsmOut = document.getElementById('vlsmResults');
+  const overlapA = document.getElementById('overlapCidrA');
+  const overlapB = document.getElementById('overlapCidrB');
+  const overlapOut = document.getElementById('overlapResult');
+  const scopeEl = document.getElementById('calcResScope');
+
+  const parseIp = (str) => {
+    const p = String(str || '').trim().split('.');
+    if (p.length !== 4) return null;
+    let n = 0;
+    for (let i = 0; i < 4; i++) {
+      if (!/^\d{1,3}$/.test(p[i])) return null;
+      const v = Number(p[i]);
+      if (v < 0 || v > 255) return null;
+      n = (n * 256) + v;
+    }
+    return n >>> 0;
+  };
+  const intToIp = (n) => [(n >>> 24) & 255, (n >>> 16) & 255, (n >>> 8) & 255, n & 255].join('.');
+  const parseCidr = (str) => {
+    const parts = String(str || '').trim().split('/');
+    if (parts.length !== 2) return null;
+    const ip = parseIp(parts[0]);
+    const prefix = Number(parts[1]);
+    if (ip === null || !Number.isInteger(prefix) || prefix < 0 || prefix > 32) return null;
+    const mask = prefix === 0 ? 0 : (0xFFFFFFFF << (32 - prefix)) >>> 0;
+    const net = (ip & mask) >>> 0;
+    return { ip, prefix, net, bcast: (net | (~mask >>> 0)) >>> 0 };
+  };
+
+  function updateVlsm() {
+    if (!ipInput || !prefixSelect || !targetSelect || !vlsmOut) return;
+    const ip = parseIp(ipInput.value);
+    const basePrefix = Number(prefixSelect.value);
+    if (ip !== null && scopeEl) {
+      const a = (ip >>> 24) & 255, b = (ip >>> 16) & 255;
+      if (a === 100 && b >= 64 && b <= 127) scopeEl.textContent = 'CGNAT (100.64.0.0/10, RFC 6598)';
+      else if (a === 169 && b === 254) scopeEl.textContent = 'Link-Local / APIPA (169.254.0.0/16)';
+      else if (a === 127) scopeEl.textContent = 'Loopback (127.0.0.0/8)';
+      else if (a >= 224 && a <= 239) scopeEl.textContent = 'Multicast (224.0.0.0/4)';
+    }
+    const targetPrefix = Number(targetSelect.value);
+    if (ip === null || targetPrefix <= basePrefix || targetPrefix > 30) {
+      vlsmOut.innerHTML = `<div class="vlsm-empty">Выберите целевой префикс больше текущего (/${basePrefix}) и до /30.</div>`;
+      return;
+    }
+    const count = Math.min(16, Math.pow(2, targetPrefix - basePrefix));
+    const baseMask = basePrefix === 0 ? 0 : (0xFFFFFFFF << (32 - basePrefix)) >>> 0;
+    const baseNet = (ip & baseMask) >>> 0;
+    const step = Math.pow(2, 32 - targetPrefix);
+    let html = '';
+    for (let i = 0; i < count; i++) {
+      const sNet = (baseNet + i * step) >>> 0;
+      const sBcast = (sNet + step - 1) >>> 0;
+      html += `<div class="vlsm-row"><code>${intToIp(sNet)}/${targetPrefix}</code><span>Usable: ${intToIp((sNet + 1) >>> 0)} – ${intToIp((sBcast - 1) >>> 0)}</span><span>Bcast: ${intToIp(sBcast)}</span></div>`;
+    }
+    vlsmOut.innerHTML = html;
+  }
+
+  function updateOverlap() {
+    if (!overlapA || !overlapB || !overlapOut) return;
+    const a = parseCidr(overlapA.value);
+    const b = parseCidr(overlapB.value);
+    if (!a || !b) {
+      overlapOut.textContent = 'Введите две корректные сети в формате CIDR (например, 10.0.0.0/16).';
+      overlapOut.className = 'overlap-result-box overlap-warn';
+      return;
+    }
+    const overlaps = a.net <= b.bcast && b.net <= a.bcast;
+    if (!overlaps) {
+      overlapOut.textContent = `✅ Не пересекаются: ${intToIp(a.net)}/${a.prefix} и ${intToIp(b.net)}/${b.prefix} изолированы.`;
+      overlapOut.className = 'overlap-result-box overlap-ok';
+    } else if (a.net === b.net && a.prefix === b.prefix) {
+      overlapOut.textContent = `⚠️ Идентичные подсети: ${intToIp(a.net)}/${a.prefix}.`;
+      overlapOut.className = 'overlap-result-box overlap-bad';
+    } else if (a.net <= b.net && a.bcast >= b.bcast) {
+      overlapOut.textContent = `⚠️ Пересекаются: ${intToIp(b.net)}/${b.prefix} входит в ${intToIp(a.net)}/${a.prefix}.`;
+      overlapOut.className = 'overlap-result-box overlap-bad';
+    } else {
+      overlapOut.textContent = `⚠️ Пересекаются: ${intToIp(a.net)}/${a.prefix} входит в ${intToIp(b.net)}/${b.prefix}.`;
+      overlapOut.className = 'overlap-result-box overlap-bad';
+    }
+  }
+
+  if (ipInput) ipInput.addEventListener('input', updateVlsm);
+  if (prefixSelect) prefixSelect.addEventListener('change', updateVlsm);
+  if (targetSelect) targetSelect.addEventListener('change', updateVlsm);
+  if (overlapA) overlapA.addEventListener('input', updateOverlap);
+  if (overlapB) overlapB.addEventListener('input', updateOverlap);
+  updateVlsm();
+  updateOverlap();
+}
+
+/* ==========================================================================
+   NETWORK TOPOLOGY BACKGROUND (Canvas: роутеры с пульсацией + пакеты по проводам)
+   Чтобы откатиться на статичный blueprint, закомментируй вызов initNetworkBackground()
+   и раскомментируй блок BACKGROUND VARIANT: BLUEPRINT в style.css.
+   ========================================================================== */
+function initNetworkBackground() {
+  const canvas = document.getElementById('networkBgCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return;
+
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let width = 0;
+  let height = 0;
+  let dpr = 1;
+  let nodes = [];
+  let edges = [];
+  let packets = [];
+  let rafId = null;
+  let lastTime = 0;
+
+  function buildTopology() {
+    const isDesktop = width >= 1024;
+    const isMobile = width < 640;
+
+    const routerCoords = isMobile
+      ? [
+          { x: 0.25, y: 0.28 },
+          { x: 0.76, y: 0.68 }
+        ]
+      : [
+          { x: 0.16, y: 0.26 },
+          { x: 0.52, y: 0.48 },
+          { x: 0.84, y: 0.28 },
+          { x: 0.24, y: 0.78 },
+          { x: 0.78, y: 0.76 }
+        ];
+
+    nodes = [];
+    edges = [];
+    packets = [];
+
+    routerCoords.forEach((rc, idx) => {
+      nodes.push({
+        x: rc.x * width,
+        y: rc.y * height,
+        type: 'router',
+        radius: isDesktop ? 7 : 5.5,
+        pulsePhase: idx * 1.35
+      });
+    });
+
+    for (let i = 0; i < routerCoords.length; i++) {
+      for (let j = i + 1; j < routerCoords.length; j++) {
+        const dx = nodes[i].x - nodes[j].x;
+        const dy = nodes[i].y - nodes[j].y;
+        if (Math.hypot(dx, dy) < Math.max(width, height) * 0.62) {
+          edges.push({ a: i, b: j, backbone: true });
+        }
+      }
+    }
+
+    const satellitesPerRouter = isMobile ? 3 : isDesktop ? 5 : 4;
+    const routerCount = nodes.length;
+    for (let r = 0; r < routerCount; r++) {
+      const router = nodes[r];
+      for (let s = 0; s < satellitesPerRouter; s++) {
+        const angle = (Math.PI * 2 * s) / satellitesPerRouter + r * 0.55 + (Math.random() - 0.5) * 0.35;
+        const dist = (isMobile ? 95 : 130) + Math.random() * (isDesktop ? 130 : 75);
+        const nx = Math.max(24, Math.min(width - 24, router.x + Math.cos(angle) * dist));
+        const ny = Math.max(24, Math.min(height - 24, router.y + Math.sin(angle) * dist));
+        const nodeIdx = nodes.length;
+        nodes.push({
+          x: nx,
+          y: ny,
+          type: 'host',
+          radius: isDesktop ? 3.2 : 2.6,
+          pulsePhase: Math.random() * Math.PI * 2
+        });
+        edges.push({ a: r, b: nodeIdx, backbone: false });
+      }
+    }
+
+    const packetCount = isMobile ? 14 : isDesktop ? 36 : 22;
+    for (let i = 0; i < packetCount; i++) {
+      const edge = edges[Math.floor(Math.random() * edges.length)];
+      if (!edge) continue;
+      packets.push({
+        edge,
+        t: Math.random(),
+        dir: Math.random() > 0.5 ? 1 : -1,
+        speed: (edge.backbone ? 0.16 : 0.24) + Math.random() * 0.22,
+        size: edge.backbone ? 2.8 : 2.1
+      });
+    }
+  }
+  function resize() {
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    width = window.innerWidth;
+    height = window.innerHeight;
+    canvas.width = Math.floor(width * dpr);
+    canvas.height = Math.floor(height * dpr);
+    canvas.style.width = `${width}px`;
+    canvas.style.height = `${height}px`;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    buildTopology();
+    if (prefersReducedMotion) render(0);
+  }
+
+  function render(now) {
+    const dt = lastTime ? Math.min(0.05, (now - lastTime) / 1000) : 0.016;
+    lastTime = now;
+    const timeSec = now * 0.001;
+    const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+
+    ctx.clearRect(0, 0, width, height);
+
+    const wireColor = isLight ? 'rgba(37, 99, 235, 0.14)' : 'rgba(59, 130, 246, 0.16)';
+    const backboneColor = isLight ? 'rgba(37, 99, 235, 0.24)' : 'rgba(96, 165, 250, 0.26)';
+    const hostColor = isLight ? 'rgba(37, 99, 235, 0.35)' : 'rgba(96, 165, 250, 0.45)';
+    const routerCore = isLight ? 'rgba(37, 99, 235, 0.72)' : 'rgba(96, 165, 250, 0.85)';
+    const routerRing = isLight ? 'rgba(59, 130, 246, ' : 'rgba(56, 189, 248, ';
+    const packetColor = isLight ? 'rgba(37, 99, 235, 0.9)' : 'rgba(125, 211, 252, 0.95)';
+    const packetGlow = isLight ? 'rgba(59, 130, 246, 0.35)' : 'rgba(56, 189, 248, 0.45)';
+
+    for (let i = 0; i < edges.length; i++) {
+      const e = edges[i];
+      const na = nodes[e.a];
+      const nb = nodes[e.b];
+      ctx.beginPath();
+      ctx.moveTo(na.x, na.y);
+      ctx.lineTo(nb.x, nb.y);
+      ctx.strokeStyle = e.backbone ? backboneColor : wireColor;
+      ctx.lineWidth = e.backbone ? 1.4 : 1;
+      ctx.stroke();
+    }
+
+    for (let i = 0; i < nodes.length; i++) {
+      const n = nodes[i];
+      if (n.type === 'router') {
+        const pulse = (timeSec * 0.55 + n.pulsePhase) % 1;
+        const ringRadius = n.radius + pulse * 28;
+        const ringAlpha = (1 - pulse) * 0.42;
+
+        ctx.beginPath();
+        ctx.arc(n.x, n.y, ringRadius, 0, Math.PI * 2);
+        ctx.strokeStyle = `${routerRing}${ringAlpha.toFixed(3)})`;
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.arc(n.x, n.y, n.radius + 5, 0, Math.PI * 2);
+        ctx.fillStyle = isLight ? 'rgba(59, 130, 246, 0.14)' : 'rgba(59, 130, 246, 0.2)';
+        ctx.fill();
+
+        ctx.beginPath();
+        ctx.arc(n.x, n.y, n.radius, 0, Math.PI * 2);
+        ctx.fillStyle = routerCore;
+        ctx.fill();
+      } else {
+        ctx.beginPath();
+        ctx.arc(n.x, n.y, n.radius, 0, Math.PI * 2);
+        ctx.fillStyle = hostColor;
+        ctx.fill();
+      }
+    }
+
+    if (!prefersReducedMotion) {
+      for (let i = 0; i < packets.length; i++) {
+        const p = packets[i];
+        p.t += p.dir * p.speed * dt;
+        if (p.t > 1 || p.t < 0) {
+          p.edge = edges[Math.floor(Math.random() * edges.length)] || p.edge;
+          p.dir = Math.random() > 0.5 ? 1 : -1;
+          p.t = p.dir > 0 ? 0 : 1;
+        }
+
+        const na = nodes[p.edge.a];
+        const nb = nodes[p.edge.b];
+        const px = na.x + (nb.x - na.x) * p.t;
+        const py = na.y + (nb.y - na.y) * p.t;
+
+        const tailT = Math.max(0, Math.min(1, p.t - p.dir * 0.08));
+        const tx = na.x + (nb.x - na.x) * tailT;
+        const ty = na.y + (nb.y - na.y) * tailT;
+
+        ctx.beginPath();
+        ctx.moveTo(tx, ty);
+        ctx.lineTo(px, py);
+        ctx.strokeStyle = packetGlow;
+        ctx.lineWidth = p.size * 1.4;
+        ctx.lineCap = 'round';
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.arc(px, py, p.size, 0, Math.PI * 2);
+        ctx.fillStyle = packetColor;
+        ctx.fill();
+      }
+    }
+
+    if (!prefersReducedMotion && document.visibilityState !== 'hidden') {
+      rafId = requestAnimationFrame(render);
+    }
+  }
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') {
+      if (rafId) {
+        cancelAnimationFrame(rafId);
+        rafId = null;
+      }
+    } else if (!prefersReducedMotion && !rafId) {
+      lastTime = performance.now();
+      rafId = requestAnimationFrame(render);
+    }
+  });
+
+  window.addEventListener('resize', resize);
+  resize();
+  if (!prefersReducedMotion) {
+    rafId = requestAnimationFrame(render);
+  }
 }
