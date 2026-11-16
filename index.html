@@ -280,12 +280,8 @@
           <div class="hero-glow-blob"></div>
           <div class="hero-badges">
             <span class="badge-tag badge-tag-edition">🎓 Academic Computer Science</span>
-            <span class="badge-tag"
-              style="background: rgba(168, 85, 247, 0.15); border: 1px solid rgba(168, 85, 247, 0.3); color: #d8b4fe;">⚡
-              RFC Standards</span>
-            <span class="badge-tag"
-              style="background: rgba(6, 182, 212, 0.15); border: 1px solid rgba(6, 182, 212, 0.3); color: #67e8f9;">🔬
-              Deep Inspection</span>
+            <span class="badge-tag badge-tag-protocol">⚡ RFC Standards</span>
+            <span class="badge-tag badge-tag-inspection">🔬 Deep Inspection</span>
           </div>
 
           <h1 class="hero-title">
@@ -318,7 +314,7 @@
         <!-- Search Empty State -->
         <div id="noResultsPanel" class="no-results-panel">
           <div class="no-results-icon">🔍</div>
-          <h3 style="color: #fff; margin-bottom: 8px;">Ничего не найдено</h3>
+          <h3>Ничего не найдено</h3>
           <p style="color: var(--text-muted); font-size: 0.9rem;">Попробуйте изменить поисковый запрос (например: TCP,
             ARP, CIDR, TLS, Sockets).</p>
         </div>
@@ -591,7 +587,7 @@
                   соединения и не требует TCP. (Раздел 03)</li>
                 <li><strong>Запечатывание (TLS handshake).</strong> Стороны проверяют сертификат сервера и
                   договариваются о ключах шифрования — дальше всё летит в «запечатанном конверте». (Раздел 05)</li>
-                <li style="color: #67e8f9;"><strong>⚡ Современный вариант (QUIC / HTTP/3):</strong> Если сервер и клиент поддерживают HTTP/3, QUIC объединяет установление транспорта и TLS 1.3: обычно приложение может начать обмен после 1 RTT; при возобновлении сессии возможна отправка 0-RTT-данных с ограничениями против повторного воспроизведения.</li>
+                <li class="journey-quic-step"><strong>⚡ Современный вариант (QUIC / HTTP/3):</strong> Если сервер и клиент поддерживают HTTP/3, QUIC объединяет установление транспорта и TLS 1.3: обычно приложение может начать обмен после 1 RTT; при возобновлении сессии возможна отправка 0-RTT-данных с ограничениями против повторного воспроизведения.</li>
                 <li><strong>Запрос страницы (HTTP).</strong> Внутри зашифрованного канала клиент шлёт
                   <code>GET / HTTP/1.1</code> (или фреймы HTTP/2 / HTTP/3), сервер отвечает HTML-кодом, картинками и стилями.
                   (Раздел 06)</li>
@@ -700,7 +696,7 @@
 
               <details class="academic-accordion" id="journey-step-quic">
                 <summary class="accordion-summary">
-                  <div class="accordion-title-box"><span style="color:#67e8f9;">⚡</span><span>Современный путь: HTTP/3 + QUIC over UDP (1-RTT / 0-RTT)</span></div>
+                  <div class="accordion-title-box"><span class="accent-cyan">⚡</span><span>Современный путь: HTTP/3 + QUIC over UDP (1-RTT / 0-RTT)</span></div>
                   <svg class="accordion-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <polyline points="6 9 12 15 18 9"></polyline>
                   </svg>
@@ -842,7 +838,7 @@
               Физические среды передачи данных (L1), эталонная модель OSI vs гибридный стек TCP/IP, кодирование
               сигналов, архитектура коммутации Ethernet II и механизмы разрешения адресов ARP.
             </p>
-            <div style="margin-top:14px; padding:12px 16px; background:rgba(6,182,212,0.08); border:1px solid rgba(6,182,212,0.25); border-radius:10px; font-size:0.88rem; color:#67e8f9;">
+            <div class="model-note">
               <strong>📐 О модели, используемой в этом справочнике:</strong> навигация использует нумерацию L1–L7 из 7-уровневой модели OSI, однако протоколы разбираются по гибридной <strong>5-уровневой модели</strong> (Physical → Data Link → Network → Transport → Application), принятой в стеке TCP/IP и учебнике Куроуза–Росса. Уровни 5 (Session) и 6 (Presentation) модели OSI объединены в Application layer. Это стандартная практика в современной инженерной литературе.
             </div>
           </div>
@@ -2510,9 +2506,9 @@ Paths: (2 available, best #1)
                     <li><strong>9. Lowest BGP Router-ID:</strong> Тай-брейкер: наименьший IP-идентификатор маршрутизатора-соседа.</li>
                   </ol>
 
-                  <div style="margin-top:14px; padding:12px 16px; background:rgba(239,68,68,0.08); border:1px solid rgba(239,68,68,0.3); border-radius:8px;">
-                    <strong style="color:#f87171;">🛡️ BGP Hijacking и защита RPKI / ROA:</strong>
-                    <p style="margin:6px 0 0; font-size:0.9rem; color:#fca5a5;">
+                  <div class="security-callout">
+                    <strong class="security-callout-title">🛡️ BGP Hijacking и защита RPKI / ROA:</strong>
+                    <p class="security-callout-text">
                       BGP исторически не имеет аутентификации: роутер безоговорочно верит тому, что ему анонсирует сосед. Известны случаи, когда ошибки конфигурации или атаки перехватывали трафик целых стран (например, перехват трафика YouTube через Пакистан в 2008 г., перехват префиксов Amazon DNS для кражи криптовалюты в 2018 г.).<br>
                       <strong>Решение: RPKI (Resource Public Key Infrastructure)</strong>. Владельцы префиксов публикуют криптографически подписанные сертификаты <strong>ROA (Route Origin Authorization)</strong> в RIR (RIPE, ARIN, APNIC). Роутеры проверяют валидность пары {Префикс, ASN} и автоматически отбрасывают <code>RPKI Invalid</code> анонсы.
                     </p>
@@ -2611,7 +2607,7 @@ show ip bgp 1.1.1.0/24               # Детальный разбор пути 
 
               <div class="calc-field" style="flex: 2; min-width: 220px;">
                 <label for="cidrPrefixSlider">
-                  Ползунок префикса: <strong id="cidrSliderLabel" style="color: #67e8f9;">/24</strong>
+                  Ползунок префикса: <strong id="cidrSliderLabel" class="cidr-slider-label">/24</strong>
                 </label>
                 <input type="range" id="cidrPrefixSlider" class="calc-range-slider" min="0" max="32" value="24">
               </div>
@@ -5054,8 +5050,7 @@ netsh int ipv4 show interfaces             # Список интерфейсов
             инженеров, архитекторов и исследователей на базе классических трудов Computer Science.
           </p>
           <div style="margin-top: 16px;">
-            <span class="badge-tag"
-              style="background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.3); color: #93c5fd;">
+            <span class="badge-tag footer-edition-badge">
               Single Page Application • GitHub Pages Ready
             </span>
           </div>
