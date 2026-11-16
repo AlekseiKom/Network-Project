@@ -2774,7 +2774,15 @@ body.pro-mode .beginner-content { display: none; }
   --accent-blue: #2563eb;
   --accent-cyan: #0284c7;
 }
-[data-theme="light"] body { background: #f1f5f9; color: #0f172a; }
+[data-theme="light"] body {
+  background: transparent;
+  color: #0f172a;
+}
+
+/* Light theme ambient background – similar visual to dark */
+[data-theme="light"] .ambient-background {
+  background: radial-gradient(circle at 50% 25%, #152d5a 0%, #0d1e3d 50%, #0a1428 100%);
+}
 [data-theme="light"] .site-header,
 [data-theme="light"] .sidebar,
 [data-theme="light"] .academic-card,
@@ -2787,6 +2795,11 @@ body.pro-mode .beginner-content { display: none; }
   border-color: #bfd6ed;
 }
 [data-theme="light"] .brand-title {
+  color: var(--text-main);
+  background: none;
+  -webkit-background-clip: unset;
+  -webkit-text-fill-color: unset;
+}
   background: linear-gradient(90deg, #123b68 60%, #2563eb 100%);
   -webkit-text-fill-color: transparent;
 }
@@ -2795,6 +2808,10 @@ body.pro-mode .beginner-content { display: none; }
   -webkit-text-fill-color: #315d85;
 }
 [data-theme="light"] .hero-title .gradient-text {
+  background: linear-gradient(110deg, #60a5fa 20%, #c084fc 80%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
   background: linear-gradient(110deg, #1d4ed8 20%, #6d28d9 80%);
 }
 [data-theme="light"] .hero-meta-row {
