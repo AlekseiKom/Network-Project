@@ -2779,18 +2779,36 @@ body.pro-mode .beginner-content { display: none; }
   color: #0f172a;
 }
 
-/* Light theme ambient background – similar visual to dark */
+/* Light theme ambient background – crisp light blueprint canvas */
 [data-theme="light"] .ambient-background {
-  background: radial-gradient(circle at 50% 25%, #152d5a 0%, #0d1e3d 50%, #0a1428 100%);
+  background-color: #f4f8ff;
+  background-image:
+    radial-gradient(ellipse 65% 55% at 16% 18%, rgba(59, 130, 246, 0.14), transparent 58%),
+    radial-gradient(ellipse 60% 50% at 84% 78%, rgba(139, 92, 246, 0.10), transparent 58%),
+    radial-gradient(ellipse 50% 45% at 50% 45%, rgba(56, 189, 248, 0.09), transparent 65%),
+    linear-gradient(155deg, #ffffff 0%, #edf4ff 52%, #f4f8ff 100%);
+}
+[data-theme="light"] .ambient-orb {
+  opacity: 0.32;
+}
+[data-theme="light"] .ambient-grid {
+  opacity: 0.35;
+  background-image:
+    linear-gradient(to right, rgba(37, 99, 235, 0.07) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(37, 99, 235, 0.07) 1px, transparent 1px);
 }
 [data-theme="light"] .site-header,
-[data-theme="light"] .sidebar,
+[data-theme="light"] .sidebar {
+  background: rgba(255, 255, 255, 0.78);
+  color: #0f172a;
+  border-color: #bfd6ed;
+}
 [data-theme="light"] .academic-card,
 [data-theme="light"] .glass-panel,
 [data-theme="light"] .calc-subpanel,
 [data-theme="light"] .bdp-stat,
 [data-theme="light"] .vlsm-row {
-  background: rgba(255, 255, 255, 0.92);
+  background: rgba(255, 255, 255, 0.62);
   color: #0f172a;
   border-color: #bfd6ed;
 }
