@@ -1473,13 +1473,13 @@ function initNetworkBackground() {
 
     ctx.clearRect(0, 0, width, height);
 
-    const wireColor = isLight ? 'rgba(37, 99, 235, 0.22)' : 'rgba(59, 130, 246, 0.16)';
-    const backboneColor = isLight ? 'rgba(29, 78, 216, 0.34)' : 'rgba(96, 165, 250, 0.26)';
-    const hostColor = isLight ? 'rgba(37, 99, 235, 0.55)' : 'rgba(96, 165, 250, 0.45)';
+    const wireColor = isLight ? 'rgba(29, 78, 216, 0.34)' : 'rgba(59, 130, 246, 0.16)';
+    const backboneColor = isLight ? 'rgba(29, 78, 216, 0.52)' : 'rgba(96, 165, 250, 0.26)';
+    const hostColor = isLight ? 'rgba(29, 78, 216, 0.72)' : 'rgba(96, 165, 250, 0.45)';
     const routerCore = isLight ? 'rgba(29, 78, 216, 0.85)' : 'rgba(96, 165, 250, 0.85)';
     const routerRing = isLight ? 'rgba(37, 99, 235, ' : 'rgba(56, 189, 248, ';
     const packetColor = isLight ? 'rgba(29, 78, 216, 0.95)' : 'rgba(125, 211, 252, 0.95)';
-    const packetGlow = isLight ? 'rgba(37, 99, 235, 0.45)' : 'rgba(56, 189, 248, 0.45)';
+    const packetGlow = isLight ? 'rgba(29, 78, 216, 0.62)' : 'rgba(56, 189, 248, 0.45)';
 
     for (let i = 0; i < edges.length; i++) {
       const e = edges[i];
@@ -1502,13 +1502,14 @@ function initNetworkBackground() {
 
         ctx.beginPath();
         ctx.arc(n.x, n.y, ringRadius, 0, Math.PI * 2);
-        ctx.strokeStyle = `${routerRing}${ringAlpha.toFixed(3)})`;
+        const visibleRingAlpha = isLight ? Math.min(0.78, ringAlpha * 1.65) : ringAlpha;
+        ctx.strokeStyle = `${routerRing}${visibleRingAlpha.toFixed(3)})`;
         ctx.lineWidth = 1.5;
         ctx.stroke();
 
         ctx.beginPath();
         ctx.arc(n.x, n.y, n.radius + 5, 0, Math.PI * 2);
-        ctx.fillStyle = isLight ? 'rgba(59, 130, 246, 0.14)' : 'rgba(59, 130, 246, 0.2)';
+        ctx.fillStyle = isLight ? 'rgba(37, 99, 235, 0.24)' : 'rgba(59, 130, 246, 0.2)';
         ctx.fill();
 
         ctx.beginPath();

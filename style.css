@@ -1661,11 +1661,12 @@ table.academic-table tr:hover td {
 @media (max-width: 640px) {
   .header-inner {
     padding: 0 12px;
-    gap: 12px;
+    gap: 8px;
   }
 
   .header-brand {
-    gap: 10px;
+    gap: 8px;
+    min-width: 0;
   }
 
   .brand-icon-wrapper {
@@ -1681,6 +1682,19 @@ table.academic-table tr:hover td {
   .brand-subtitle {
     font-size: 0.64rem;
     letter-spacing: 0.03em;
+  }
+
+  .mode-switch-btn,
+  .theme-toggle-btn,
+  .mobile-search-btn,
+  .mobile-menu-btn {
+    width: 36px;
+    min-width: 36px;
+    height: 36px;
+  }
+
+  .header-actions {
+    gap: 8px;
   }
 
   .badge-tag-edition {
@@ -1853,6 +1867,16 @@ table.academic-table tr:hover td {
 
   .tool-card .calc-binary-code {
     overflow-wrap: anywhere;
+  }
+}
+
+@media (max-width: 380px) {
+  .brand-subtitle {
+    display: none;
+  }
+
+  .header-inner {
+    gap: 6px;
   }
 }
 
