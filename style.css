@@ -688,7 +688,7 @@ body.menu-open {
 .main-content {
   flex: 1;
   min-width: 0;
-  padding: 32px 36px 80px 24px; /* left = 24px — тот же ритм, что между карточками (.academic-card margin-bottom) */
+  padding: 32px 36px 32px 24px; /* нижний отступ совпадает с отступом панели: последняя карточка и сайдбар заканчиваются вместе */
   overflow-y: visible;
 }
 
@@ -778,6 +778,16 @@ body.menu-open {
 .academic-section {
   margin-bottom: 56px;
   scroll-margin-top: 96px;
+}
+
+@media (min-width: 1025px) {
+  .content-container > .academic-section:last-child {
+    margin-bottom: 0;
+  }
+
+  .content-container > .academic-section:last-child > :last-child {
+    margin-bottom: 0;
+  }
 }
 
 .section-header {
@@ -2667,6 +2677,7 @@ body.pro-mode .beginner-content { display: none; }
     grid-template-columns: 1fr auto 1fr auto;
     align-items: center;
     gap: 16px;
+    padding-right: 36px; /* край правой кнопки совпадает с краем карточек контента */
   }
 
   .header-brand {
@@ -3102,7 +3113,7 @@ body.pro-mode .beginner-content { display: none; }
   color: #174a7e;
 }
 [data-theme="light"] body {
-  background: #eff6ff;
+  background: transparent;
   color: #0f172a;
 }
 [data-theme="light"] .table-wrapper,

@@ -58,10 +58,10 @@ function initLiveSearch() {
     { term: 'ACK', title: 'Флаг ACK (Acknowledgment)', category: 'Флаг TCP', badgeClass: 'badge-tcp', targetId: 'sec-l4', desc: 'Подтверждение получения байтов (поле Acknowledgment Number).' },
     { term: 'FIN', title: 'Флаг FIN (Finish)', category: 'Флаг TCP', badgeClass: 'badge-tcp', targetId: 'sec-l4', desc: 'Инициация корректного закрытия TCP-соединения (4-Way Close).' },
     { term: 'RST', title: 'Флаг RST (Reset)', category: 'Флаг TCP', badgeClass: 'badge-tcp', targetId: 'sec-l4', desc: 'Аварийный немедленный сброс соединения при ошибке или атаке.' },
-    { term: 'PSH', title: 'Флаг PSH (Push)', category: 'Флаг TCP', badgeClass: 'badge-tcp', targetId: 'sec-l4', desc: 'Требование немедленно выдать данные приложению без ожидания буфера.' },
+    { term: 'PSH', title: 'Флаг PSH (Push)', category: 'Флаг TCP', badgeClass: 'badge-tcp', targetId: 'sec-l4', desc: 'Push-флаг: приложение просит передать накопленные данные без лишней задержки; он не означает немедленную отправку каждого сегмента.' },
     { term: 'URG', title: 'Флаг URG (Urgent)', category: 'Флаг TCP', badgeClass: 'badge-tcp', targetId: 'sec-l4', desc: 'Указатель на срочные внеполосные данные (Urgent Pointer).' },
-    { term: 'ECE', title: 'Флаг ECE (ECN-Echo)', category: 'Флаг TCP', badgeClass: 'badge-tcp', targetId: 'sec-l4', desc: 'Явное уведомление от роутера о возникновении затора в канале.' },
-    { term: 'CWR', title: 'Флаг CWR (Congestion Window Reduced)', category: 'Флаг TCP', badgeClass: 'badge-tcp', targetId: 'sec-l4', desc: 'Подтверждение отправителя об уменьшении окна cwnd.' },
+    { term: 'ECE', title: 'Флаг ECE (ECN-Echo)', category: 'Флаг TCP', badgeClass: 'badge-tcp', targetId: 'sec-l4', desc: 'ECN-обратная связь о перегрузке; также участвует в согласовании ECN при установке соединения.' },
+    { term: 'CWR', title: 'Флаг CWR (Congestion Window Reduced)', category: 'Флаг TCP', badgeClass: 'badge-tcp', targetId: 'sec-l4', desc: 'Отправитель сообщает, что отреагировал на ECN-сигнал и уменьшил окно перегрузки.' },
 
     // DNS Records
     { term: 'A', title: 'DNS Запись A (IPv4 Address)', category: 'Запись DNS', badgeClass: 'badge-dns', targetId: 'sec-app', desc: 'Преобразует доменное имя в 32-битный IPv4-адрес.' },
@@ -228,7 +228,7 @@ function initLiveSearch() {
             category: categoryBadge ? categoryBadge.textContent.trim() : 'Раздел',
             badgeClass: 'badge-term',
             targetId: card.id || card.closest('section')?.id,
-            desc: card.querySelector('p')?.textContent.substring(0, 110) + '...' || ''
+            desc: card.querySelector('p')?.textContent.trim().slice(0, 110) || ''
           });
         }
       }
@@ -318,36 +318,86 @@ function initLiveSearch() {
    3. SCROLLSPY (SIDEBAR ACTIVE HIGHLIGHT)
    ========================================================================== */
 function initScrollSpy() {
-  const sections = document.querySelectorAll('.academic-section, .tool-card[id], #sec-footer');
-  const navLinks = document.querySelectorAll('.sidebar-nav-link');
+  const sidebar = document.getElementById('sidebar');
+  const targets = Array.from(document.querySelectorAll('.sidebar-nav-link'))
+    .map(link => ({ link, target: document.getElementById(link.hash.slice(1)) }))
+    .filter(item => item.target);
 
-  if (!sections.length || !navLinks.length) return;
+  if (!sidebar || !targets.length) return;
 
-  const observerOptions = {
-    root: null,
-    rootMargin: '-20% 0px -70% 0px',
-    threshold: 0
-  };
+  let activeLink = null;
+  let clickedLink = null;
+  let framePending = false;
 
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        const id = entry.target.getAttribute('id');
-        navLinks.forEach(link => {
-          const href = link.getAttribute('href');
-          if (href === `#${id}`) {
-            link.classList.add('active');
-            // Ensure visible in sidebar viewport
-            link.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-          } else {
-            link.classList.remove('active');
-          }
-        });
+  function setActiveLink(link) {
+    if (!link || link === activeLink) return;
+    activeLink = link;
+    targets.forEach(item => item.link.classList.toggle('active', item.link === activeLink));
+
+    // Reveal the active item inside the sidebar without scrolling the document.
+    const sidebarRect = sidebar.getBoundingClientRect();
+    const linkRect = activeLink.getBoundingClientRect();
+    if (linkRect.top < sidebarRect.top) {
+      sidebar.scrollBy({ top: linkRect.top - sidebarRect.top - 8, behavior: 'smooth' });
+    } else if (linkRect.bottom > sidebarRect.bottom) {
+      sidebar.scrollBy({ top: linkRect.bottom - sidebarRect.bottom + 8, behavior: 'smooth' });
+    }
+  }
+
+  function releaseClickedLink() {
+    if (!clickedLink) return;
+    clickedLink = null;
+    scheduleUpdate();
+  }
+
+  targets.forEach(({ link }) => link.addEventListener('click', () => {
+    clickedLink = link;
+    setActiveLink(link);
+  }));
+  window.addEventListener('pointerdown', releaseClickedLink, { passive: true });
+  window.addEventListener('wheel', releaseClickedLink, { passive: true });
+  window.addEventListener('touchstart', releaseClickedLink, { passive: true });
+  window.addEventListener('keydown', e => {
+    if (!['ArrowDown', 'ArrowUp', 'PageDown', 'PageUp', 'Home', 'End', ' '].includes(e.key)) return;
+    if (/INPUT|TEXTAREA|SELECT/.test(document.activeElement?.tagName || '')) return;
+    releaseClickedLink();
+  });
+
+  function updateActiveLink() {
+    framePending = false;
+    if (clickedLink) return;
+    const header = document.getElementById('siteHeader');
+    const activationLine = (header?.getBoundingClientRect().bottom || 0) + 32;
+    let current = null;
+    let currentTop = -Infinity;
+
+    targets.forEach(item => {
+      const top = item.target.getBoundingClientRect().top;
+      if (top <= activationLine && top > currentTop) {
+        current = item;
+        currentTop = top;
       }
     });
-  }, observerOptions);
 
-  sections.forEach(section => observer.observe(section));
+    if (!current) {
+      current = targets.reduce((first, item) => (
+        item.target.getBoundingClientRect().top < first.target.getBoundingClientRect().top ? item : first
+      ));
+    }
+
+    if (!current || current.link === activeLink) return;
+    setActiveLink(current.link);
+  }
+
+  function scheduleUpdate() {
+    if (framePending) return;
+    framePending = true;
+    requestAnimationFrame(updateActiveLink);
+  }
+
+  window.addEventListener('scroll', scheduleUpdate, { passive: true });
+  window.addEventListener('resize', scheduleUpdate);
+  scheduleUpdate();
 }
 
 /* ==========================================================================

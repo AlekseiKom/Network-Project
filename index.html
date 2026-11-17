@@ -242,7 +242,7 @@
             </a>
           </li>
           <li>
-            <a href="#sec-debug" class="sidebar-nav-link">
+            <a href="#card-cli-troubleshooting" class="sidebar-nav-link">
               <span class="sidebar-icon">🔬</span>
               <span>Troubleshooting & Deep Inspection</span>
               <span class="sidebar-number">10</span>
@@ -1888,7 +1888,7 @@ Internet Protocol Version 4, Src: 10.100.1.25, Dst: 10.100.1.1</code></pre>
           </article>
 
           <!-- Card 2.2: Algorithms - CIDR & Longest Prefix Match -->
-          <article class="academic-card card-algo">
+          <article id="sec-kernel" class="academic-card card-algo">
             <header class="card-header">
               <div class="card-title-group">
                 <h3 class="card-title">⚙️ Под капотом: CIDR, маски подсетей и алгоритм Longest Prefix Match</h3>
@@ -2027,7 +2027,7 @@ Broadcast:      11000000.10101000.00001010.10111111  -> 192.168.10.191
           </article>
 
           <!-- Card 2.4: NAT / PAT (RFC 3022) & RFC 1918 Private Ranges -->
-          <article class="academic-card card-theory">
+          <article id="sec-pivot" class="academic-card card-theory">
             <header class="card-header">
               <div class="card-title-group">
                 <h3 class="card-title">🛡️ Трансляция адресов NAT / PAT (RFC 3022) и приватные сети RFC 1918</h3>
@@ -2310,7 +2310,7 @@ rdisc6 eth0</code></pre>
           </article>
 
           <!-- Card 2.5: Dynamic Routing Protocols - OSPF (IGP) vs BGP (EGP) -->
-          <article class="academic-card card-algo">
+          <article id="sec-enterprise" class="academic-card card-algo">
             <header class="card-header">
               <div class="card-title-group">
                 <h3 class="card-title">🧭 Динамическая маршрутизация: OSPF (IGP) vs BGP-4 (EGP)</h3>
@@ -3125,9 +3125,12 @@ show ip bgp 1.1.1.0/24               # Детальный разбор пути 
               <p>
                 <strong>Значение контрольных флагов TCP:</strong>
                 <code>SYN</code> (Синхронизация номеров ISN), <code>ACK</code> (Подтверждение получения),
-                <code>FIN</code> (Инициация корректного закрытия), <code>RST</code> (Аварийный сброс соединения при
-                ошибке или атаке), <code>PSH</code> (Немедленная передача данных приложению без ожидания заполнения
-                буфера), <code>URG</code> (Указатель на срочные данные), <code>ECE/CWR</code> (Явное уведомление о перегрузке Explicit Congestion Notification).
+                <code>FIN</code> (Инициация корректного закрытия), <code>RST</code> (Сброс соединения),
+                <code>PSH</code> (Флаг Push: приложение просит передать накопленные данные без лишней задержки; это не
+                команда немедленно отправить каждый сегмент), <code>URG</code> (Указатель на срочные данные, когда
+                установлен URG), <code>ECE</code> (ECN-обратная связь о перегрузке и согласование ECN при установке
+                соединения), <code>CWR</code> (отправитель сообщает, что отреагировал на ECN и уменьшил окно
+                перегрузки).
               </p>
             </div>
           </article>
@@ -4026,11 +4029,14 @@ ssize_t bytes_read = <span class="tok-fn">read</span>(client_fd, buffer, <span c
 
               <p>
                 <strong>Эволюция высокопроизводительного I/O:</strong>
-                Классическая модель <em>Thread-per-Connection</em> не масштабируется на 100,000+ одновременных
-                подключений (проблема C10K). Вызов <code>select()</code> ограничен 1024 дескрипторами и имеет
-                вычислительную сложность <code>O(N)</code> на каждой итерации. Высокопроизводительные движки
-                (Nginx, Envoy, Node.js) традиционно использовали <strong>epoll (Linux, <code>O(1)</code>)</strong> и <strong>kqueue
-                  (BSD/macOS)</strong>. Однако в 2020-х годах архитектурный предел масштабирования был преодолён новым интерфейсом ядра Linux — <strong>io_uring</strong> (раздел ниже).
+                Классическая модель <em>Thread-per-Connection</em> может упираться в расходы на потоки при десятках
+                тысяч одновременных подключений (проблема C10K). <code>select()</code> повторно проверяет набор
+                дескрипторов и обычно ограничен размером <code>fd_set</code> (часто 1024 в Linux/glibc); <code>poll()</code>
+                тоже просматривает переданный набор. Linux <strong>epoll</strong> и BSD/macOS <strong>kqueue</strong>
+                отслеживают готовые события и лучше масштабируются при большом числе наблюдаемых дескрипторов, но
+                постоянная сложность <code>O(1)</code> не гарантируется для любой операции и нагрузки. Современный
+                Linux также предлагает <strong>io_uring</strong> — интерфейс очередей асинхронного ввода-вывода, который
+                может сократить накладные расходы в подходящих сценариях; выигрыш зависит от приложения и нагрузки.
               </p>
             </div>
           </article>
@@ -4045,12 +4051,16 @@ ssize_t bytes_read = <span class="tok-fn">read</span>(client_fd, buffer, <span c
             </header>
             <div class="card-body">
               <p>
-                В классических серверах с <code>epoll</code> на каждый сетевой пакет расходуются системные вызовы:
-                сначала <code>epoll_wait()</code> сообщает о готовности дескриптора (<em>Readiness Notification</em>), затем процесс вызывает <code>read()</code> или <code>write()</code>.
-                На скоростях 10–100 Гбит/с и миллионах IOPS переключения контекста пользователь/ядро (Ring 3 ↔ Ring 0) и сбросы кешей CPU становятся главным узким местом системы.
+                В классической readiness-модели приложение ждёт готовность дескриптора через
+                <code>epoll_wait()</code>, затем выполняет <code>read()</code> или <code>write()</code>. Число вызовов
+                зависит от реализации цикла событий и характера нагрузки. При высокой интенсивности I/O накладные
+                расходы на системные вызовы, переключения контекста и копирование данных могут стать заметной частью
+                общей стоимости обработки.
               </p>
               <p>
-                В 2019 году в ядре Linux 5.1 появился <strong>io_uring</strong> (автор Jens Axboe) — подлинный асинхронный интерфейс на основе модели <em>Completion Notification</em> (уведомление о завершении), кардинально изменивший высоконагруженный сетевой стек.
+                В Linux 5.1 (2019) появился <strong>io_uring</strong> — интерфейс очередей запросов и завершений
+                (<em>Completion Notification</em>). Он может сократить накладные расходы в подходящих сценариях, но
+                результат зависит от типа операций, реализации и нагрузки.
               </p>
 
               <!-- COMPARISON TABLE: select vs poll vs epoll vs io_uring -->
@@ -4068,10 +4078,10 @@ ssize_t bytes_read = <span class="tok-fn">read</span>(client_fd, buffer, <span c
                   <tbody>
                     <tr>
                       <td><strong>Сложность проверки</strong></td>
-                      <td><code>O(N)</code></td>
-                      <td><code>O(N)</code></td>
-                      <td><code>O(1)</code></td>
-                      <td><code>O(1)</code> (Lock-free Ring)</td>
+                      <td><code>O(N)</code> — просмотр набора</td>
+                      <td><code>O(N)</code> — просмотр набора</td>
+                      <td>Возвращает готовые события; стоимость зависит от числа событий и операций с набором</td>
+                      <td>Зависит от операций и режима; общая очередь сама по себе не делает обработку <code>O(1)</code></td>
                     </tr>
                     <tr>
                       <td><strong>Модель I/O</strong></td>
@@ -4082,17 +4092,17 @@ ssize_t bytes_read = <span class="tok-fn">read</span>(client_fd, buffer, <span c
                     </tr>
                     <tr>
                       <td><strong>Лимит дескрипторов</strong></td>
-                      <td>1024 (FD_SETSIZE)</td>
-                      <td>Не ограничен</td>
-                      <td>Не ограничен (память ядра)</td>
-                      <td>Не ограничен + регистрируемые FD</td>
+                      <td>Размером <code>fd_set</code>; в Linux/glibc часто 1024</td>
+                      <td>Нет фиксированного лимита API; действуют системные ограничения ресурсов</td>
+                      <td>Нет фиксированного лимита API; действуют лимиты памяти и ресурсов ядра</td>
+                      <td>Размер колец и системные ограничения ресурсов</td>
                     </tr>
                     <tr>
                       <td><strong>Системные вызовы на I/O</strong></td>
                       <td>Syscall на вызов + <code>read/write</code></td>
                       <td>Syscall на вызов + <code>read/write</code></td>
                       <td>Syscall на <code>epoll_wait</code> + <code>read/write</code></td>
-                      <td><strong>0 вызовов</strong> в режиме SQPOLL!</td>
+                      <td>SQPOLL может сократить вызовы при подаче запросов; настройка и ожидание завершений всё ещё могут требовать системных вызовов</td>
                     </tr>
                     <tr>
                       <td><strong>Общая память (Shared Memory)</strong></td>
